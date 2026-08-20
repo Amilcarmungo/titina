@@ -7,6 +7,7 @@ import { actions, useStore } from "@/lib/store";
 import { Minus, Plus, Trash2, ShoppingCart, Check, Store as StoreIcon, Sparkles } from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
 import { ProductCard } from "@/components/ProductCard";
+import { quoteShipping } from "@/lib/logistics-store";
 
 
 export const Route = createFileRoute("/cart")({
@@ -83,6 +84,8 @@ function CartPage() {
 
   const selected = items.filter((i) => i.selected);
   const subtotal = selected.reduce((s, i) => s + (i.unitPrice ?? i.product.price) * i.qty, 0);
+  const shipping = quoteShipping(subtotal);
+  const estimatedTotal = subtotal + (shipping?.chargedFee ?? 0);
   const allSelected = items.length > 0 && selected.length === items.length;
 
   return (
@@ -173,8 +176,9 @@ function CartPage() {
 
           <div className="mx-3 mt-2 space-y-2 rounded-2xl bg-card p-4 text-sm shadow-[var(--shadow-card)]">
             <div className="flex justify-between"><span className="text-muted-foreground">Itens seleccionados</span><span>{selected.length}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span>Grátis</span></div>
-            <div className="flex justify-between border-t border-border pt-2 text-base font-black"><span>Total</span><span className="text-sale">{formatKz(subtotal)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Frete estimado</span><span className={shipping?.isFree ? "font-bold text-emerald-700" : ""}>{shipping?.isFree ? "Grátis" : formatKz(shipping?.chargedFee ?? 0)}</span></div>
+            <p className="text-[11px] text-muted-foreground">O valor final é confirmado depois de escolher a entrega e informar o endereço.</p>
+            <div className="flex justify-between border-t border-border pt-2 text-base font-black"><span>Total estimado</span><span className="text-sale">{formatKz(estimatedTotal)}</span></div>
           </div>
 
           <Recommendations
@@ -189,7 +193,7 @@ function CartPage() {
               <Checkbox checked={allSelected} onChange={() => actions.setAllSelected(!allSelected)} label="Seleccionar tudo" />
               <div className="min-w-0">
                 <div className="text-[11px] text-muted-foreground">Total</div>
-                <div className="truncate font-black text-sale">{formatKz(subtotal)}</div>
+                <div className="truncate font-black text-sale">{formatKz(estimatedTotal)}</div>
               </div>
               {selected.length === 0 ? (
                 <span className="ml-auto rounded-full bg-muted px-8 py-3 text-center text-sm font-bold text-muted-foreground">Continuar (0)</span>

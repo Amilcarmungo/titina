@@ -188,6 +188,9 @@ function OrderCard({ order, onReview }: { order: Order; onReview: () => void }) 
           <div className="ml-auto text-right">
             <p className="text-[11px] text-muted-foreground">{totalItems} {totalItems === 1 ? "item" : "itens"}</p>
             <p className="mt-0.5 text-sm font-black">{formatKz(order.total)}</p>
+            <p className={`mt-0.5 text-[11px] font-semibold ${order.shipping?.isFree ? "text-emerald-700" : "text-muted-foreground"}`}>
+              {order.shipping?.isFree ? "Frete grátis" : `Frete ${formatKz(order.shipping?.chargedFee ?? 0)}`}
+            </p>
           </div>
         </div>
 

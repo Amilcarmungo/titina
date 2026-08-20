@@ -8,6 +8,7 @@ import { orderActions } from "@/lib/orders-store";
 import { usePaymentMethods } from "@/lib/payments-store";
 import { newOrderCode, setPendingPayment } from "@/lib/pending-payment";
 import { validateCoupon, type Coupon } from "@/lib/coupons-store";
+import { quoteShipping, shippingOptions, useShippingSettings } from "@/lib/logistics-store";
 import { listAddresses, saveAddress, saveCheckoutDraft, clearCheckoutDraft } from "@/lib/firebase/user-data";
 import { emptyAddress, readCachedAddress, writeCachedAddress } from "@/lib/address-cache";
 import { sendAppEmail } from "@/lib/email/send";
@@ -79,6 +80,10 @@ function CheckoutPage() {
   const [step, setStep] = useState(() => (cached?.name && cached.street && cached.city && cached.cep ? 2 : 1));
   // Endereço guardado no dispositivo → nova compra já vem preenchida.
   const [address, setAddress] = useState<Address>(() => cached ?? emptyAddress);
+  const [carrierId, setCarrierId] = useState<string | undefined>();
+  const shippingSettings = useShippingSettings();
+  const shippingOptionsForOrder = shippingOptions(subtotal, address);
+  const shipping = quoteShipping(subtotal, carrierId, address);
 
 
   const methods = usePaymentMethods().filter((m) => m.active);
@@ -92,7 +97,7 @@ function CheckoutPage() {
   const [coupon, setCoupon] = useState<Coupon | null>(null);
   const [couponError, setCouponError] = useState("");
   const discount = coupon ? Math.min(coupon.type === "percent" ? (subtotal * coupon.value) / 100 : coupon.value, subtotal) : 0;
-  const total = Math.max(subtotal - discount, 0);
+  const total = Math.max(subtotal - discount + (shipping?.chargedFee ?? 0), 0);
 
   const applyCoupon = () => {
     const res = validateCoupon(couponCode, subtotal);
@@ -144,6 +149,7 @@ function CheckoutPage() {
         address,
         paymentMethod: payment,
         coupon: coupon?.code ?? null,
+        shipping,
       });
     }, 800);
     return () => clearTimeout(t);
@@ -162,6 +168,9 @@ function CheckoutPage() {
     const orderId = orderActions.add({
       status: "processing",
       items: items.map((i) => ({ productId: i.id, qty: i.qty, size: i.size, color: i.color, unitPrice: i.unitPrice ?? i.product.price, image: i.image ?? i.product.image })),
+      subtotal,
+      discount,
+      shipping: shipping ? { ...shipping } : undefined,
       total,
       customer: user?.email || address.name,
       paymentMethod: payment ?? undefined,
@@ -321,11 +330,36 @@ function CheckoutPage() {
                     </div>
                   </div>
                   <div className="mt-3 border-t border-border pt-2 text-sm">
-                    <p className="font-bold">Envio: Frete grátis</p>
-                    <p className="text-muted-foreground">Entrega: 12 de agosto</p>
+                    <p className="font-bold">Envio: {shipping?.isFree ? "Frete grátis" : formatKz(shipping?.chargedFee ?? 0)}</p>
+                    <p className="text-muted-foreground">{shipping?.carrierName ?? "Escolha uma opção de entrega"} · {shipping?.etaText ?? "Prazo a confirmar"}</p>
                   </div>
                 </section>
               ))}
+
+              <section className="rounded-xl bg-card p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="font-bold">Opção de entrega</h2>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      {shippingSettings.freeShippingEnabled ? `Frete grátis em compras a partir de ${formatKz(shippingSettings.freeShippingThreshold)}.` : "Escolha a forma de entrega para ver o custo."}
+                    </p>
+                  </div>
+                  <MapPin className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div className="mt-3 space-y-2">
+                  {shippingOptionsForOrder.map((option) => (
+                    <button key={option.carrierId} onClick={() => setCarrierId(option.carrierId)}
+                      className={`flex w-full items-center justify-between rounded-lg border p-3 text-left ${shipping?.carrierId === option.carrierId ? "border-foreground bg-muted/50" : "border-border"}`}>
+                      <span className="min-w-0">
+                        <span className="block text-sm font-bold">{option.carrierName}</span>
+                        <span className="block text-[11px] text-muted-foreground">{option.zoneName ? `${option.zoneName} · ` : ""}{option.etaText}</span>
+                      </span>
+                      <span className={`shrink-0 text-sm font-black ${option.isFree ? "text-emerald-700" : "text-sale"}`}>{option.isFree ? "Grátis" : formatKz(option.chargedFee)}</span>
+                    </button>
+                  ))}
+                  {shippingOptionsForOrder.length === 0 && <p className="text-xs text-muted-foreground">Não há opções de entrega ativas. Contacte o suporte.</p>}
+                </div>
+              </section>
 
               <section className="rounded-xl bg-card p-4 shadow-sm text-sm">
                 <h2 className="font-bold">Resumo</h2>
@@ -362,7 +396,7 @@ function CheckoutPage() {
                 {discount > 0 && (
                   <div className="mt-2 flex justify-between text-emerald-700"><span>Desconto</span><span>-{formatKz(discount)}</span></div>
                 )}
-                <div className="mt-2 flex justify-between"><span>Frete</span><span>grátis</span></div>
+                <div className="mt-2 flex justify-between"><span>Frete</span><span className={shipping?.isFree ? "font-bold text-emerald-700" : ""}>{shipping?.isFree ? "Grátis" : formatKz(shipping?.chargedFee ?? 0)}</span></div>
                 <div className="mt-2 flex justify-between text-base font-bold"><span>Total</span><span className="text-sale">{formatKz(total)}</span></div>
                 <p className="mt-4 text-[11px] text-muted-foreground">
                   Ao clicar "Fazer o pedido", eu afirmo que li e estou de acordo{" "}
@@ -441,7 +475,7 @@ function CheckoutPage() {
             <h3 className="font-bold">Resumo</h3>
             <div className="mt-3 space-y-2 text-sm">
               <div className="flex justify-between"><span className="text-muted-foreground">Itens ({items.length})</span><span>{formatKz(subtotal)}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span>grátis</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Frete</span><span>{shipping?.isFree ? "Grátis" : formatKz(shipping?.chargedFee ?? 0)}</span></div>
               <div className="flex justify-between border-t border-border pt-2 text-base font-bold"><span>Total</span><span className="text-sale">{formatKz(total)}</span></div>
             </div>
           </div>
@@ -473,6 +507,9 @@ function CheckoutPage() {
                   code,
                   methodId: payment,
                   total,
+                    subtotal,
+                    discount,
+                    shipping: shipping ?? undefined,
                   items: items.map((i) => ({ productId: i.id, name: i.product.name, qty: i.qty, size: i.size, color: i.color, unitPrice: i.unitPrice ?? i.product.price, image: i.image ?? i.product.image })),
                   customer: user?.email || address.name,
                   shippingAddress: {

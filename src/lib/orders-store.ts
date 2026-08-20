@@ -3,6 +3,7 @@ import { useSyncExternalStore } from "react";
 import { getAnyProduct } from "@/lib/products-store";
 import { getShop } from "@/lib/shops-store";
 import { notificationActions } from "@/lib/notifications-store";
+import type { ShippingQuote } from "@/lib/logistics-store";
 
 export type OrderStatus = "unpaid" | "processing" | "shipped" | "review" | "returns";
 
@@ -67,6 +68,9 @@ export type Order = {
   items: OrderItem[];
   packages?: OrderPackage[];
   total: number;
+  subtotal?: number;
+  discount?: number;
+  shipping?: ShippingQuote;
   eta?: string;
   customer?: string;
   paymentMethod?: string;

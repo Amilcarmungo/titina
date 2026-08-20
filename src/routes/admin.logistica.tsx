@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Plus, Trash2, Pencil, Truck, Bike, Store as StoreIcon, MapPin, RotateCcw, Power } from "lucide-react";
-import { useCarriers, carrierActions, CARRIER_LABEL, splitFreight, PLATFORM_FEE, type Carrier, type CarrierType, type Zone } from "@/lib/logistics-store";
+import { useCarriers, useShippingSettings, carrierActions, shippingActions, CARRIER_LABEL, splitFreight, PLATFORM_FEE, type Carrier, type CarrierType, type Zone } from "@/lib/logistics-store";
 import { formatKz } from "@/lib/format";
 import { AdminModal, AdminField, AdminInput } from "@/components/admin/AdminModal";
 
@@ -21,6 +21,7 @@ const ICON: Record<CarrierType, typeof Truck> = { transportadora: Truck, moto: B
 
 function LogisticsPage() {
   const carriers = useCarriers();
+  const shippingSettings = useShippingSettings();
   const [modal, setModal] = useState<Draft | null>(null);
   const [simKm, setSimKm] = useState(8);
 
@@ -52,7 +53,7 @@ function LogisticsPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => { carrierActions.reset(); toast.success("Restaurado"); }}
+          <button onClick={() => { carrierActions.reset(); shippingActions.reset(); toast.success("Restaurado"); }}
             className="inline-flex items-center gap-1.5 rounded-full border border-border px-4 py-2 text-xs font-bold hover:bg-muted">
             <RotateCcw className="h-3.5 w-3.5" /> Restaurar padrão
           </button>
@@ -74,6 +75,24 @@ function LogisticsPage() {
         <div className="rounded-2xl border border-border bg-gradient-to-br from-orange-500/10 to-pink-500/5 p-4">
           <p className="text-[11px] font-bold uppercase text-muted-foreground">Comissão no frete</p>
           <p className="text-2xl font-black">{Math.round(PLATFORM_FEE * 100)}%</p>
+        </div>
+      </div>
+
+      <div className="rounded-2xl bg-background p-5 shadow-[var(--shadow-card)]">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-black">Política de frete grátis</h2>
+            <p className="mt-1 text-[11px] text-muted-foreground">A regra é aplicada automaticamente no carrinho e no checkout.</p>
+          </div>
+          <label className="flex items-center gap-2 text-xs font-bold">
+            <input type="checkbox" checked={shippingSettings.freeShippingEnabled} onChange={(e) => shippingActions.update({ freeShippingEnabled: e.target.checked })} className="h-4 w-4 accent-foreground" />
+            Ativar frete grátis
+          </label>
+        </div>
+        <div className="mt-4 max-w-xs">
+          <AdminField label="Compra mínima (Kz)">
+            <AdminInput type="number" min={0} value={shippingSettings.freeShippingThreshold} onChange={(e) => shippingActions.update({ freeShippingThreshold: Number(e.target.value) })} />
+          </AdminField>
         </div>
       </div>
 

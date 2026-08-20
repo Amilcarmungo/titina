@@ -1,3 +1,5 @@
+import type { ShippingQuote } from "@/lib/logistics-store";
+
 export type PendingItem = {
   productId: string;
   name: string;
@@ -11,6 +13,9 @@ export type PendingPayment = {
   code: string;
   methodId: string;
   total: number;
+  subtotal?: number;
+  discount?: number;
+  shipping?: ShippingQuote;
   items: PendingItem[];
   customer?: string;
   shippingAddress?: {

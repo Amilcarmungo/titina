@@ -72,8 +72,9 @@ function invoiceCard(order: Order, items: InvoiceItem[], logo: string) {
       <tbody>${rows}</tbody>
     </table>
     <div class="totals">
-      <div><span>Subtotal</span><span>${formatKz(order.total)}</span></div>
-      <div><span>Entrega</span><span>Grátis</span></div>
+      <div><span>Subtotal</span><span>${formatKz(order.subtotal ?? order.total)}</span></div>
+      ${order.discount ? `<div><span>Desconto</span><span>-${formatKz(order.discount)}</span></div>` : ""}
+      <div><span>Entrega</span><span>${order.shipping?.isFree ? "Grátis" : formatKz(order.shipping?.chargedFee ?? 0)}</span></div>
       <div class="grand"><span>Total</span><span>${formatKz(order.total)}</span></div>
     </div>
     <footer>
@@ -385,7 +386,11 @@ function OrderDetail({ order, onClose }: { order: Order; onClose: () => void }) 
 
               </div>
               <div className="mt-3 flex justify-between border-t border-border pt-3">
-                <span className="text-sm font-bold">Total</span>
+                <div className="text-sm">
+                  <p><span className="text-muted-foreground">Subtotal:</span> {formatKz(order.subtotal ?? order.total)}</p>
+                  <p><span className="text-muted-foreground">Frete:</span> {order.shipping?.isFree ? <span className="font-bold text-emerald-700">Grátis</span> : formatKz(order.shipping?.chargedFee ?? 0)}</p>
+                  <p className="mt-1 font-bold">Total</p>
+                </div>
                 <span className="text-lg font-black text-sale">{formatKz(order.total)}</span>
               </div>
             </div>
@@ -396,6 +401,7 @@ function OrderDetail({ order, onClose }: { order: Order; onClose: () => void }) 
                 <div className="space-y-1.5 text-sm">
                   <p><span className="text-muted-foreground">Método:</span> <span className="font-bold">{order.paymentMethod ?? "—"}</span></p>
                   <p><span className="text-muted-foreground">Valor:</span> <span className="font-bold text-sale">{formatKz(order.total)}</span></p>
+                  <p><span className="text-muted-foreground">Frete:</span> {order.shipping?.isFree ? <span className="font-bold text-emerald-700">Grátis</span> : formatKz(order.shipping?.chargedFee ?? 0)}</p>
                   <p className={`inline-flex items-center gap-1.5 text-xs font-bold ${order.paymentProof ? "text-emerald-700" : "text-amber-700"}`}>
                     <ShieldCheck className="h-3.5 w-3.5" />
                     {order.paymentProof ? "Comprovante anexado" : "Sem comprovante"}

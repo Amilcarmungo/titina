@@ -22,7 +22,29 @@ export type Carrier = {
   createdAt: string;
 };
 
+export type ShippingSettings = {
+  freeShippingEnabled: boolean;
+  freeShippingThreshold: number;
+};
+
+export type ShippingQuote = {
+  carrierId: string;
+  carrierName: string;
+  carrierType: CarrierType;
+  fee: number;
+  chargedFee: number;
+  isFree: boolean;
+  etaText: string;
+  zoneName?: string;
+};
+
 const KEY = "shop_logistics_v1";
+const SETTINGS_KEY = "shop_shipping_settings_v1";
+
+const defaultSettings: ShippingSettings = {
+  freeShippingEnabled: true,
+  freeShippingThreshold: 120000,
+};
 
 const defaults: Carrier[] = [
   {
@@ -85,6 +107,13 @@ function read(): Carrier[] {
 }
 
 let list: Carrier[] = read();
+let settings: ShippingSettings = (() => {
+  if (typeof window === "undefined") return defaultSettings;
+  try {
+    const raw = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "");
+    return { ...defaultSettings, ...(raw && typeof raw === "object" ? raw : {}) };
+  } catch { return defaultSettings; }
+})();
 const listeners = new Set<() => void>();
 function emit() {
   if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(list));
@@ -107,6 +136,14 @@ export function useCarriers(): Carrier[] {
   );
 }
 
+export function useShippingSettings(): ShippingSettings {
+  return useSyncExternalStore(
+    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    () => settings,
+    () => defaultSettings,
+  );
+}
+
 export const carrierActions = {
   add(c: Omit<Carrier, "id" | "createdAt">) {
     const id = `lg-${Date.now()}`;
@@ -124,6 +161,43 @@ export const carrierActions = {
   },
   reset() { list = defaults; emit(); },
 };
+
+export const shippingActions = {
+  update(patch: Partial<ShippingSettings>) {
+    settings = { ...settings, ...patch, freeShippingThreshold: Math.max(0, Number(patch.freeShippingThreshold ?? settings.freeShippingThreshold)) };
+    if (typeof window !== "undefined") localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    listeners.forEach((l) => l());
+  },
+  reset() {
+    settings = defaultSettings;
+    if (typeof window !== "undefined") localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    listeners.forEach((l) => l());
+  },
+};
+
+export function shippingOptions(subtotal: number, address?: { city?: string; state?: string }): ShippingQuote[] {
+  const query = `${address?.city ?? ""} ${address?.state ?? ""}`.toLocaleLowerCase();
+  return list.filter((carrier) => carrier.active).map((carrier) => {
+    const zone = carrier.zones.find((item) => query.includes(item.name.toLocaleLowerCase()));
+    const fee = zone?.fee ?? carrier.baseFee;
+    const isFree = carrier.type === "retirada" || (settings.freeShippingEnabled && subtotal >= settings.freeShippingThreshold);
+    return {
+      carrierId: carrier.id,
+      carrierName: carrier.name,
+      carrierType: carrier.type,
+      fee,
+      chargedFee: isFree ? 0 : fee,
+      isFree,
+      etaText: zone?.etaText ?? carrier.etaText ?? "A combinar",
+      ...(zone ? { zoneName: zone.name } : {}),
+    };
+  });
+}
+
+export function quoteShipping(subtotal: number, carrierId?: string, address?: { city?: string; state?: string }): ShippingQuote | null {
+  const options = shippingOptions(subtotal, address);
+  return options.find((option) => option.carrierId === carrierId) ?? options[0] ?? null;
+}
 
 export const CARRIER_LABEL: Record<CarrierType, string> = {
   transportadora: "Transportadora",
