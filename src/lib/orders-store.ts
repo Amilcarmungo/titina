@@ -254,13 +254,18 @@ export function registerOrdersBridge(
  */
 export function mergeRemoteOrders(remote: Order[]) {
   const allowed = staffMode ? remote : remote.filter((o) => o.uid === ownerUid);
-  const ids = new Set(allowed.map((o) => o.id));
+  const restored = allowed.map((order) => ({
+    ...order,
+    // Pedidos antigos podem não ter packages; cria apenas nesse caso.
+    packages: order.packages?.length ? order.packages : buildPackages(order),
+  }));
+  const ids = new Set(restored.map((o) => o.id));
   const stillPending = orders.filter(
     (o) =>
       pending.has(o.id) && !ids.has(o.id) && (staffMode || o.uid === ownerUid),
   );
-  allowed.forEach((o) => pending.delete(o.id));
-  orders = [...stillPending, ...allowed];
+  restored.forEach((o) => pending.delete(o.id));
+  orders = [...stillPending, ...restored];
   emit();
 }
 

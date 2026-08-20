@@ -24,6 +24,16 @@ import {
 
 let registered = false;
 
+function withoutUndefined(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(withoutUndefined);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .filter(([, entry]) => entry !== undefined)
+      .map(([key, entry]) => [key, withoutUndefined(entry)]),
+  );
+}
+
 export function initOrdersBridge() {
   if (registered) return;
   registered = true;
@@ -32,11 +42,17 @@ export function initOrdersBridge() {
       const db = getDb();
       const uid = getFirebaseAuth()?.currentUser?.uid;
       if (!db || !uid) return;
+      const payload = withoutUndefined({
+        ...order,
+        uid: order.uid ?? uid,
+      }) as Record<string, unknown>;
       void setDoc(
         doc(db, "orders", order.id),
-        { ...order, uid: order.uid ?? uid, updatedAt: serverTimestamp() },
+        { ...payload, updatedAt: serverTimestamp() },
         { merge: true },
-      ).catch(() => {});
+      ).catch((error) => {
+        console.error("Não foi possível guardar o estado do pedido:", error);
+      });
     },
     (id) => {
       const db = getDb();
