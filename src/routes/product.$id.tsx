@@ -47,20 +47,24 @@ export const Route = createFileRoute("/product/$id")({
     if (!loaderData) {
       return {
         meta: [{ title: `Produto — ${SITE_NAME}` }],
-        links: [{ rel: "canonical", href: path }],
+        links: [{ rel: "canonical", href: absoluteUrl(path) }],
       };
     }
     const url = productUrl(params.id);
     const image = absoluteUrl(loaderData.image);
     const price = loaderData.price;
-    const desc = (
-      loaderData.description || `${loaderData.name} na ${SITE_NAME}.`
-    ).slice(0, 155);
+    const desc =
+      (loaderData.description || `${loaderData.name} na ${SITE_NAME}.`)
+        .replace(/\s+/g, " ")
+        .trim()
+        .slice(0, 155)
+        .replace(/\s+\S*$/, "") + "…";
     return {
       meta: [
         { title: `${loaderData.name} — ${SITE_NAME}` },
         { name: "description", content: desc },
         { property: "og:site_name", content: SITE_NAME },
+        { property: "og:locale", content: "pt_PT" },
         { property: "og:type", content: "product" },
         { property: "og:title", content: loaderData.name },
         { property: "og:description", content: desc },
@@ -73,8 +77,9 @@ export const Route = createFileRoute("/product/$id")({
         { name: "twitter:title", content: loaderData.name },
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: image },
+        { name: "twitter:image:alt", content: loaderData.name },
       ],
-      links: [{ rel: "canonical", href: path }],
+      links: [{ rel: "canonical", href: url }],
       scripts: [
         {
           type: "application/ld+json",
@@ -398,7 +403,7 @@ function ProductPage() {
                   const target = {
                     url: productUrl(product.id),
                     title: product.name,
-                    text: `Veja ${product.name} na Bazarixy`,
+                    text: `${product.description || `Veja ${product.name}`} na Bazarixy`,
                     image: mainImage,
                   };
                   if (!(await nativeShare(target))) setShareOpen(true);
@@ -686,7 +691,7 @@ function ProductPage() {
         target={{
           url: productUrl(product.id),
           title: product.name,
-          text: `Veja ${product.name} na Bazarixy`,
+          text: `${product.description || `Veja ${product.name}`} na Bazarixy`,
           image: mainImage,
         }}
       />
