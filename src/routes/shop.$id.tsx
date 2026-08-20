@@ -14,7 +14,14 @@ import {
 } from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
 import { ShareSheet, nativeShare } from "@/components/ShareSheet";
-import { absoluteUrl, paths, shopUrl, SITE_NAME } from "@/lib/site";
+import {
+  absoluteUrl,
+  paths,
+  seoDescription,
+  shareText,
+  shopUrl,
+  SITE_NAME,
+} from "@/lib/site";
 import { toggleFollow, useFollowedShops } from "@/lib/firebase/follows";
 import { useStore } from "@/lib/store";
 import { requireAuth } from "@/lib/auth-guard";
@@ -22,13 +29,14 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/shop/$id")({
-  loader: ({ params }) => ({ id: params.id }),
-  head: ({ params }) => {
-    const shop = getShop(params.id);
+  loader: ({ params }) => ({ id: params.id, shop: getShop(params.id) }),
+  head: ({ params, loaderData }) => {
+    const shop = loaderData.shop;
     const name = shop?.name ?? "Loja";
-    const desc = (
-      shop?.description ?? `Descubra a loja ${name} na ${SITE_NAME}.`
-    ).slice(0, 155);
+    const desc = seoDescription(
+      shop?.description,
+      `Descubra a loja ${name} na ${SITE_NAME}.`,
+    );
     const image = absoluteUrl(shop?.cover || shop?.logo || "/favicon.ico");
     return {
       meta: [
@@ -38,14 +46,31 @@ export const Route = createFileRoute("/shop/$id")({
         { property: "og:title", content: `${name} — ${SITE_NAME}` },
         { property: "og:description", content: desc },
         { property: "og:type", content: "website" },
+        { property: "og:locale", content: "pt_PT" },
         { property: "og:url", content: shopUrl(params.id) },
         { property: "og:image", content: image },
+        { property: "og:image:alt", content: name },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: `${name} — ${SITE_NAME}` },
         { name: "twitter:description", content: desc },
         { name: "twitter:image", content: image },
+        { name: "twitter:image:alt", content: name },
       ],
-      links: [{ rel: "canonical", href: paths.shop(params.id) }],
+      links: [{ rel: "canonical", href: shopUrl(params.id) }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Store",
+            name,
+            description: desc,
+            image,
+            url: shopUrl(params.id),
+            brand: { "@type": "Brand", name: SITE_NAME },
+          }),
+        },
+      ],
     };
   },
   component: ShopPage,
@@ -57,9 +82,9 @@ export const Route = createFileRoute("/shop/$id")({
 });
 
 function ShopPage() {
-  const { id } = Route.useLoaderData();
+  const { id, shop: loadedShop } = Route.useLoaderData();
   useShops(); // subscribe so live edits refresh
-  const shop = getShop(id);
+  const shop = loadedShop ?? getShop(id);
   const { user } = useStore();
   const followed = useFollowedShops();
   const [shareOpen, setShareOpen] = useState(false);
@@ -88,7 +113,11 @@ function ShopPage() {
         target={{
           url: shopUrl(id),
           title: shop.name,
-          text: `Veja a loja ${shop.name} na Bazarixy`,
+          text: shareText(
+            shop.name,
+            shop.description,
+            "Descubra esta loja na Bazarixy",
+          ),
           image: shop.logo || shop.cover,
         }}
       />
@@ -112,7 +141,11 @@ function ShopPage() {
                 const target = {
                   url: shopUrl(id),
                   title: shop.name,
-                  text: `Veja a loja ${shop.name} na Bazarixy`,
+                  text: shareText(
+                    shop.name,
+                    shop.description,
+                    "Descubra esta loja na Bazarixy",
+                  ),
                   image: shop.logo || shop.cover,
                 };
                 if (!(await nativeShare(target))) setShareOpen(true);

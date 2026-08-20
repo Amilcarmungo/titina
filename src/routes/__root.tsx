@@ -13,6 +13,7 @@ import { Toaster } from "sonner";
 import appCss from "../styles.css?url";
 import { FirebaseAuthSync } from "../components/FirebaseAuthSync";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { absoluteUrl, SITE_NAME, SITE_URL } from "../lib/site";
 
 function NotFoundComponent() {
   return (
@@ -83,22 +84,49 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       meta: [
         { charSet: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { title: "Bazarixy — Compre online em Angola" },
+        { title: "Bazarixy — Marketplace online em Angola" },
         {
           name: "description",
-          content: "Descubra produtos e compre online na Bazarixy.",
+          content:
+            "Compre produtos de lojas angolanas na Bazarixy: moda, beleza, casa e muito mais, com preços especiais e entrega em Angola.",
         },
-        { name: "author", content: "Bazarixy" },
-        { property: "og:site_name", content: "Bazarixy" },
-        { property: "og:title", content: "Bazarixy — Compre online em Angola" },
+        { name: "author", content: SITE_NAME },
+        { property: "og:site_name", content: SITE_NAME },
+        { property: "og:locale", content: "pt_PT" },
+        {
+          property: "og:title",
+          content: "Bazarixy — Marketplace online em Angola",
+        },
         {
           property: "og:description",
-          content: "Descubra produtos e compre online na Bazarixy.",
+          content:
+            "Compre produtos de lojas angolanas na Bazarixy: moda, beleza, casa e muito mais, com preços especiais e entrega em Angola.",
         },
         { property: "og:type", content: "website" },
+        { property: "og:url", content: SITE_URL },
+        {
+          property: "og:image",
+          content: absoluteUrl("/img/bazarixy-mark.webp"),
+        },
+        { property: "og:image:alt", content: "Bazarixy" },
         { name: "twitter:card", content: "summary_large_image" },
+        {
+          name: "twitter:title",
+          content: "Bazarixy — Marketplace online em Angola",
+        },
+        {
+          name: "twitter:description",
+          content:
+            "Compre produtos de lojas angolanas na Bazarixy: moda, beleza, casa e muito mais.",
+        },
+        {
+          name: "twitter:image",
+          content: absoluteUrl("/img/bazarixy-mark.webp"),
+        },
+        { name: "twitter:image:alt", content: "Bazarixy" },
       ],
       links: [
+        { rel: "canonical", href: SITE_URL },
         { rel: "stylesheet", href: appCss },
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         {

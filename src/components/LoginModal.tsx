@@ -231,7 +231,7 @@ export function LoginModal() {
               </div>
 
               <label className="mt-5 block text-xs text-muted-foreground">
-                Email ou Telefone
+                Email
               </label>
               <input
                 value={email}

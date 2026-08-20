@@ -38,7 +38,14 @@ import { useReviews, type Review } from "@/lib/reviews";
 import { useShops, type Shop } from "@/lib/shops-store";
 import { SmartImage } from "@/components/SmartImage";
 import { ShareSheet, nativeShare } from "@/components/ShareSheet";
-import { absoluteUrl, paths, productUrl, SITE_NAME } from "@/lib/site";
+import {
+  absoluteUrl,
+  paths,
+  productUrl,
+  seoDescription,
+  shareText,
+  SITE_NAME,
+} from "@/lib/site";
 
 export const Route = createFileRoute("/product/$id")({
   loader: ({ params }) => getProduct(params.id) ?? null,
@@ -53,12 +60,10 @@ export const Route = createFileRoute("/product/$id")({
     const url = productUrl(params.id);
     const image = absoluteUrl(loaderData.image);
     const price = loaderData.price;
-    const desc =
-      (loaderData.description || `${loaderData.name} na ${SITE_NAME}.`)
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 155)
-        .replace(/\s+\S*$/, "") + "…";
+    const desc = seoDescription(
+      loaderData.description,
+      `${loaderData.name} na ${SITE_NAME}.`,
+    );
     return {
       meta: [
         { title: `${loaderData.name} — ${SITE_NAME}` },
@@ -409,7 +414,7 @@ function ProductPage() {
                   const target = {
                     url: productUrl(product.id),
                     title: product.name,
-                    text: `${product.description || `Veja ${product.name}`} na Bazarixy`,
+                    text: shareText(product.name, product.description),
                     image: mainImage,
                   };
                   if (!(await nativeShare(target))) setShareOpen(true);
@@ -626,7 +631,7 @@ function ProductPage() {
         target={{
           url: productUrl(product.id),
           title: product.name,
-          text: `${product.description || `Veja ${product.name}`} na Bazarixy`,
+          text: shareText(product.name, product.description),
           image: mainImage,
         }}
       />

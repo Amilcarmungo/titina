@@ -279,7 +279,7 @@ function AuthPage() {
             </div>
 
             <label className="mt-6 block text-xs text-muted-foreground">
-              Email ou Telefone
+              Email
             </label>
             <input
               value={email}

@@ -7,6 +7,30 @@
 export const SITE_URL = "https://bazarixy.com";
 export const SITE_NAME = "Bazarixy";
 
+/** Normaliza uma descrição para snippets do Google e prévias sociais. */
+export function seoDescription(
+  value: string | undefined,
+  fallback: string,
+  max = 155,
+): string {
+  const text = (value || fallback).replace(/\s+/g, " ").trim();
+  if (text.length <= max) return text;
+  return `${text
+    .slice(0, max - 1)
+    .replace(/\s+\S*$/, "")
+    .trim()}…`;
+}
+
+/** Texto claro para partilhas: identifica o conteúdo e dá contexto à marca. */
+export function shareText(
+  title: string,
+  description: string | undefined,
+  subject = "Veja na Bazarixy",
+): string {
+  const detail = seoDescription(description, "", 220);
+  return detail ? `${title} — ${detail} ${subject}` : `${title} · ${subject}`;
+}
+
 /** Junta um caminho relativo ao domínio oficial (sem barras duplicadas). */
 export function absoluteUrl(path = "/"): string {
   if (/^https?:\/\//i.test(path)) return path;
