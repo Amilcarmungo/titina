@@ -32,6 +32,7 @@ export type PackageStage =
 export const STAGE_FLOW: PackageStage[] = [
   "awaiting_payment",
   "payment_review",
+  "payment_rejected",
   "payment_accepted",
   "preparing",
   "shipped",
@@ -273,7 +274,7 @@ function put(next: Order) {
 function notifyCustomer(order: Order, pkg: OrderPackage, note?: string) {
   const body = note?.trim()
     ? note.trim()
-    : `${pkg.shopName}: ${STAGE_LABEL[pkg.stage]}${pkg.eta ? ` · ${pkg.eta}` : ""}`;
+    : `${STAGE_DESC[pkg.stage]}${pkg.eta ? ` ${pkg.eta}.` : ""}`;
   const title = `Pedido #${order.id} — ${STAGE_LABEL[pkg.stage]}`;
   const kind =
     pkg.stage === "shipped" || pkg.stage === "delivered" ? "delivery" : "order";
@@ -304,6 +305,21 @@ function notifyCustomer(order: Order, pkg: OrderPackage, note?: string) {
   }
 }
 
+function notifyOrderStatus(order: Order, title: string, body: string) {
+  if (order.uid) {
+    void import("@/lib/firebase/notifications").then(({ pushNotificationTo }) =>
+      pushNotificationTo(order.uid as string, {
+        kind: "order",
+        title,
+        body,
+        href: "/orders",
+      }),
+    );
+  } else {
+    notificationActions.add({ kind: "order", title, body, href: "/orders" });
+  }
+}
+
 export function useOrders(): Order[] {
   return useSyncExternalStore(
     (l) => {
@@ -325,11 +341,24 @@ export const orderActions = {
     orders = [order, ...orders];
     emit();
     remoteSave?.(order);
+    const firstPackage = order.packages?.[0];
+    if (firstPackage) notifyCustomer(order, firstPackage);
     return id;
   },
   updateStatus(id: string, status: OrderStatus) {
     const order = orders.find((o) => o.id === id);
     if (!order) return;
+    if (status === order.status) return;
+    if (status === "returns") {
+      const next = { ...order, status };
+      put(next);
+      notifyOrderStatus(
+        next,
+        `Pedido #${next.id} — devolução em análise`,
+        "A sua devolução foi encaminhada para análise. Enviaremos uma nova atualização assim que houver uma decisão.",
+      );
+      return;
+    }
     const stage: PackageStage =
       status === "unpaid"
         ? "awaiting_payment"
@@ -342,13 +371,23 @@ export const orderActions = {
             : status === "review"
               ? "delivered"
               : (packagesOf(order)[0]?.stage ?? "preparing");
-    const packages = packagesOf(order).map((p) => ({
+    const previous = packagesOf(order);
+    const packages = previous.map((p) => ({
       ...p,
       stage,
       timeline: [...p.timeline, { stage, at: now() }],
       ...(stage === "shipped" ? { eta: p.eta ?? etaFromNow() } : {}),
     }));
-    put({ ...order, status, packages, eta: packages[0]?.eta ?? order.eta });
+    const next = {
+      ...order,
+      status,
+      packages,
+      eta: packages[0]?.eta ?? order.eta,
+    };
+    put(next);
+    packages.forEach((pkg, index) => {
+      if (pkg.stage !== previous[index]?.stage) notifyCustomer(next, pkg);
+    });
   },
 
   /** Avança um pacote (loja) e, se pedido, notifica o cliente. */
@@ -393,8 +432,11 @@ export const orderActions = {
   markReceived(orderId: string, packageId?: string) {
     const order = orders.find((o) => o.id === orderId);
     if (!order) return;
-    const packages = packagesOf(order).map((p) =>
-      (!packageId || p.id === packageId) && p.stage !== "reviewed"
+    const previous = packagesOf(order);
+    const packages = previous.map((p) =>
+      (!packageId || p.id === packageId) &&
+      p.stage !== "delivered" &&
+      p.stage !== "reviewed"
         ? {
             ...p,
             stage: "delivered" as PackageStage,
@@ -405,17 +447,22 @@ export const orderActions = {
           }
         : p,
     );
-    put({
+    const next = {
       ...order,
       packages,
       status: statusFromPackages(packages, order.status),
+    };
+    put(next);
+    packages.forEach((pkg, index) => {
+      if (pkg.stage !== previous[index]?.stage) notifyCustomer(next, pkg);
     });
   },
 
   markReviewed(orderId: string) {
     const order = orders.find((o) => o.id === orderId);
     if (!order) return;
-    const packages = packagesOf(order).map((p) => ({
+    const previous = packagesOf(order);
+    const packages = previous.map((p) => ({
       ...p,
       stage: "reviewed" as PackageStage,
       timeline: [
@@ -423,12 +470,23 @@ export const orderActions = {
         { stage: "reviewed" as PackageStage, at: now() },
       ],
     }));
-    put({ ...order, packages, status: "review" });
+    const next = { ...order, packages, status: "review" as const };
+    put(next);
+    packages.forEach((pkg, index) => {
+      if (pkg.stage !== previous[index]?.stage) notifyCustomer(next, pkg);
+    });
   },
   update(id: string, patch: Partial<Order>) {
     const order = orders.find((o) => o.id === id);
     if (!order) return;
-    put({ ...order, ...patch });
+    const next = { ...order, ...patch };
+    put(next);
+    if (!order.paymentProof && next.paymentProof) {
+      const packages = packagesOf(next);
+      packages.forEach((pkg) => {
+        if (pkg.stage === "payment_review") notifyCustomer(next, pkg);
+      });
+    }
   },
   /** Cliente pede o reembolso e indica onde quer receber. */
   requestRefund(
@@ -441,12 +499,11 @@ export const orderActions = {
       ...order,
       refund: { ...data, requestedAt: now(), status: "requested" },
     });
-    notificationActions.add({
-      kind: "order",
-      title: `Pedido #${order.id} — reembolso solicitado`,
-      body: `Vamos transferir para ${data.method} · ${data.account} depois de confirmarmos a devolução.`,
-      href: "/orders",
-    });
+    notifyOrderStatus(
+      order,
+      `Pedido #${order.id} — reembolso solicitado`,
+      `Recebemos o seu pedido de reembolso por ${data.method}. A equipa irá analisar os dados e avisará quando houver uma decisão.`,
+    );
   },
   remove(id: string) {
     orders = orders.filter((o) => o.id !== id);
