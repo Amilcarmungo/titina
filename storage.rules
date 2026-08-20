@@ -1,0 +1,58 @@
+rules_version = '2';
+
+// Segurança: uploads só na pasta do próprio usuário, imagens até 8 MB.
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isStaff() {
+      return request.auth != null
+             && firestore.exists(/databases/(default)/documents/staff/$(request.auth.uid))
+             && firestore.get(/databases/(default)/documents/staff/$(request.auth.uid)).data.active == true;
+    }
+    function isCatalogStaff() {
+      return isStaff()
+             && firestore.get(/databases/(default)/documents/staff/$(request.auth.uid)).data.role in ['admin', 'gerente'];
+    }
+    function validImage() {
+      return request.resource.size < 8 * 1024 * 1024
+             && request.resource.contentType.matches('image/.*');
+    }
+
+    // Catálogo e conteúdo publicado: leitura pública, escrita só pela equipa.
+    match /catalog/{allPaths=**} {
+      allow read: if true;
+      allow write: if isCatalogStaff() && validImage();
+    }
+    match /content/{allPaths=**} {
+      allow read: if true;
+      allow write: if isCatalogStaff() && validImage();
+    }
+
+    // Comprovativos de pagamento: qualquer cliente autenticado envia e consegue
+    // ler o ficheiro que acabou de enviar (o getDownloadURL precisa de leitura).
+    match /orders/{orderId}/proofs/{fileName} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                    && request.resource.size < 8 * 1024 * 1024
+                    && request.resource.contentType.matches('image/.*|application/pdf');
+      allow update, delete: if isStaff();
+    }
+
+
+    match /users/{uid}/{allPaths=**} {
+      allow read: if (request.auth != null && request.auth.uid == uid) || isStaff();
+      allow write: if request.auth != null
+                   && request.auth.uid == uid
+                   && request.resource.size < 8 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*|application/pdf');
+    }
+
+    match /public/{allPaths=**} {
+      allow read: if true;
+      allow write: if isCatalogStaff() && validImage();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

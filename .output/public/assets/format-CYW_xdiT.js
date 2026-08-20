@@ -1,0 +1,1 @@
+function e(e){let t=Number.isFinite(e)?e:0,n=Math.abs(t%1)>.001;return`Kz ${t.toLocaleString(`pt-AO`,{minimumFractionDigits:n?2:0,maximumFractionDigits:n?2:0})}`}export{e as t};

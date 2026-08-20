@@ -1,0 +1,1 @@
+import{s as e}from"./roles-CawZpz5D.js";import{t}from"./Layout-DFjI1JOR.js";var n=e(),r=()=>(0,n.jsx)(t,{title:`Erro`,showBack:!0,children:(0,n.jsx)(`p`,{className:`p-6`,children:`Algo deu errado.`})});export{r as errorComponent};

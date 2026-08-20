@@ -1,0 +1,137 @@
+rules_version = '2';
+
+// Segurança: cada usuário só acessa a própria subárvore em /users/{uid}.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    // ---- Equipa / permissões (fonte da verdade no backend) ----
+    function staffDoc() {
+      return get(/databases/$(database)/documents/staff/$(request.auth.uid)).data;
+    }
+    function isStaff() {
+      return request.auth != null
+             && exists(/databases/$(database)/documents/staff/$(request.auth.uid))
+             && staffDoc().active == true;
+    }
+    function hasRole(roles) {
+      return isStaff() && staffDoc().role in roles;
+    }
+
+    // Só um administrador cria/altera membros da equipa; cada um lê o próprio papel.
+    match /staff/{uid} {
+      allow get: if isOwner(uid) || hasRole(['admin']);
+      allow list: if hasRole(['admin']);
+      allow create, update, delete: if hasRole(['admin']);
+    }
+
+    // Índice de emails: apenas hashes SHA-256, sem listagem (evita enumeração).
+    match /emailIndex/{hash} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+
+    // Catálogo/configuração do site: leitura pública, escrita só por função.
+    match /siteData/{key} {
+      allow read: if true;
+      allow write: if hasRole(['admin', 'gerente']);
+    }
+
+    // Conteúdo publicado em coleções próprias, visível no console Firebase.
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if hasRole(['admin', 'gerente']);
+    }
+    match /banners/{bannerId} {
+      allow read: if true;
+      allow write: if hasRole(['admin', 'gerente']);
+    }
+
+    match /users/{uid} {
+      // O próprio dono lê o seu perfil; a equipa pode consultar (painel admin).
+      allow get: if isOwner(uid) || isStaff();
+      allow list: if isStaff();
+      // O documento de perfil nunca pode mudar de dono.
+      allow create, update: if isOwner(uid) && request.resource.data.uid == uid;
+      allow delete: if isOwner(uid);
+
+      match /addresses/{addressId} {
+        allow read, write: if isOwner(uid);
+      }
+      match /searches/{searchId} {
+        allow read, write: if isOwner(uid);
+      }
+      match /events/{eventId} {
+        allow read, create: if isOwner(uid);
+        allow update, delete: if false;
+      }
+      match /checkouts/{checkoutId} {
+        allow read, write: if isOwner(uid);
+      }
+      // Notificações: só o dono lê/apaga. A equipa pode criar avisos para o
+      // dono do pedido, mas nunca ler as notificações de ninguém.
+      match /notifications/{notificationId} {
+        allow read, update, delete: if isOwner(uid);
+        allow create: if isOwner(uid) || hasRole(['admin', 'gerente', 'atendente']);
+      }
+      match /follows/{shopId} {
+        allow read, write: if isOwner(uid);
+      }
+      // Códigos de verificação de e-mail: só o próprio (guardamos apenas o hash).
+      match /security/{docId} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // Convites: o novo utilizador cria o seu registo (nunca se auto-convida) e
+    // apenas o próprio ou o convidador conseguem ler. Sem listagem aberta:
+    // a consulta é sempre filtrada por `referrerUid == auth.uid`.
+    match /referrals/{uid} {
+      allow get: if isOwner(uid) || (request.auth != null && resource.data.referrerUid == request.auth.uid);
+      allow list: if request.auth != null
+                  && request.query.limit <= 500
+                  && resource.data.referrerUid == request.auth.uid;
+      allow create: if isOwner(uid)
+                    && request.resource.data.uid == uid
+                    && request.resource.data.referrerUid is string
+                    && request.resource.data.referrerUid != uid;
+      allow update, delete: if false;
+    }
+
+
+    match /orders/{orderId} {
+      allow read: if isStaff() || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      // Cliente pode confirmar receção/avaliação do próprio pedido, sem mudar de dono.
+      allow update: if hasRole(['admin', 'gerente', 'atendente'])
+                    || (request.auth != null
+                        && resource.data.uid == request.auth.uid
+                        && request.resource.data.uid == resource.data.uid);
+      allow delete: if hasRole(['admin']);
+    }
+
+    // Avaliações de produtos: públicas para leitura (reviews verificadas),
+    // clientes autenticados podem criar (validação de compra feita no backend).
+    match /reviews/{reviewId} {
+      allow read: if resource.data.verified == true;
+      allow create: if request.auth != null
+                    && request.resource.data.uid == request.auth.uid
+                    && request.resource.data.verified == true
+                    && request.resource.data.text is string
+                    && request.resource.data.text.size() >= 5
+                    && request.resource.data.rating >= 1
+                    && request.resource.data.rating <= 5;
+      allow update, delete: if hasRole(['admin', 'moderador']) || (request.auth != null && resource.data.uid == request.auth.uid && isStaff());
+    }
+
+    // Nada mais é acessível pelo cliente.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
