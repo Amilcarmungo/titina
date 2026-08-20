@@ -159,9 +159,7 @@ function AuthPage() {
         {step === "email" && (
           <>
             <div className="mt-2 flex flex-col items-center text-center">
-              <div className="grid h-24 w-24 place-items-center rounded-3xl bg-gradient-to-br from-pink-400 to-rose-500 shadow-lg shadow-pink-500/20">
-                <img src={logoMark} alt="Bazarixy" className="h-16 w-16 object-contain" />
-              </div>
+              <img src={logoMark} alt="Bazarixy" className="h-16 w-16 object-contain" />
             </div>
 
             <div className="mt-4 grid grid-cols-3 divide-x divide-border rounded-2xl bg-brand/25 py-3 text-center">

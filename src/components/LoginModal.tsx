@@ -15,7 +15,6 @@ import {
 } from "@/lib/firebase/auth";
 import type { AuthCredential } from "firebase/auth";
 import { firebaseEnabled } from "@/lib/firebase/client";
-import logoMark from "@/assets/bazarixy-mark.webp.asset.json";
 
 function GoogleIcon() {
   return (
@@ -129,10 +128,6 @@ export function LoginModal() {
 
           {step === "email" && (
             <>
-              <div className="flex flex-col items-center text-center">
-                <img src={logoMark.url} alt="Bazarixy" className="h-14 w-14 object-contain" />
-              </div>
-
               <div className="mt-4 grid grid-cols-3 divide-x divide-border bg-brand/25 py-3 text-center">
                 {[
                   { icon: Ticket, t: "30% Off", s: "Primeiro Pedido" },
