@@ -34,7 +34,7 @@ import {
 import { SearchIcon } from "@/components/SearchIcon";
 import logo from "../../logotipo.webp";
 import { toastAdded } from "@/lib/toast-added";
-import { useReviews } from "@/lib/reviews";
+import { useReviews, type Review } from "@/lib/reviews";
 import { useShops, type Shop } from "@/lib/shops-store";
 import { SmartImage } from "@/components/SmartImage";
 import { ShareSheet, nativeShare } from "@/components/ShareSheet";
@@ -349,6 +349,12 @@ function ProductPage() {
           </div>
         </div>
 
+        <ReviewsSection
+          reviews={userReviews}
+          average={avgRating}
+          count={reviewCount}
+        />
+
         <div className="mt-10">
           <h3 className="font-display text-xl font-bold">
             Você também pode gostar
@@ -560,83 +566,12 @@ function ProductPage() {
         </div>
 
         {/* Reviews block — Shein style */}
-        <div className="mt-2 bg-card px-4 py-4">
-          <h3 className="font-display text-lg font-bold">Avaliações</h3>
-
-          {reviewCount === 0 ? (
-            <p className="mt-2 text-xs text-muted-foreground">
-              Este produto ainda não tem avaliações. Só mostramos avaliações de
-              compras verificadas.
-            </p>
-          ) : (
-            <>
-              <div className="mt-3 flex items-center gap-4">
-                <div className="text-3xl font-black">
-                  {avgRating.toFixed(1)}
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <div className="flex items-center gap-0.5">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${i < Math.round(avgRating) ? "fill-gold text-gold" : "text-muted-foreground/40"}`}
-                      />
-                    ))}
-                    <span className="ml-1 text-xs text-muted-foreground">
-                      ({reviewCount})
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-muted-foreground">
-                    Baseado em compras verificadas
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-4 divide-y divide-border">
-                {userReviews.map((rv) => (
-                  <div key={rv.id} className="py-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {rv.photoURL ? (
-                          <img
-                            src={rv.photoURL}
-                            alt={rv.name}
-                            loading="lazy"
-                            decoding="async"
-                            referrerPolicy="no-referrer"
-                            className="h-7 w-7 shrink-0 rounded-full object-cover"
-                          />
-                        ) : (
-                          <div className="grid h-7 w-7 place-items-center rounded-full bg-gold/20 text-[11px] font-bold text-gold">
-                            {rv.name[0]?.toUpperCase()}
-                          </div>
-                        )}
-                        <span className="text-xs font-semibold">{rv.name}</span>
-                        <div className="flex items-center gap-0.5">
-                          {Array.from({ length: 5 }).map((_, j) => (
-                            <Star
-                              key={j}
-                              className={`h-3 w-3 ${j < rv.rating ? "fill-gold text-gold" : "text-muted-foreground/30"}`}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                      <span className="text-[10px] text-muted-foreground">
-                        {rv.size ? `Tam: ${rv.size}` : rv.createdAt}
-                      </span>
-                    </div>
-                    <p className="mt-1.5 text-xs leading-relaxed text-foreground/90">
-                      {rv.text}
-                    </p>
-                    <span className="mt-1.5 block text-[11px] text-muted-foreground">
-                      Compra verificada
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
+        <ReviewsSection
+          reviews={userReviews}
+          average={avgRating}
+          count={reviewCount}
+          className="mt-2"
+        />
 
         {shop && <ShopCard shop={shop} mobile />}
 
@@ -725,6 +660,96 @@ function ProductPage() {
 }
 
 /** Dados reais da loja associada ao produto; o toque leva ao respetivo perfil. */
+function ReviewsSection({
+  reviews,
+  average,
+  count,
+  className = "",
+}: {
+  reviews: Review[];
+  average: number;
+  count: number;
+  className?: string;
+}) {
+  return (
+    <div className={`rounded-lg border border-border bg-card p-5 ${className}`}>
+      <h3 className="font-display text-lg font-bold">Avaliações</h3>
+      {count === 0 ? (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Este produto ainda não tem avaliações. Só mostramos avaliações de
+          compras verificadas.
+        </p>
+      ) : (
+        <>
+          <div className="mt-3 flex items-center gap-4">
+            <div className="text-3xl font-black">{average.toFixed(1)}</div>
+            <div>
+              <div className="flex items-center gap-0.5">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-4 w-4 ${i < Math.round(average) ? "fill-gold text-gold" : "text-muted-foreground/40"}`}
+                  />
+                ))}
+                <span className="ml-1 text-xs text-muted-foreground">
+                  ({count})
+                </span>
+              </div>
+              <span className="text-[11px] text-muted-foreground">
+                Baseado em compras verificadas
+              </span>
+            </div>
+          </div>
+          <div className="mt-4 divide-y divide-border">
+            {reviews.map((review) => (
+              <div key={review.id} className="py-3 first:pt-0 last:pb-0">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-2">
+                    {review.photoURL ? (
+                      <img
+                        src={review.photoURL}
+                        alt={review.name}
+                        loading="lazy"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
+                        className="h-7 w-7 shrink-0 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gold/20 text-[11px] font-bold text-gold">
+                        {review.name[0]?.toUpperCase()}
+                      </div>
+                    )}
+                    <span className="truncate text-xs font-semibold">
+                      {review.name}
+                    </span>
+                    <div className="flex shrink-0 items-center gap-0.5">
+                      {Array.from({ length: 5 }).map((_, j) => (
+                        <Star
+                          key={j}
+                          className={`h-3 w-3 ${j < review.rating ? "fill-gold text-gold" : "text-muted-foreground/30"}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <span className="shrink-0 text-[10px] text-muted-foreground">
+                    {review.size ? `Tam: ${review.size}` : review.createdAt}
+                  </span>
+                </div>
+                <p className="mt-1.5 text-xs leading-relaxed text-foreground/90">
+                  {review.text}
+                </p>
+                <span className="mt-1.5 block text-[11px] text-muted-foreground">
+                  Compra verificada
+                </span>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function ShopCard({ shop, mobile = false }: { shop: Shop; mobile?: boolean }) {
   const initials = shop.name
     .split(" ")

@@ -5,7 +5,7 @@ import { n as shopActions, r as useShops } from "./shops-store-CX-UvhEW.mjs";
 import { v as Link } from "../_libs/@tanstack/react-router+[...].mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
-import { B as Pencil, H as Package, Jt as ArrowUpRight, R as Plus, _ as Store, p as Trash2, st as Image } from "../_libs/lucide-react.mjs";
+import { B as Pencil, H as Package, R as Plus, Xt as ArrowUpRight, _ as Store, p as Trash2, st as Image } from "../_libs/lucide-react.mjs";
 import { a as AdminTextarea, n as AdminInput, r as AdminModal, t as AdminField } from "./AdminModal-DXEoyymL.mjs";
 import { n as uploadImageFile, t as storagePaths } from "./upload-D4601ayU.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/admin.lojas-tti4fysc.js

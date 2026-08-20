@@ -25,6 +25,7 @@ import {
   Target,
   Users,
   ShieldCheck,
+  BarChart3,
 } from "lucide-react";
 
 import logoAsset from "@/assets/bazarixy-logo.webp.asset.json";
@@ -80,6 +81,12 @@ const GROUPS: NavGroup[] = [
         to: "/admin/metas",
         label: "Metas",
         icon: Target,
+        perm: "settings.write",
+      },
+      {
+        to: "/admin/pesquisas",
+        label: "Pesquisas dos clientes",
+        icon: BarChart3,
         perm: "settings.write",
       },
     ],

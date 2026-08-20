@@ -64,7 +64,8 @@ service cloud.firestore {
         allow read, write: if isOwner(uid);
       }
       match /searches/{searchId} {
-        allow read, write: if isOwner(uid);
+        allow read: if isOwner(uid) || isStaff();
+        allow write: if isOwner(uid);
       }
       match /events/{eventId} {
         allow read, create: if isOwner(uid);
