@@ -26,12 +26,36 @@ const defaults: PaymentMethod[] = [
     image: payExpress.url,
     active: true,
     phone: "923 000 000",
-    instructions: "Abra o app Multicaixa Express, escolha Transferência Express, copie os dados abaixo e confirme o envio.",
+    instructions:
+      "Abra o app Multicaixa Express, escolha Transferência Express, copie os dados abaixo e confirme o envio.",
   },
-  { id: "unitel-money", label: "Unitel Money", desc: "Débito da sua conta Unitel Money", image: payUnitel.url, active: true },
-  { id: "paypay", label: "PayPay", desc: "Carteira digital PayPay", image: payPaypay.url, active: true },
-  { id: "multicaixa", label: "Multicaixa (Referência)", desc: "Pague em qualquer ATM", image: payMulticaixa.url, active: true },
-  { id: "card", label: "Cartão de crédito / débito", desc: "Visa, Mastercard, Amex", active: true },
+  {
+    id: "unitel-money",
+    label: "Unitel Money",
+    desc: "Débito da sua conta Unitel Money",
+    image: payUnitel.url,
+    active: true,
+  },
+  {
+    id: "paypay",
+    label: "PayPay",
+    desc: "Carteira digital PayPay",
+    image: payPaypay.url,
+    active: true,
+  },
+  {
+    id: "multicaixa",
+    label: "Multicaixa (Referência)",
+    desc: "Pague em qualquer ATM",
+    image: payMulticaixa.url,
+    active: true,
+  },
+  {
+    id: "card",
+    label: "Cartão de crédito / débito",
+    desc: "Visa, Mastercard, Amex",
+    active: true,
+  },
 ];
 
 function read(): PaymentMethod[] {
@@ -39,28 +63,39 @@ function read(): PaymentMethod[] {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) || "");
     if (Array.isArray(raw) && raw.length) return raw;
-  } catch {}
+  } catch {
+    return defaults;
+  }
   return defaults;
 }
 
 let list: PaymentMethod[] = read();
 const listeners = new Set<() => void>();
 function emit() {
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(list));
+  if (typeof window !== "undefined")
+    localStorage.setItem(KEY, JSON.stringify(list));
   sync.push();
   listeners.forEach((l) => l());
 }
 
-const sync = attachSync<PaymentMethod[]>("paymentMethods", () => list, (value) => {
-  if (!Array.isArray(value)) return;
-  list = value;
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(list));
-  listeners.forEach((l) => l());
-});
+const sync = attachSync<PaymentMethod[]>(
+  "paymentMethods",
+  () => list,
+  (value) => {
+    if (!Array.isArray(value)) return;
+    list = value;
+    if (typeof window !== "undefined")
+      localStorage.setItem(KEY, JSON.stringify(list));
+    listeners.forEach((l) => l());
+  },
+);
 
 export function usePaymentMethods(): PaymentMethod[] {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => list,
     () => defaults,
   );
@@ -72,7 +107,13 @@ export function getPaymentMethod(id?: string) {
 
 export const paymentActions = {
   add(m: Omit<PaymentMethod, "id"> & { id?: string }) {
-    const id = m.id?.trim() || m.label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `pm-${Date.now()}`;
+    const id =
+      m.id?.trim() ||
+      m.label
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") ||
+      `pm-${Date.now()}`;
     list = [...list, { ...m, id }];
     emit();
     return id;
@@ -85,5 +126,8 @@ export const paymentActions = {
     list = list.filter((m) => m.id !== id);
     emit();
   },
-  reset() { list = defaults; emit(); },
+  reset() {
+    list = defaults;
+    emit();
+  },
 };

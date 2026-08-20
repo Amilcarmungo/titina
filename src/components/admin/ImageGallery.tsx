@@ -9,7 +9,12 @@ type Props = {
   max?: number;
 };
 
-export function ImageGallery({ images, onChange, onFilesAdded, max = 5 }: Props) {
+export function ImageGallery({
+  images,
+  onChange,
+  onFilesAdded,
+  max = 5,
+}: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const urlRef = useRef<HTMLInputElement>(null);
 
@@ -55,21 +60,53 @@ export function ImageGallery({ images, onChange, onFilesAdded, max = 5 }: Props)
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
         {images.map((src, i) => (
-          <div key={i} className={`group relative aspect-square overflow-hidden rounded-xl border-2 ${i === 0 ? "border-foreground" : "border-border"}`}>
+          <div
+            key={i}
+            className={`group relative aspect-square overflow-hidden rounded-xl border-2 ${i === 0 ? "border-foreground" : "border-border"}`}
+          >
             <img src={src} alt="" className="h-full w-full object-cover" />
             {i === 0 && (
-              <span className="absolute left-1 top-1 rounded-full bg-foreground px-1.5 py-0.5 text-[9px] font-bold text-background">CAPA</span>
+              <span className="absolute left-1 top-1 rounded-full bg-foreground px-1.5 py-0.5 text-[9px] font-bold text-background">
+                CAPA
+              </span>
             )}
             <div className="absolute inset-0 flex flex-col justify-between bg-black/0 p-1 opacity-0 transition group-hover:bg-black/40 group-hover:opacity-100">
               <div className="flex justify-end">
-                <button type="button" onClick={() => remove(i)} className="grid h-6 w-6 place-items-center rounded-full bg-white text-red-600 shadow"><X className="h-3 w-3" /></button>
+                <button
+                  type="button"
+                  onClick={() => remove(i)}
+                  className="grid h-6 w-6 place-items-center rounded-full bg-white text-red-600 shadow"
+                >
+                  <X className="h-3 w-3" />
+                </button>
               </div>
               <div className="flex justify-between gap-1">
-                <button type="button" onClick={() => move(i, -1)} className="grid h-6 w-6 place-items-center rounded-full bg-white text-foreground shadow disabled:opacity-40" disabled={i === 0}><ArrowLeft className="h-3 w-3" /></button>
+                <button
+                  type="button"
+                  onClick={() => move(i, -1)}
+                  className="grid h-6 w-6 place-items-center rounded-full bg-white text-foreground shadow disabled:opacity-40"
+                  disabled={i === 0}
+                >
+                  <ArrowLeft className="h-3 w-3" />
+                </button>
                 {i !== 0 && (
-                  <button type="button" onClick={() => makeCover(i)} className="grid h-6 w-6 place-items-center rounded-full bg-white text-amber-600 shadow" title="Definir como capa"><Star className="h-3 w-3" /></button>
+                  <button
+                    type="button"
+                    onClick={() => makeCover(i)}
+                    className="grid h-6 w-6 place-items-center rounded-full bg-white text-amber-600 shadow"
+                    title="Definir como capa"
+                  >
+                    <Star className="h-3 w-3" />
+                  </button>
                 )}
-                <button type="button" onClick={() => move(i, 1)} className="grid h-6 w-6 place-items-center rounded-full bg-white text-foreground shadow disabled:opacity-40" disabled={i === images.length - 1}><ArrowRight className="h-3 w-3" /></button>
+                <button
+                  type="button"
+                  onClick={() => move(i, 1)}
+                  className="grid h-6 w-6 place-items-center rounded-full bg-white text-foreground shadow disabled:opacity-40"
+                  disabled={i === images.length - 1}
+                >
+                  <ArrowRight className="h-3 w-3" />
+                </button>
               </div>
             </div>
           </div>
@@ -87,14 +124,34 @@ export function ImageGallery({ images, onChange, onFilesAdded, max = 5 }: Props)
           </button>
         )}
       </div>
-      <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => { void addFiles(e.target.files); e.target.value = ""; }} />
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          void addFiles(e.target.files);
+          e.target.value = "";
+        }}
+      />
       <div className="flex flex-wrap items-center gap-2">
-        <p className="text-[11px] text-muted-foreground">{images.length}/{max} foto(s). A primeira imagem é a capa.</p>
+        <p className="text-[11px] text-muted-foreground">
+          {images.length}/{max} foto(s). A primeira imagem é a capa.
+        </p>
         <div className="ml-auto flex flex-1 items-center gap-2 min-w-[220px]">
-          <input ref={urlRef} type="url" placeholder="ou cole URL da imagem"
-            className="flex-1 rounded-lg border border-border bg-transparent px-3 py-2 text-xs outline-none" />
-          <button type="button" onClick={addUrl} disabled={images.length >= max}
-            className="rounded-full bg-foreground px-4 py-2 text-xs font-bold text-background disabled:opacity-40">
+          <input
+            ref={urlRef}
+            type="url"
+            placeholder="ou cole URL da imagem"
+            className="flex-1 rounded-lg border border-border bg-transparent px-3 py-2 text-xs outline-none"
+          />
+          <button
+            type="button"
+            onClick={addUrl}
+            disabled={images.length >= max}
+            className="rounded-full bg-foreground px-4 py-2 text-xs font-bold text-background disabled:opacity-40"
+          >
             Adicionar URL
           </button>
         </div>

@@ -4,7 +4,10 @@ import { actions } from "@/lib/store";
  *  On desktop → opens login modal. On mobile → navigates to /auth. */
 export function requireAuth(user: { email: string } | null): boolean {
   if (user) return true;
-  if (typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches) {
+  if (
+    typeof window !== "undefined" &&
+    window.matchMedia("(min-width: 768px)").matches
+  ) {
     actions.openLogin();
   } else if (typeof window !== "undefined") {
     window.location.assign("/auth");

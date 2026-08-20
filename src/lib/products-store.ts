@@ -1,7 +1,13 @@
 import { useSyncExternalStore } from "react";
 import { type Product } from "@/lib/products";
 import { attachSync } from "@/lib/firebase/sync-store";
-import { collection, deleteDoc, doc, onSnapshot, setDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  setDoc,
+} from "firebase/firestore";
 import { getDb } from "@/lib/firebase/client";
 import { canSyncSiteData } from "@/lib/firebase/roles";
 import { stripUndefined } from "@/lib/firebase/sanitize";
@@ -12,7 +18,12 @@ const KEY = "shop_custom_products_v1";
 /** Cache local apenas dos dados REAIS já recebidos do banco (nunca demo). */
 function read<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
-  try { const v = JSON.parse(localStorage.getItem(key) || ""); return v ?? fallback; } catch { return fallback; }
+  try {
+    const v = JSON.parse(localStorage.getItem(key) || "");
+    return v ?? fallback;
+  } catch {
+    return fallback;
+  }
 }
 
 let list: Product[] = read<Product[]>(KEY, []);
@@ -20,10 +31,13 @@ let list: Product[] = read<Product[]>(KEY, []);
 let status: "loading" | "ready" | "error" = list.length ? "ready" : "loading";
 
 const listeners = new Set<() => void>();
-function notify() { listeners.forEach((l) => l()); }
+function notify() {
+  listeners.forEach((l) => l());
+}
 
 function cache() {
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(list));
+  if (typeof window !== "undefined")
+    localStorage.setItem(KEY, JSON.stringify(list));
 }
 
 function emit() {
@@ -38,7 +52,11 @@ const sync = attachSync<Product[]>(
   () => list,
   (value) => {
     // Compatibilidade com o formato antigo ({ custom, hidden, overrides }).
-    const next = Array.isArray(value) ? value : Array.isArray((value as { custom?: Product[] })?.custom) ? (value as { custom: Product[] }).custom : null;
+    const next = Array.isArray(value)
+      ? value
+      : Array.isArray((value as { custom?: Product[] })?.custom)
+        ? (value as { custom: Product[] }).custom
+        : null;
     if (!next) return;
     list = next;
     status = "ready";
@@ -57,7 +75,12 @@ const retrier = createRetrier(() => {
 function subscribe() {
   if (typeof window === "undefined" || unsubscribe) return;
   const db = getDb();
-  if (!db) { status = "error"; notify(); retrier.schedule(); return; }
+  if (!db) {
+    status = "error";
+    notify();
+    retrier.schedule();
+    return;
+  }
   unsubscribe = onSnapshot(
     collection(db, "products"),
     (snap) => {
@@ -67,7 +90,11 @@ function subscribe() {
       cache();
       notify();
     },
-    () => { status = list.length ? "ready" : "error"; notify(); retrier.schedule(); },
+    () => {
+      status = list.length ? "ready" : "error";
+      notify();
+      retrier.schedule();
+    },
   );
 }
 
@@ -85,15 +112,24 @@ export function retryProducts() {
 async function publishProduct(product: Product): Promise<void> {
   const db = getDb();
   if (!db) throw new Error("Sem ligação ao banco de dados.");
-  if (!canSyncSiteData()) throw new Error("Sem permissão para publicar. Entre com uma conta de gestor.");
-  await setDoc(doc(db, "products", product.id), stripUndefined(product) as Product);
+  if (!canSyncSiteData())
+    throw new Error(
+      "Sem permissão para publicar. Entre com uma conta de gestor.",
+    );
+  await setDoc(
+    doc(db, "products", product.id),
+    stripUndefined(product) as Product,
+  );
 }
 
 const EMPTY: Product[] = [];
 
 export function useProductsStatus(): "loading" | "ready" | "error" {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => status,
     () => "loading" as const,
   );
@@ -105,7 +141,10 @@ export function useCustomProducts(): Product[] {
 
 export function useAllProducts(): Product[] {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => list,
     () => EMPTY,
   );

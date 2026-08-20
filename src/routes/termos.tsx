@@ -7,9 +7,17 @@ export const Route = createFileRoute("/termos")({
   head: () => ({
     meta: [
       { title: "Termos e Condições — Bazarixy" },
-      { name: "description", content: "Termos e condições de utilização da plataforma Bazarixy, incluindo compras, pagamentos, entregas e responsabilidades da marketplace em Angola." },
+      {
+        name: "description",
+        content:
+          "Termos e condições de utilização da plataforma Bazarixy, incluindo compras, pagamentos, entregas e responsabilidades da marketplace em Angola.",
+      },
       { property: "og:title", content: "Termos e Condições — Bazarixy" },
-      { property: "og:description", content: "Regras de utilização, responsabilidades, pagamentos e protecção de dados da plataforma Bazarixy." },
+      {
+        property: "og:description",
+        content:
+          "Regras de utilização, responsabilidades, pagamentos e protecção de dados da plataforma Bazarixy.",
+      },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -17,7 +25,12 @@ export const Route = createFileRoute("/termos")({
   component: TermsPage,
 });
 
-const sections: { id: string; title: string; paragraphs: string[]; list?: string[] }[] = [
+const sections: {
+  id: string;
+  title: string;
+  paragraphs: string[];
+  list?: string[];
+}[] = [
   {
     id: "1",
     title: "1. DISPOSIÇÕES INICIAIS",
@@ -178,11 +191,21 @@ const sections: { id: string; title: string; paragraphs: string[]; list?: string
 
 function TermsPage() {
   return (
-    <Layout title="Termos e Condições" showBack hideHeader hideBottomNav hideTopNav>
+    <Layout
+      title="Termos e Condições"
+      showBack
+      hideHeader
+      hideBottomNav
+      hideTopNav
+    >
       <article className="mx-auto w-full max-w-[980px] bg-white px-4 py-6 text-slate-800 md:px-10 md:py-10">
         <header className="border-b border-slate-200 pb-6 text-center md:pb-8">
           <div className="flex justify-center">
-            <img src={logoAsset.url} alt="Bazarixy" className="h-20 w-auto object-contain md:h-24" />
+            <img
+              src={logoAsset.url}
+              alt="Bazarixy"
+              className="h-20 w-auto object-contain md:h-24"
+            />
           </div>
 
           <h1 className="mt-6 font-display text-2xl font-black leading-tight text-slate-900 md:text-4xl">
@@ -197,13 +220,19 @@ function TermsPage() {
 
         <div className="py-6 md:py-8">
           {sections.map((section) => (
-            <section key={section.id} className="scroll-mt-20 border-b border-slate-200 py-6 last:border-b-0 first:pt-0">
+            <section
+              key={section.id}
+              className="scroll-mt-20 border-b border-slate-200 py-6 last:border-b-0 first:pt-0"
+            >
               <h2 className="text-center font-display text-lg font-black tracking-tight text-slate-900 md:text-xl">
                 {section.title}
               </h2>
 
               {section.paragraphs.map((paragraph, index) => (
-                <p key={`${section.id}-${index}`} className="mt-3 text-[15px] leading-8 text-slate-700">
+                <p
+                  key={`${section.id}-${index}`}
+                  className="mt-3 text-[15px] leading-8 text-slate-700"
+                >
                   {paragraph}
                 </p>
               ))}
@@ -211,7 +240,10 @@ function TermsPage() {
               {section.list && (
                 <ul className="mt-3 space-y-2 pl-5 text-[15px] leading-8 text-slate-700">
                   {section.list.map((item) => (
-                    <li key={item} className="list-disc marker:text-brand-strong">
+                    <li
+                      key={item}
+                      className="list-disc marker:text-brand-strong"
+                    >
                       {item}
                     </li>
                   ))}
@@ -222,40 +254,64 @@ function TermsPage() {
         </div>
 
         <section className="border-t border-slate-200 pt-6">
-          <h3 className="font-display text-xl font-black text-slate-900">Contactos oficiais</h3>
+          <h3 className="font-display text-xl font-black text-slate-900">
+            Contactos oficiais
+          </h3>
 
           <div className="mt-5 grid gap-4 md:grid-cols-2">
-            <a href="mailto:suporte@bazarixy.com" className="flex items-center gap-3 rounded-xl bg-slate-50 p-4 transition hover:bg-slate-100">
+            <a
+              href="mailto:suporte@bazarixy.com"
+              className="flex items-center gap-3 rounded-xl bg-slate-50 p-4 transition hover:bg-slate-100"
+            >
               <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white text-brand-strong ring-1 ring-slate-200">
                 <Mail className="h-5 w-5" />
               </div>
               <div>
-                <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Suporte ao cliente</span>
-                <span className="text-sm font-medium text-slate-800">suporte@bazarixy.com</span>
+                <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                  Suporte ao cliente
+                </span>
+                <span className="text-sm font-medium text-slate-800">
+                  suporte@bazarixy.com
+                </span>
               </div>
             </a>
 
-            <a href="mailto:parcerias@bazarixy.com" className="flex items-center gap-3 rounded-xl bg-slate-50 p-4 transition hover:bg-slate-100">
+            <a
+              href="mailto:parcerias@bazarixy.com"
+              className="flex items-center gap-3 rounded-xl bg-slate-50 p-4 transition hover:bg-slate-100"
+            >
               <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-white text-brand-strong ring-1 ring-slate-200">
                 <Handshake className="h-5 w-5" />
               </div>
               <div>
-                <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Parcerias comerciais</span>
-                <span className="text-sm font-medium text-slate-800">parcerias@bazarixy.com</span>
+                <span className="block text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                  Parcerias comerciais
+                </span>
+                <span className="text-sm font-medium text-slate-800">
+                  parcerias@bazarixy.com
+                </span>
               </div>
             </a>
           </div>
         </section>
 
         <div className="mt-8 flex flex-col items-center gap-3 border-t border-slate-200 pt-5 text-center md:flex-row md:items-center md:justify-between md:text-left">
-          <Link to="/support" className="inline-flex items-center gap-2 text-sm font-bold text-brand-strong">
+          <Link
+            to="/support"
+            className="inline-flex items-center gap-2 text-sm font-bold text-brand-strong"
+          >
             Falar com o suporte
             <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link to="/trocas-devolucoes" className="text-sm font-bold text-brand-strong underline-offset-4 hover:underline">
+          <Link
+            to="/trocas-devolucoes"
+            className="text-sm font-bold text-brand-strong underline-offset-4 hover:underline"
+          >
             Política de Trocas e Devoluções
           </Link>
-          <span className="text-sm text-slate-500">Estas condições podem ser atualizadas com aviso na plataforma.</span>
+          <span className="text-sm text-slate-500">
+            Estas condições podem ser atualizadas com aviso na plataforma.
+          </span>
         </div>
       </article>
     </Layout>

@@ -29,7 +29,12 @@ export function useReviews(productId?: string): Review[] {
 }
 
 export const reviewActions = {
-  async add(r: Omit<Review, "id" | "createdAt" | "verified" | "createdAtTimestamp" | "uid">) {
+  async add(
+    r: Omit<
+      Review,
+      "id" | "createdAt" | "verified" | "createdAtTimestamp" | "uid"
+    >,
+  ) {
     const reviewId = await addReviewToFirebase({ ...r, uid: "" });
     if (!reviewId) throw new Error("Falha na validação da compra");
     return reviewId;
@@ -39,7 +44,10 @@ export const reviewActions = {
 /** Mantido por compatibilidade — a verificação real vive no banco de dados. */
 export async function markOrderReviewed(_orderId: string) {}
 
-export async function isOrderReviewed(orderId: string, uid?: string): Promise<boolean> {
+export async function isOrderReviewed(
+  orderId: string,
+  uid?: string,
+): Promise<boolean> {
   if (!uid) return false;
   try {
     return await isOrderReviewedInFirebase(orderId, uid);
@@ -53,5 +61,7 @@ if (typeof window !== "undefined") {
   try {
     localStorage.removeItem("shop_reviews_v1");
     localStorage.removeItem("shop_reviewed_orders_v1");
-  } catch {}
+  } catch {
+    // O armazenamento local pode não estar disponível em modo privado.
+  }
 }

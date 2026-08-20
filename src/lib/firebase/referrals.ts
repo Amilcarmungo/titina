@@ -8,7 +8,17 @@
  * regras autorizam), e o convidador lê os registos onde é o `referrerUid`.
  * Assim os pontos são sempre calculados a partir do banco, nunca do frontend.
  */
-import { collection, doc, getDoc, getDocs, onSnapshot, query, serverTimestamp, setDoc, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
+} from "firebase/firestore";
 
 import { getDb } from "./client";
 import { inviteUrl } from "@/lib/site";
@@ -65,7 +75,9 @@ export async function countReferrals(uid: string): Promise<number> {
   const db = getDb();
   if (!db) return 0;
   try {
-    const snap = await getDocs(query(collection(db, "referrals"), where("referrerUid", "==", uid)));
+    const snap = await getDocs(
+      query(collection(db, "referrals"), where("referrerUid", "==", uid)),
+    );
     return snap.size;
   } catch {
     return 0;

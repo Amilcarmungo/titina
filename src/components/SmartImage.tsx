@@ -28,31 +28,50 @@ const LOADED_KEY = "img_cache_v1";
 const loaded = new Set<string>(
   (() => {
     if (typeof window === "undefined") return [];
-    try { return JSON.parse(sessionStorage.getItem(LOADED_KEY) || "[]") as string[]; } catch { return []; }
+    try {
+      return JSON.parse(sessionStorage.getItem(LOADED_KEY) || "[]") as string[];
+    } catch {
+      return [];
+    }
   })(),
 );
 function rememberLoaded(src: string) {
   if (loaded.has(src)) return;
   loaded.add(src);
   if (typeof window === "undefined") return;
-  try { sessionStorage.setItem(LOADED_KEY, JSON.stringify([...loaded].slice(-400))); } catch { /* quota */ }
+  try {
+    sessionStorage.setItem(LOADED_KEY, JSON.stringify([...loaded].slice(-400)));
+  } catch {
+    /* quota */
+  }
 }
 
-export function SmartImage({ src, alt, className = "", wrapperClassName = "", eager, draggable, rounded = "" }: Props) {
+export function SmartImage({
+  src,
+  alt,
+  className = "",
+  wrapperClassName = "",
+  eager,
+  draggable,
+  rounded = "",
+}: Props) {
   // Sem `src` ainda (dados a chegar do banco) → apenas esqueleto, nunca erro.
   const [state, setState] = useState<"loading" | "ready" | "error">(() =>
     src && loaded.has(src) ? "ready" : "loading",
   );
 
   useEffect(() => {
-    if (src && loaded.has(src)) { setState("ready"); return; }
+    if (src && loaded.has(src)) {
+      setState("ready");
+      return;
+    }
     setState("loading");
   }, [src]);
 
-
-
   return (
-    <div className={`relative overflow-hidden bg-muted ${rounded} ${wrapperClassName}`}>
+    <div
+      className={`relative overflow-hidden bg-muted ${rounded} ${wrapperClassName}`}
+    >
       {state !== "ready" && (
         <div className={`absolute inset-0 shimmer ${rounded}`} aria-hidden />
       )}
@@ -69,7 +88,10 @@ export function SmartImage({ src, alt, className = "", wrapperClassName = "", ea
           loading={eager ? "eager" : "lazy"}
           decoding={eager ? "sync" : "async"}
           fetchPriority={eager ? "high" : "auto"}
-          onLoad={() => { rememberLoaded(src); setState("ready"); }}
+          onLoad={() => {
+            rememberLoaded(src);
+            setState("ready");
+          }}
           onError={() => setState("error")}
 
           className={`h-full w-full transition-opacity duration-500 ${state === "ready" ? "opacity-100" : "opacity-0"} ${className}`}

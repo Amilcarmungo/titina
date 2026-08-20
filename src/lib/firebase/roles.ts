@@ -23,15 +23,22 @@ export type StaffState = { staff: StaffMember | null; loading: boolean };
 
 /** O que cada função pode fazer (espelho do que as regras do backend permitem). */
 export type Permission =
-  | "catalog.write"      // produtos, categorias, banners, lojas
-  | "publish.approve"    // aprovar publicação de produtos/lojas
-  | "orders.status"      // alterar estado e notificar cliente
+  | "catalog.write" // produtos, categorias, banners, lojas
+  | "publish.approve" // aprovar publicação de produtos/lojas
+  | "orders.status" // alterar estado e notificar cliente
   | "orders.delete"
-  | "settings.write"     // pagamentos, logística, configurações
+  | "settings.write" // pagamentos, logística, configurações
   | "staff.manage";
 
 const MATRIX: Record<StaffRole, Permission[]> = {
-  admin: ["catalog.write", "publish.approve", "orders.status", "orders.delete", "settings.write", "staff.manage"],
+  admin: [
+    "catalog.write",
+    "publish.approve",
+    "orders.status",
+    "orders.delete",
+    "settings.write",
+    "staff.manage",
+  ],
   gerente: ["catalog.write", "publish.approve", "orders.status"],
   atendente: ["orders.status"],
 };
@@ -71,7 +78,10 @@ export function watchStaff(uid: string | null) {
     (snap) => {
       const data = snap.data() as Omit<StaffMember, "uid"> | undefined;
       const valid = data && data.active !== false && data.role in MATRIX;
-      emit({ staff: valid ? { uid, ...data, active: true } : null, loading: false });
+      emit({
+        staff: valid ? { uid, ...data, active: true } : null,
+        loading: false,
+      });
     },
     () => emit({ staff: null, loading: false }),
   );
@@ -79,13 +89,19 @@ export function watchStaff(uid: string | null) {
 
 export function useStaff(): StaffState {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => state,
     () => server,
   );
 }
 
-export function can(staff: StaffMember | null, permission: Permission): boolean {
+export function can(
+  staff: StaffMember | null,
+  permission: Permission,
+): boolean {
   if (!staff) return false;
   return MATRIX[staff.role].includes(permission);
 }
@@ -101,7 +117,8 @@ export function usePermission(permission: Permission): boolean {
  * bloqueamos a publicação — o backend recusa se o utilizador não tiver direito.
  */
 export function canSyncSiteData(): boolean {
-  if (can(state.staff, "catalog.write") || can(state.staff, "settings.write")) return true;
+  if (can(state.staff, "catalog.write") || can(state.staff, "settings.write"))
+    return true;
   if (state.loading) return Boolean(getFirebaseAuth()?.currentUser);
   return false;
 }

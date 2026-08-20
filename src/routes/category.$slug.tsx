@@ -1,6 +1,13 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ChevronLeft, Menu, ShoppingCart, Camera, SlidersHorizontal, ChevronDown } from "lucide-react";
+import {
+  ChevronLeft,
+  Menu,
+  ShoppingCart,
+  Camera,
+  SlidersHorizontal,
+  ChevronDown,
+} from "lucide-react";
 import { NotificationBell } from "@/components/Layout";
 import { useUnreadCount } from "@/lib/notifications-store";
 import { Layout } from "@/components/Layout";
@@ -17,14 +24,27 @@ export const Route = createFileRoute("/category/$slug")({
   }),
   loader: ({ params }) => ({ slug: params.slug }),
   head: ({ loaderData }) => ({
-    meta: loaderData ? [
-      { title: `Categoria — Bazarixy` },
-      { name: "description", content: `Compre produtos com preços incríveis.` },
-    ] : [],
+    meta: loaderData
+      ? [
+          { title: `Categoria — Bazarixy` },
+          {
+            name: "description",
+            content: `Compre produtos com preços incríveis.`,
+          },
+        ]
+      : [],
   }),
   component: CategoryPage,
-  notFoundComponent: () => <Layout title="Categoria" showBack><p className="p-6">Categoria não encontrada.</p></Layout>,
-  errorComponent: () => <Layout title="Erro" showBack><p className="p-6">Algo deu errado.</p></Layout>,
+  notFoundComponent: () => (
+    <Layout title="Categoria" showBack>
+      <p className="p-6">Categoria não encontrada.</p>
+    </Layout>
+  ),
+  errorComponent: () => (
+    <Layout title="Erro" showBack>
+      <p className="p-6">Algo deu errado.</p>
+    </Layout>
+  ),
 });
 
 function CategoryPage() {
@@ -38,8 +58,12 @@ function CategoryPage() {
   const unread = useUnreadCount();
   const cartCount = cart.reduce((s, c) => s + c.qty, 0);
 
-  const all = useMemo(() => [...customs].filter((p) => p.category === slug), [customs, slug]);
-  const filtered = sub === "all" ? all : all.filter((p) => p.subcategory === sub);
+  const all = useMemo(
+    () => [...customs].filter((p) => p.category === slug),
+    [customs, slug],
+  );
+  const filtered =
+    sub === "all" ? all : all.filter((p) => p.subcategory === sub);
 
   // Resolve a representative image for each subcategory (first product of that sub)
   const subImage = (name: string) =>
@@ -54,7 +78,11 @@ function CategoryPage() {
       {/* Mobile custom header (matches the reference) */}
       <header className="sticky top-0 z-40 border-b border-border bg-background md:hidden">
         <div className="flex items-center gap-1.5 px-2 py-2">
-          <button onClick={() => window.history.back()} className="p-1.5" aria-label="Voltar">
+          <button
+            onClick={() => window.history.back()}
+            className="p-1.5"
+            aria-label="Voltar"
+          >
             <ChevronLeft className="h-5 w-5" strokeWidth={2.2} />
           </button>
           <Link to="/categories" className="p-1.5" aria-label="Menu">
@@ -67,14 +95,21 @@ function CategoryPage() {
             <span className="flex-1 min-w-0 truncate text-[13px] text-foreground/80">
               {cat.name} femininas
             </span>
-            <button aria-label="Buscar por imagem" className="grid h-7 w-7 place-items-center text-foreground/70">
+            <button
+              aria-label="Buscar por imagem"
+              className="grid h-7 w-7 place-items-center text-foreground/70"
+            >
               <Camera className="h-4 w-4" strokeWidth={2} />
             </button>
             <span className="grid h-7 w-9 place-items-center rounded-full bg-foreground text-background">
               <SearchIcon className="h-4 w-4" strokeWidth={2} />
             </span>
           </Link>
-          <Link to="/notifications" className="relative p-1.5" aria-label="Notificações">
+          <Link
+            to="/notifications"
+            className="relative p-1.5"
+            aria-label="Notificações"
+          >
             <NotificationBell count={unread} />
           </Link>
           <Link to="/cart" className="relative p-1.5" aria-label="Carrinho">
@@ -164,7 +199,12 @@ function SubTile({
         }`}
       >
         {image ? (
-          <SmartImage src={image} alt={label} wrapperClassName="absolute inset-0 h-full w-full" className="object-cover" />
+          <SmartImage
+            src={image}
+            alt={label}
+            wrapperClassName="absolute inset-0 h-full w-full"
+            className="object-cover"
+          />
         ) : (
           <span className="text-2xl">🛍️</span>
         )}

@@ -4,7 +4,14 @@ import { Layout } from "@/components/Layout";
 import { ProductCard } from "@/components/ProductCard";
 import { useAllProducts } from "@/lib/products-store";
 import { getShop, useShops } from "@/lib/shops-store";
-import { Star, BadgeCheck, Flame, Share2, Store as StoreIcon, ChevronLeft } from "lucide-react";
+import {
+  Star,
+  BadgeCheck,
+  Flame,
+  Share2,
+  Store as StoreIcon,
+  ChevronLeft,
+} from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
 import { ShareSheet, nativeShare } from "@/components/ShareSheet";
 import { absoluteUrl, paths, shopUrl, SITE_NAME } from "@/lib/site";
@@ -19,7 +26,9 @@ export const Route = createFileRoute("/shop/$id")({
   head: ({ params }) => {
     const shop = getShop(params.id);
     const name = shop?.name ?? "Loja";
-    const desc = (shop?.description ?? `Descubra a loja ${name} na ${SITE_NAME}.`).slice(0, 155);
+    const desc = (
+      shop?.description ?? `Descubra a loja ${name} na ${SITE_NAME}.`
+    ).slice(0, 155);
     const image = absoluteUrl(shop?.cover || shop?.logo || "/favicon.ico");
     return {
       meta: [
@@ -40,7 +49,11 @@ export const Route = createFileRoute("/shop/$id")({
     };
   },
   component: ShopPage,
-  notFoundComponent: () => <Layout title="Loja" showBack><p className="p-6">Loja não encontrada.</p></Layout>,
+  notFoundComponent: () => (
+    <Layout title="Loja" showBack>
+      <p className="p-6">Loja não encontrada.</p>
+    </Layout>
+  ),
 });
 
 function ShopPage() {
@@ -72,7 +85,12 @@ function ShopPage() {
       <ShareSheet
         open={shareOpen}
         onClose={() => setShareOpen(false)}
-        target={{ url: shopUrl(id), title: shop.name, text: `Veja a loja ${shop.name} na Bazarixy`, image: shop.logo || shop.cover }}
+        target={{
+          url: shopUrl(id),
+          title: shop.name,
+          text: `Veja a loja ${shop.name} na Bazarixy`,
+          image: shop.logo || shop.cover,
+        }}
       />
 
       {/* Simple top bar */}
@@ -91,7 +109,12 @@ function ShopPage() {
           <button
             onClick={() => {
               void (async () => {
-                const target = { url: shopUrl(id), title: shop.name, text: `Veja a loja ${shop.name} na Bazarixy`, image: shop.logo || shop.cover };
+                const target = {
+                  url: shopUrl(id),
+                  title: shop.name,
+                  text: `Veja a loja ${shop.name} na Bazarixy`,
+                  image: shop.logo || shop.cover,
+                };
                 if (!(await nativeShare(target))) setShareOpen(true);
               })();
             }}
@@ -109,7 +132,12 @@ function ShopPage() {
           <div className="flex items-center gap-4 md:items-end md:gap-5">
             <div className="grid h-24 w-24 md:h-32 md:w-32 shrink-0 place-items-center rounded-full bg-background text-foreground font-display text-2xl md:text-3xl font-black shadow-xl ring-4 ring-background overflow-hidden">
               {shop.logo ? (
-                <SmartImage src={shop.logo} alt={shop.name} wrapperClassName="absolute inset-0 h-full w-full" className="object-cover" />
+                <SmartImage
+                  src={shop.logo}
+                  alt={shop.name}
+                  wrapperClassName="absolute inset-0 h-full w-full"
+                  className="object-cover"
+                />
               ) : (
                 initials || <StoreIcon className="h-8 w-8" />
               )}
@@ -122,7 +150,9 @@ function ShopPage() {
                 <BadgeCheck className="h-4 w-4 md:h-5 md:w-5 text-gold shrink-0" />
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] md:text-xs text-muted-foreground">
-                <span className="rounded bg-gold px-1.5 py-0.5 font-bold text-foreground">Choices</span>
+                <span className="rounded bg-gold px-1.5 py-0.5 font-bold text-foreground">
+                  Choices
+                </span>
                 <span className="flex items-center gap-0.5">
                   <Star className="h-3 w-3 fill-gold text-gold" /> 4.87
                 </span>
@@ -137,7 +167,11 @@ function ShopPage() {
                 if (!requireAuth(user) || saving) return;
                 setSaving(true);
                 void toggleFollow(id, shop.name)
-                  .then((now) => toast.success(now ? "A seguir esta loja" : "Deixou de seguir"))
+                  .then((now) =>
+                    toast.success(
+                      now ? "A seguir esta loja" : "Deixou de seguir",
+                    ),
+                  )
                   .catch((e: Error) => toast.error(e.message))
                   .finally(() => setSaving(false));
               }}
@@ -172,9 +206,9 @@ function ShopPage() {
 
       {/* Products */}
       <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 px-3 py-4 md:grid-cols-4 md:gap-4 md:px-0 lg:grid-cols-5">
-        {shopProducts.length ? shopProducts.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        )) : (
+        {shopProducts.length ? (
+          shopProducts.map((p) => <ProductCard key={p.id} product={p} />)
+        ) : (
           <p className="col-span-full py-10 text-center text-sm text-muted-foreground">
             Esta loja ainda não tem produtos.
           </p>
@@ -184,7 +218,9 @@ function ShopPage() {
       <div className="mx-4 mb-6 rounded-lg bg-gradient-to-r from-sale/10 to-gold/10 p-3 text-xs md:mx-auto md:max-w-5xl">
         <span className="font-bold text-sale">SuperDeals</span> Poupe até{" "}
         <span className="font-bold">15%</span> nesta loja
-        <Link to="/" className="ml-1 font-bold underline">›</Link>
+        <Link to="/" className="ml-1 font-bold underline">
+          ›
+        </Link>
       </div>
     </Layout>
   );

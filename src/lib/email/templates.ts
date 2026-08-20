@@ -40,8 +40,21 @@ export type EmailPayloads = {
     address?: string;
     paymentMethod?: string;
   };
-  notification: { name?: string; title: string; message: string; ctaLabel?: string; ctaPath?: string };
-  promo: { name?: string; headline: string; message: string; ctaLabel?: string; ctaPath?: string; imageUrl?: string };
+  notification: {
+    name?: string;
+    title: string;
+    message: string;
+    ctaLabel?: string;
+    ctaPath?: string;
+  };
+  promo: {
+    name?: string;
+    headline: string;
+    message: string;
+    ctaLabel?: string;
+    ctaPath?: string;
+    imageUrl?: string;
+  };
 };
 
 export type EmailRequest<K extends EmailTemplateName = EmailTemplateName> = {
@@ -52,8 +65,14 @@ export type EmailRequest<K extends EmailTemplateName = EmailTemplateName> = {
 
 type Built = { subject: string; html: string };
 
-const url = (path?: string) => (path ? (path.startsWith("http") ? path : `${SITE_URL}${path.startsWith("/") ? "" : "/"}${path}`) : SITE_URL);
-const hello = (name?: string) => paragraph(name ? `Olá <strong>${esc(name)}</strong>,` : "Olá,");
+const url = (path?: string) =>
+  path
+    ? path.startsWith("http")
+      ? path
+      : `${SITE_URL}${path.startsWith("/") ? "" : "/"}${path}`
+    : SITE_URL;
+const hello = (name?: string) =>
+  paragraph(name ? `Olá <strong>${esc(name)}</strong>,` : "Olá,");
 
 export const EMAIL_TEMPLATES: {
   [K in EmailTemplateName]: (data: EmailPayloads[K]) => Built;
@@ -63,9 +82,13 @@ export const EMAIL_TEMPLATES: {
     html: shell(
       heading("Confirme o seu e-mail") +
         hello(d.name) +
-        paragraph("Use o código abaixo para confirmar a sua conta na Bazarixy.") +
+        paragraph(
+          "Use o código abaixo para confirmar a sua conta na Bazarixy.",
+        ) +
         codeBox(d.code) +
-        muted(`O código expira em ${esc(d.minutes ?? 15)} minutos. Se não foi você, ignore este e-mail.`),
+        muted(
+          `O código expira em ${esc(d.minutes ?? 15)} minutos. Se não foi você, ignore este e-mail.`,
+        ),
       "Código de verificação da sua conta",
     ),
   }),
@@ -75,9 +98,13 @@ export const EMAIL_TEMPLATES: {
     html: shell(
       heading("Recuperar palavra-passe") +
         hello(d.name) +
-        paragraph("Recebemos um pedido para redefinir a sua palavra-passe. Toque no botão abaixo para criar uma nova.") +
+        paragraph(
+          "Recebemos um pedido para redefinir a sua palavra-passe. Toque no botão abaixo para criar uma nova.",
+        ) +
         button("Criar nova palavra-passe", d.resetLink) +
-        muted("O link é válido por tempo limitado e só pode ser usado uma vez. Se não pediu isto, pode ignorar este e-mail em segurança."),
+        muted(
+          "O link é válido por tempo limitado e só pode ser usado uma vez. Se não pediu isto, pode ignorar este e-mail em segurança.",
+        ),
       "Redefina a sua palavra-passe",
     ),
   }),
@@ -87,7 +114,9 @@ export const EMAIL_TEMPLATES: {
     html: shell(
       heading("Pedido confirmado!") +
         hello(d.name) +
-        paragraph(`Obrigado pela sua compra. O seu pedido <strong>${esc(d.orderCode)}</strong> foi registado e já está a ser tratado.`) +
+        paragraph(
+          `Obrigado pela sua compra. O seu pedido <strong>${esc(d.orderCode)}</strong> foi registado e já está a ser tratado.`,
+        ) +
         itemsTable(d.items) +
         summaryRow("Subtotal", d.subtotal) +
         (d.discount ? summaryRow("Desconto", `-${d.discount}`) : "") +
@@ -103,7 +132,9 @@ export const EMAIL_TEMPLATES: {
   notification: (d) => ({
     subject: d.title,
     html: shell(
-      heading(d.title) + hello(d.name) + paragraph(esc(d.message)) +
+      heading(d.title) +
+        hello(d.name) +
+        paragraph(esc(d.message)) +
         (d.ctaLabel ? button(d.ctaLabel, url(d.ctaPath)) : ""),
       d.title,
     ),

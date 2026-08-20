@@ -18,7 +18,10 @@ export async function sendAppEmail<K extends EmailTemplateName>(
     if (!idToken) return false;
     const res = await fetch("/api/email", {
       method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${idToken}` },
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${idToken}`,
+      },
       body: JSON.stringify({ template, to, data }),
     });
     return res.ok;

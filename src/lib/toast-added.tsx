@@ -9,7 +9,9 @@ export function toastAdded(label = "Adicionado") {
         <span className="grid h-10 w-10 place-items-center rounded-full bg-emerald-500 shadow-[0_6px_18px_-6px_rgba(16,185,129,0.8)]">
           <Check className="h-5 w-5 text-white" strokeWidth={3} />
         </span>
-        <span className="whitespace-nowrap text-[13px] font-bold text-neutral-900">{label}</span>
+        <span className="whitespace-nowrap text-[13px] font-bold text-neutral-900">
+          {label}
+        </span>
       </div>
     ),
     { duration: 1600 },

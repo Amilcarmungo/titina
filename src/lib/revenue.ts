@@ -18,8 +18,12 @@ export function isPaid(o: Order) {
 export function revenueSummary(orders: Order[]) {
   const paid = orders.filter(isPaid);
   const gross = paid.reduce((s, o) => s + o.total, 0);
-  const pending = orders.filter((o) => o.status === "unpaid").reduce((s, o) => s + o.total, 0);
-  const refunded = orders.filter((o) => o.status === "returns").reduce((s, o) => s + o.total, 0);
+  const pending = orders
+    .filter((o) => o.status === "unpaid")
+    .reduce((s, o) => s + o.total, 0);
+  const refunded = orders
+    .filter((o) => o.status === "returns")
+    .reduce((s, o) => s + o.total, 0);
   const { platform, shop } = splitSale(gross);
   return {
     orders: paid.length,

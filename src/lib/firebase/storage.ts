@@ -1,4 +1,9 @@
-import { getDownloadURL, ref, uploadBytesResumable, deleteObject } from "firebase/storage";
+import {
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+  deleteObject,
+} from "firebase/storage";
 
 import { getFirebaseStorage } from "./client";
 
@@ -18,11 +23,16 @@ function stamp(fileName: string) {
 }
 
 export const storagePaths = {
-  product: (productId: string, fileName: string) => `catalog/products/${productId}/${stamp(fileName)}`,
-  category: (slug: string, fileName: string) => `catalog/categories/${slug}/${stamp(fileName)}`,
-  shop: (shopId: string, fileName: string) => `catalog/shops/${shopId}/${stamp(fileName)}`,
-  banner: (tabId: string, fileName: string) => `content/banners/${tabId}/${stamp(fileName)}`,
-  payment: (methodId: string, fileName: string) => `content/payments/${methodId}/${stamp(fileName)}`,
+  product: (productId: string, fileName: string) =>
+    `catalog/products/${productId}/${stamp(fileName)}`,
+  category: (slug: string, fileName: string) =>
+    `catalog/categories/${slug}/${stamp(fileName)}`,
+  shop: (shopId: string, fileName: string) =>
+    `catalog/shops/${shopId}/${stamp(fileName)}`,
+  banner: (tabId: string, fileName: string) =>
+    `content/banners/${tabId}/${stamp(fileName)}`,
+  payment: (methodId: string, fileName: string) =>
+    `content/payments/${methodId}/${stamp(fileName)}`,
   // Comprovativo fica na pasta do próprio utilizador: qualquer cliente logado
   // consegue enviar e ler o seu ficheiro (a equipa também lê).
   proof: (uid: string, orderId: string, fileName: string) =>
@@ -30,15 +40,30 @@ export const storagePaths = {
 };
 
 /** Envia um arquivo para o Storage e devolve a URL pública. */
-export async function uploadFile(path: string, file: Blob | File, onProgress?: (percent: number) => void): Promise<string | null> {
+export async function uploadFile(
+  path: string,
+  file: Blob | File,
+  onProgress?: (percent: number) => void,
+): Promise<string | null> {
   const storage = getFirebaseStorage();
   if (!storage) return null;
   const r = ref(storage, path);
   const task = uploadBytesResumable(r, file);
   await new Promise<void>((resolve, reject) => {
-    task.on("state_changed", (snapshot) => {
-      onProgress?.(snapshot.totalBytes ? Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100) : 0);
-    }, reject, resolve);
+    task.on(
+      "state_changed",
+      (snapshot) => {
+        onProgress?.(
+          snapshot.totalBytes
+            ? Math.round(
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
+              )
+            : 0,
+        );
+      },
+      reject,
+      resolve,
+    );
   });
   return getDownloadURL(r);
 }

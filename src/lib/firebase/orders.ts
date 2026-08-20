@@ -4,12 +4,23 @@
  * vê todos e é a única que pode notificar/alterar etapas em nome da loja.
  */
 import {
-  collection, deleteDoc, doc, onSnapshot, query, serverTimestamp, setDoc, where,
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
 } from "firebase/firestore";
 
 import { getDb, getFirebaseAuth } from "./client";
 import { can, useStaff } from "./roles";
-import { mergeRemoteOrders, registerOrdersBridge, type Order } from "@/lib/orders-store";
+import {
+  mergeRemoteOrders,
+  registerOrdersBridge,
+  type Order,
+} from "@/lib/orders-store";
 
 let registered = false;
 
@@ -43,7 +54,13 @@ export function watchOrders(uid: string | null, isStaff: boolean) {
   const q = isStaff ? query(ref) : query(ref, where("uid", "==", uid));
   return onSnapshot(
     q,
-    (snap) => mergeRemoteOrders(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Order, "id">) }))),
+    (snap) =>
+      mergeRemoteOrders(
+        snap.docs.map((d) => ({
+          id: d.id,
+          ...(d.data() as Omit<Order, "id">),
+        })),
+      ),
     () => {},
   );
 }

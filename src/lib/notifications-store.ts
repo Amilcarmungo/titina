@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from "react";
 
-export type NotificationKind = "order" | "delivery" | "coupon" | "product" | "system";
+export type NotificationKind =
+  "order" | "delivery" | "coupon" | "product" | "system";
 
 export type AppNotification = {
   id: string;
@@ -68,7 +69,10 @@ export function mergeRemoteNotifications(remote: AppNotification[]) {
 
 export function useNotifications(): AppNotification[] {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => list,
     () => empty,
   );
@@ -81,9 +85,17 @@ export function useUnreadCount(): number {
 
 export const notificationActions = {
   add(n: Omit<AppNotification, "id" | "createdAt" | "read">) {
-    if (bridge) { bridge.add(n); return; }
+    if (bridge) {
+      bridge.add(n);
+      return;
+    }
     list = [
-      { ...n, id: `n-${Date.now()}`, createdAt: new Date().toLocaleDateString("pt-PT"), read: false },
+      {
+        ...n,
+        id: `n-${Date.now()}`,
+        createdAt: new Date().toLocaleDateString("pt-PT"),
+        read: false,
+      },
       ...list,
     ];
     emit();

@@ -13,15 +13,24 @@ const MAX_BYTES = 8 * 1024 * 1024;
 
 function reason(err: unknown): string {
   const code = (err as { code?: string })?.code ?? "";
-  if (code.includes("unauthenticated")) return "Entre na sua conta para enviar ficheiros.";
-  if (code.includes("unauthorized") || code.includes("permission")) return "Sem permissão para enviar. Entre na sua conta e tente de novo.";
-  if (code.includes("retry-limit") || code.includes("canceled")) return "A ligação falhou a meio do envio.";
-  if (code.includes("quota")) return "O armazenamento está cheio. Fale com o suporte.";
+  if (code.includes("unauthenticated"))
+    return "Entre na sua conta para enviar ficheiros.";
+  if (code.includes("unauthorized") || code.includes("permission"))
+    return "Sem permissão para enviar. Entre na sua conta e tente de novo.";
+  if (code.includes("retry-limit") || code.includes("canceled"))
+    return "A ligação falhou a meio do envio.";
+  if (code.includes("quota"))
+    return "O armazenamento está cheio. Fale com o suporte.";
   return "Verifique a ligação e tente de novo.";
 }
 
 /** Tenta o envio mais do que uma vez — falhas de rede são comuns em mobile. */
-async function uploadWithRetry(path: string, file: File, attempts = 3, onProgress?: (percent: number) => void): Promise<string> {
+async function uploadWithRetry(
+  path: string,
+  file: File,
+  attempts = 3,
+  onProgress?: (percent: number) => void,
+): Promise<string> {
   let lastError: unknown;
   for (let i = 0; i < attempts; i += 1) {
     try {
@@ -36,7 +45,11 @@ async function uploadWithRetry(path: string, file: File, attempts = 3, onProgres
   throw lastError ?? new Error("upload-failed");
 }
 
-export async function uploadImageFile(file: File, path: string, options?: { silent?: boolean; onProgress?: (percent: number) => void }): Promise<string | null> {
+export async function uploadImageFile(
+  file: File,
+  path: string,
+  options?: { silent?: boolean; onProgress?: (percent: number) => void },
+): Promise<string | null> {
   if (!file.type.startsWith("image/")) {
     toast.error("Só são aceites imagens.");
     return null;
@@ -55,13 +68,18 @@ export async function uploadImageFile(file: File, path: string, options?: { sile
     if (!options?.silent) toast.success("Imagem enviada", { id });
     return url;
   } catch (err) {
-    if (!options?.silent) toast.error(`Não foi possível enviar a imagem. ${reason(err)}`, { id });
+    if (!options?.silent)
+      toast.error(`Não foi possível enviar a imagem. ${reason(err)}`, { id });
     return null;
   }
 }
 
 /** Comprovativos aceitam imagem ou PDF e vão sempre para o Storage. */
-export async function uploadProofFile(file: File, path: string, onProgress?: (percent: number) => void): Promise<string | null> {
+export async function uploadProofFile(
+  file: File,
+  path: string,
+  onProgress?: (percent: number) => void,
+): Promise<string | null> {
   const ok = file.type.startsWith("image/") || file.type === "application/pdf";
   if (!ok) {
     toast.error("Só é aceite imagem ou PDF.");
@@ -85,7 +103,9 @@ export async function uploadProofFile(file: File, path: string, onProgress?: (pe
     toast.success("Comprovativo enviado", { id });
     return url;
   } catch (err) {
-    toast.error(`Não foi possível enviar o comprovativo. ${reason(err)}`, { id });
+    toast.error(`Não foi possível enviar o comprovativo. ${reason(err)}`, {
+      id,
+    });
     return null;
   }
 }

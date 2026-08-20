@@ -1,13 +1,29 @@
 import { useSyncExternalStore } from "react";
 import { attachSync } from "@/lib/firebase/sync-store";
 
-export type QuickStripItem = { id: string; label: string; image?: string; to?: string };
+export type QuickStripItem = {
+  id: string;
+  label: string;
+  image?: string;
+  to?: string;
+};
 
 /** Aba principal da home (Mulher, Curve, Kids…) */
-export type HomeTab = { id: string; label: string; slugs: string[]; slideIds?: string[] };
+export type HomeTab = {
+  id: string;
+  label: string;
+  slugs: string[];
+  slideIds?: string[];
+};
 
 /** Tile lateral do hero em desktop */
-export type HeroTile = { id: string; label: string; image?: string; slug?: string; badge?: string };
+export type HeroTile = {
+  id: string;
+  label: string;
+  image?: string;
+  slug?: string;
+  badge?: string;
+};
 
 export type HomeConfig = {
   showQuickStrip: boolean;
@@ -56,7 +72,11 @@ const defaults: HomeConfig = {
   categoriesOrder: [],
   homeTabs: [
     { id: "t-all", label: "Tudo", slugs: [] },
-    { id: "t-mulher", label: "Mulher", slugs: ["dresses", "tops", "skirts", "jumpsuits"] },
+    {
+      id: "t-mulher",
+      label: "Mulher",
+      slugs: ["dresses", "tops", "skirts", "jumpsuits"],
+    },
     { id: "t-curve", label: "Curve", slugs: ["dresses", "tops", "jumpsuits"] },
     { id: "t-kids", label: "Kids", slugs: ["outros"] },
     { id: "t-local", label: "Local", slugs: [] },
@@ -78,35 +98,54 @@ const defaults: HomeConfig = {
 
 function read(): HomeConfig {
   if (typeof window === "undefined") return defaults;
-  try { return { ...defaults, ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch { return defaults; }
+  try {
+    return { ...defaults, ...JSON.parse(localStorage.getItem(KEY) || "{}") };
+  } catch {
+    return defaults;
+  }
 }
 
 let cfg: HomeConfig = read();
 const listeners = new Set<() => void>();
 function emit() {
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(cfg));
+  if (typeof window !== "undefined")
+    localStorage.setItem(KEY, JSON.stringify(cfg));
   listeners.forEach((l) => l());
   sync.push();
 }
 
-const sync = attachSync<HomeConfig>("homeConfig", () => cfg, (value) => {
-  if (!value || typeof value !== "object") return;
-  cfg = { ...defaults, ...value };
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(cfg));
-  listeners.forEach((l) => l());
-});
+const sync = attachSync<HomeConfig>(
+  "homeConfig",
+  () => cfg,
+  (value) => {
+    if (!value || typeof value !== "object") return;
+    cfg = { ...defaults, ...value };
+    if (typeof window !== "undefined")
+      localStorage.setItem(KEY, JSON.stringify(cfg));
+    listeners.forEach((l) => l());
+  },
+);
 
 export function useHomeConfig(): HomeConfig {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => cfg,
     () => defaults,
   );
 }
 
 export const homeConfigActions = {
-  update(patch: Partial<HomeConfig>) { cfg = { ...cfg, ...patch }; emit(); },
-  reset() { cfg = defaults; emit(); },
+  update(patch: Partial<HomeConfig>) {
+    cfg = { ...cfg, ...patch };
+    emit();
+  },
+  reset() {
+    cfg = defaults;
+    emit();
+  },
 };
 
 /* ------------------------------------------------------------------ aba activa
@@ -118,7 +157,10 @@ const tabListeners = new Set<() => void>();
 
 export function useActiveHomeTab(): number {
   return useSyncExternalStore(
-    (l) => { tabListeners.add(l); return () => tabListeners.delete(l); },
+    (l) => {
+      tabListeners.add(l);
+      return () => tabListeners.delete(l);
+    },
     () => activeTab,
     () => 0,
   );

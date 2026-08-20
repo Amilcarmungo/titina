@@ -47,7 +47,12 @@ export function codeBox(code: string): string {
   </div>`;
 }
 
-export type EmailLineItem = { name: string; qty: number; price: string; image?: string };
+export type EmailLineItem = {
+  name: string;
+  qty: number;
+  price: string;
+  image?: string;
+};
 
 export function itemsTable(items: EmailLineItem[]): string {
   const rows = items
@@ -66,7 +71,11 @@ export function itemsTable(items: EmailLineItem[]): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #eee;border-bottom:1px solid #eee;margin:16px 0">${rows}</table>`;
 }
 
-export function summaryRow(label: string, value: string, strong = false): string {
+export function summaryRow(
+  label: string,
+  value: string,
+  strong = false,
+): string {
   const weight = strong ? 700 : 400;
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
     <td style="font:${weight} 14px Arial,Helvetica,sans-serif;color:${TEXT};padding:4px 0">${esc(label)}</td>

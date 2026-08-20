@@ -62,7 +62,9 @@ export async function deleteAllReviewsByUser(uid: string): Promise<number> {
 /**
  * Deleta todas as reviews de um produto.
  */
-export async function deleteAllReviewsForProduct(productId: string): Promise<number> {
+export async function deleteAllReviewsForProduct(
+  productId: string,
+): Promise<number> {
   const db = getDb();
   if (!db) return 0;
 
@@ -139,7 +141,9 @@ export async function deleteReviewsOlderThan(days: number): Promise<number> {
       }
     }
 
-    console.log(`${count} reviews mais antigas que ${days} dias foram deletadas`);
+    console.log(
+      `${count} reviews mais antigas que ${days} dias foram deletadas`,
+    );
     return count;
   } catch (error) {
     console.error("Erro ao deletar reviews antigas:", error);
@@ -167,7 +171,8 @@ export async function findSuspiciousReviews(): Promise<Review[]> {
       // Flags suspeitas
       const isSuspicious =
         (review.rating === 5 && review.text.length < 20) || // 5 stars mas texto muito curto
-        (review.text.includes("fake") || review.text.includes("falso")) || // Menção a fake/falso
+        review.text.includes("fake") ||
+        review.text.includes("falso") || // Menção a fake/falso
         !review.photoURL; // Sem foto de perfil
 
       if (isSuspicious) {
@@ -186,7 +191,9 @@ export async function findSuspiciousReviews(): Promise<Review[]> {
 /**
  * Obtém todas as reviews de um produto.
  */
-export async function getAllReviewsForProduct(productId: string): Promise<Review[]> {
+export async function getAllReviewsForProduct(
+  productId: string,
+): Promise<Review[]> {
   const db = getDb();
   if (!db) return [];
 
@@ -195,7 +202,7 @@ export async function getAllReviewsForProduct(productId: string): Promise<Review
     const q = query(
       reviewsRef,
       where("productId", "==", productId),
-      where("verified", "==", true)
+      where("verified", "==", true),
     );
     const snap = await getDocs(q);
 
@@ -212,7 +219,10 @@ export async function getAllReviewsForProduct(productId: string): Promise<Review
 /**
  * Marca uma review como spam (função para futuro sistema de moderação).
  */
-export async function markReviewAsSpam(reviewId: string, reason: string): Promise<boolean> {
+export async function markReviewAsSpam(
+  reviewId: string,
+  reason: string,
+): Promise<boolean> {
   const db = getDb();
   if (!db) return false;
 
@@ -248,13 +258,13 @@ export async function getReviewsStats() {
 
     // Reviews verificadas
     const verifiedSnap = await getDocs(
-      query(reviewsRef, where("verified", "==", true))
+      query(reviewsRef, where("verified", "==", true)),
     );
     const verified = verifiedSnap.size;
 
     // Reviews não verificadas
     const unverifiedSnap = await getDocs(
-      query(reviewsRef, where("verified", "==", false))
+      query(reviewsRef, where("verified", "==", false)),
     );
     const unverified = unverifiedSnap.size;
 

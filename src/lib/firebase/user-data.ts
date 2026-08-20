@@ -43,14 +43,25 @@ export type SavedAddress = {
 export type CheckoutDraft = {
   step: number;
   total: number;
-  items: { productId: string; qty: number; size?: string; color?: string; unitPrice?: number }[];
+  items: {
+    productId: string;
+    qty: number;
+    size?: string;
+    color?: string;
+    unitPrice?: number;
+  }[];
   address?: Partial<SavedAddress>;
   paymentMethod?: string | null;
   coupon?: string | null;
 };
 
 export type InterestEvent = {
-  type: "product_view" | "add_to_cart" | "favorite" | "category_view" | "checkout_start";
+  type:
+    | "product_view"
+    | "add_to_cart"
+    | "favorite"
+    | "category_view"
+    | "checkout_start";
   productId?: string;
   category?: string;
   meta?: Record<string, string | number | boolean | null>;
@@ -82,18 +93,32 @@ export async function listAddresses(uid: string): Promise<SavedAddress[]> {
   const db = getDb();
   if (!db) return [];
   const snap = await getDocs(collection(db, "users", uid, "addresses"));
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<SavedAddress, "id">) }));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...(d.data() as Omit<SavedAddress, "id">),
+  }));
 }
 
-export function watchAddresses(uid: string, cb: (rows: SavedAddress[]) => void) {
+export function watchAddresses(
+  uid: string,
+  cb: (rows: SavedAddress[]) => void,
+) {
   const db = getDb();
   if (!db) return () => {};
   return onSnapshot(collection(db, "users", uid, "addresses"), (snap) =>
-    cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<SavedAddress, "id">) }))),
+    cb(
+      snap.docs.map((d) => ({
+        id: d.id,
+        ...(d.data() as Omit<SavedAddress, "id">),
+      })),
+    ),
   );
 }
 
-export async function saveAddress(uid: string, address: Omit<SavedAddress, "id"> & { id?: string }) {
+export async function saveAddress(
+  uid: string,
+  address: Omit<SavedAddress, "id"> & { id?: string },
+) {
   const db = getDb();
   if (!db) return null;
   const id = address.id || doc(collection(db, "users", uid, "addresses")).id;
@@ -111,13 +136,20 @@ export async function setDefaultAddress(uid: string, id: string) {
   const db = getDb();
   if (!db) return;
   const snap = await getDocs(
-    query(collection(db, "users", uid, "addresses"), where("isDefault", "==", true)),
+    query(
+      collection(db, "users", uid, "addresses"),
+      where("isDefault", "==", true),
+    ),
   );
   const batch = writeBatch(db);
   snap.docs.forEach((d) => {
     if (d.id !== id) batch.update(d.ref, { isDefault: false });
   });
-  batch.set(doc(db, "users", uid, "addresses", id), { isDefault: true }, { merge: true });
+  batch.set(
+    doc(db, "users", uid, "addresses", id),
+    { isDefault: true },
+    { merge: true },
+  );
   await batch.commit();
 }
 
@@ -129,7 +161,11 @@ export async function deleteAddress(uid: string, id: string) {
 
 /* --------------------------------------------------------------- pesquisas */
 
-export async function trackSearch(uid: string | null, term: string, resultCount?: number) {
+export async function trackSearch(
+  uid: string | null,
+  term: string,
+  resultCount?: number,
+) {
   const db = getDb();
   const value = term.trim();
   if (!db || !uid || value.length < 2) return;
@@ -145,16 +181,20 @@ export async function trackSearch(uid: string | null, term: string, resultCount?
     },
     { merge: true },
   );
-  await updateDoc(doc(db, "users", uid, "searches", id), { lastSearchedAt: serverTimestamp() }).catch(
-    () => {},
-  );
+  await updateDoc(doc(db, "users", uid, "searches", id), {
+    lastSearchedAt: serverTimestamp(),
+  }).catch(() => {});
 }
 
 export async function recentSearches(uid: string, max = 10) {
   const db = getDb();
   if (!db) return [];
   const snap = await getDocs(
-    query(collection(db, "users", uid, "searches"), orderBy("lastSearchedAt", "desc"), limit(max)),
+    query(
+      collection(db, "users", uid, "searches"),
+      orderBy("lastSearchedAt", "desc"),
+      limit(max),
+    ),
   );
   return snap.docs.map((d) => (d.data() as { term: string }).term);
 }
@@ -179,7 +219,10 @@ export async function trackEvent(uid: string | null, event: InterestEvent) {
 
 /* ------------------------------------------- checkout abandonado */
 
-export async function saveCheckoutDraft(uid: string | null, draft: CheckoutDraft) {
+export async function saveCheckoutDraft(
+  uid: string | null,
+  draft: CheckoutDraft,
+) {
   const db = getDb();
   if (!db || !uid) return;
   await setDoc(
@@ -193,7 +236,9 @@ export async function saveCheckoutDraft(uid: string | null, draft: CheckoutDraft
 export async function clearCheckoutDraft(uid: string | null) {
   const db = getDb();
   if (!db || !uid) return;
-  await deleteDoc(doc(db, "users", uid, "checkouts", "current")).catch(() => {});
+  await deleteDoc(doc(db, "users", uid, "checkouts", "current")).catch(
+    () => {},
+  );
 }
 
 export async function getCheckoutDraft(uid: string) {

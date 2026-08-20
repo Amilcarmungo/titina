@@ -26,8 +26,9 @@ export const firebaseConfig = {
 };
 
 /** Firebase só é usado no browser e apenas quando as chaves existem. */
-export const firebaseEnabled =
-  Boolean(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId);
+export const firebaseEnabled = Boolean(
+  firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId,
+);
 
 let app: FirebaseApp | null = null;
 
@@ -55,7 +56,9 @@ export function getDb(): Firestore | null {
   if (!db) {
     try {
       db = initializeFirestore(a, {
-        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
+        localCache: persistentLocalCache({
+          tabManager: persistentMultipleTabManager(),
+        }),
       });
     } catch {
       db = getFirestore(a);

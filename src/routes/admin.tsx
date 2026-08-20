@@ -1,14 +1,40 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  useRouterState,
+} from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  LayoutGrid, Package, ShoppingBag, Home as HomeIcon,
-  FolderTree, Settings, CreditCard, Menu, X, LogOut, Store as StoreIcon, Search, Heart,
-  Truck, TrendingUp, Ticket, Target, Users, ShieldCheck,
+  LayoutGrid,
+  Package,
+  ShoppingBag,
+  Home as HomeIcon,
+  FolderTree,
+  Settings,
+  CreditCard,
+  Menu,
+  X,
+  LogOut,
+  Store as StoreIcon,
+  Search,
+  Heart,
+  Truck,
+  TrendingUp,
+  Ticket,
+  Target,
+  Users,
+  ShieldCheck,
 } from "lucide-react";
 
 import logoAsset from "@/assets/bazarixy-logo.webp.asset.json";
 import { AdminGate } from "@/components/admin/AdminGate";
-import { ROLE_LABEL, can, useStaff, type Permission } from "@/lib/firebase/roles";
+import {
+  ROLE_LABEL,
+  can,
+  useStaff,
+  type Permission,
+} from "@/lib/firebase/roles";
 import { signOutUser } from "@/lib/firebase/auth";
 import { watchOrders } from "@/lib/firebase/orders";
 import { useStore } from "@/lib/store";
@@ -19,46 +45,137 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Admin — Bazarixy" },
-      { name: "description", content: "Painel de administração — banners, produtos, categorias, pedidos, lojas." },
+      {
+        name: "description",
+        content:
+          "Painel de administração — banners, produtos, categorias, pedidos, lojas.",
+      },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
   component: AdminShell,
 });
 
-type NavItem = { to: string; label: string; icon: typeof LayoutGrid; exact?: boolean; perm?: Permission };
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutGrid;
+  exact?: boolean;
+  perm?: Permission;
+};
 type NavGroup = { title: string; items: NavItem[] };
 
 const GROUPS: NavGroup[] = [
-  { title: "Visão geral", items: [
-    { to: "/admin", label: "Dashboard", icon: LayoutGrid, exact: true },
-    { to: "/admin/receita", label: "Receita total", icon: TrendingUp, perm: "settings.write" },
-    { to: "/admin/metas", label: "Metas", icon: Target, perm: "settings.write" },
-  ]},
-  { title: "Loja", items: [
-    { to: "/admin/produtos", label: "Produtos", icon: Package, perm: "catalog.write" },
-    { to: "/admin/categorias", label: "Categorias", icon: FolderTree, perm: "catalog.write" },
-    { to: "/admin/pedidos", label: "Pedidos", icon: ShoppingBag, perm: "orders.status" },
-    { to: "/admin/lojas", label: "Lojas", icon: StoreIcon, perm: "catalog.write" },
-  ]},
-  { title: "Pessoas", items: [
-    { to: "/admin/usuarios", label: "Usuários", icon: Users, perm: "orders.status" },
-    { to: "/admin/equipa", label: "Equipa", icon: ShieldCheck, perm: "staff.manage" },
-  ]},
-  { title: "Conteúdo", items: [
-    { to: "/admin/home", label: "Página inicial", icon: HomeIcon, perm: "catalog.write" },
-  ]},
-  { title: "Marketing", items: [
-    { to: "/admin/cupons", label: "Cupons", icon: Ticket, perm: "catalog.write" },
-  ]},
-  { title: "Sistema", items: [
-    { to: "/admin/logistica", label: "Logística & fretes", icon: Truck, perm: "settings.write" },
-    { to: "/admin/pagamentos", label: "Pagamentos", icon: CreditCard, perm: "settings.write" },
-    { to: "/admin/config", label: "Configurações", icon: Settings, perm: "settings.write" },
-  ]},
+  {
+    title: "Visão geral",
+    items: [
+      { to: "/admin", label: "Dashboard", icon: LayoutGrid, exact: true },
+      {
+        to: "/admin/receita",
+        label: "Receita total",
+        icon: TrendingUp,
+        perm: "settings.write",
+      },
+      {
+        to: "/admin/metas",
+        label: "Metas",
+        icon: Target,
+        perm: "settings.write",
+      },
+    ],
+  },
+  {
+    title: "Loja",
+    items: [
+      {
+        to: "/admin/produtos",
+        label: "Produtos",
+        icon: Package,
+        perm: "catalog.write",
+      },
+      {
+        to: "/admin/categorias",
+        label: "Categorias",
+        icon: FolderTree,
+        perm: "catalog.write",
+      },
+      {
+        to: "/admin/pedidos",
+        label: "Pedidos",
+        icon: ShoppingBag,
+        perm: "orders.status",
+      },
+      {
+        to: "/admin/lojas",
+        label: "Lojas",
+        icon: StoreIcon,
+        perm: "catalog.write",
+      },
+    ],
+  },
+  {
+    title: "Pessoas",
+    items: [
+      {
+        to: "/admin/usuarios",
+        label: "Usuários",
+        icon: Users,
+        perm: "orders.status",
+      },
+      {
+        to: "/admin/equipa",
+        label: "Equipa",
+        icon: ShieldCheck,
+        perm: "staff.manage",
+      },
+    ],
+  },
+  {
+    title: "Conteúdo",
+    items: [
+      {
+        to: "/admin/home",
+        label: "Página inicial",
+        icon: HomeIcon,
+        perm: "catalog.write",
+      },
+    ],
+  },
+  {
+    title: "Marketing",
+    items: [
+      {
+        to: "/admin/cupons",
+        label: "Cupons",
+        icon: Ticket,
+        perm: "catalog.write",
+      },
+    ],
+  },
+  {
+    title: "Sistema",
+    items: [
+      {
+        to: "/admin/logistica",
+        label: "Logística & fretes",
+        icon: Truck,
+        perm: "settings.write",
+      },
+      {
+        to: "/admin/pagamentos",
+        label: "Pagamentos",
+        icon: CreditCard,
+        perm: "settings.write",
+      },
+      {
+        to: "/admin/config",
+        label: "Configurações",
+        icon: Settings,
+        perm: "settings.write",
+      },
+    ],
+  },
 ];
-
-
 
 function AdminShell() {
   return (
@@ -103,22 +220,31 @@ function AdminLayout() {
         <button
           onClick={() => setCollapsed((c) => !c)}
           className="hidden h-9 w-9 place-items-center rounded-lg hover:bg-muted md:grid"
-          aria-label={collapsed ? "Mostrar menu lateral" : "Esconder menu lateral"}
+          aria-label={
+            collapsed ? "Mostrar menu lateral" : "Esconder menu lateral"
+          }
           title={collapsed ? "Mostrar menu" : "Esconder menu"}
         >
           <Menu className="h-5 w-5" />
         </button>
         <Link to="/admin" className="flex items-center gap-2.5">
           <img src={logoAsset.url} alt="Bazarixy" className="h-7 w-auto" />
-          <span className="hidden sm:inline rounded-full bg-foreground px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-background">Admin</span>
+          <span className="hidden sm:inline rounded-full bg-foreground px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-background">
+            Admin
+          </span>
         </Link>
         <div className="hidden md:flex ml-6 items-center gap-2 rounded-full border border-border bg-muted/40 px-3.5 py-2 text-sm text-muted-foreground w-72">
           <Search className="h-4 w-4" />
           <span className="text-xs">Pesquisar…</span>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <button className="grid h-9 w-9 place-items-center rounded-lg hover:bg-muted"><Heart className="h-4 w-4 fill-gold text-gold" /></button>
-          <Link to="/" className="rounded-full border border-border px-3.5 py-1.5 text-xs font-bold hover:bg-muted">
+          <button className="grid h-9 w-9 place-items-center rounded-lg hover:bg-muted">
+            <Heart className="h-4 w-4 fill-gold text-gold" />
+          </button>
+          <Link
+            to="/"
+            className="rounded-full border border-border px-3.5 py-1.5 text-xs font-bold hover:bg-muted"
+          >
             Ver loja
           </Link>
           {staff && (
@@ -148,11 +274,19 @@ function AdminLayout() {
         {/* Mobile drawer */}
         {open && (
           <div className="fixed inset-0 z-50 md:hidden">
-            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setOpen(false)} />
+            <div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setOpen(false)}
+            />
             <aside className="absolute left-0 top-0 h-full w-72 max-w-[80%] bg-background p-3 shadow-2xl overflow-y-auto">
               <div className="mb-3 flex items-center justify-between">
-                <span className="font-display text-lg font-black">Menu Admin</span>
-                <button onClick={() => setOpen(false)} className="grid h-8 w-8 place-items-center rounded-md hover:bg-muted">
+                <span className="font-display text-lg font-black">
+                  Menu Admin
+                </span>
+                <button
+                  onClick={() => setOpen(false)}
+                  className="grid h-8 w-8 place-items-center rounded-md hover:bg-muted"
+                >
                   <X className="h-4 w-4" />
                 </button>
               </div>
@@ -172,16 +306,29 @@ function AdminLayout() {
   );
 }
 
-function SideNav({ isActive, onNavigate, collapsed }: { isActive: (to: string, exact?: boolean) => boolean; onNavigate?: () => void; collapsed?: boolean }) {
+function SideNav({
+  isActive,
+  onNavigate,
+  collapsed,
+}: {
+  isActive: (to: string, exact?: boolean) => boolean;
+  onNavigate?: () => void;
+  collapsed?: boolean;
+}) {
   const { staff } = useStaff();
-  const groups = GROUPS
-    .map((g) => ({ ...g, items: g.items.filter((n) => !n.perm || can(staff, n.perm)) }))
-    .filter((g) => g.items.length > 0);
+  const groups = GROUPS.map((g) => ({
+    ...g,
+    items: g.items.filter((n) => !n.perm || can(staff, n.perm)),
+  })).filter((g) => g.items.length > 0);
   return (
     <nav className="flex flex-col gap-5 text-sm">
       {groups.map((g) => (
         <div key={g.title}>
-          {!collapsed && <p className="mb-1.5 px-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground">{g.title}</p>}
+          {!collapsed && (
+            <p className="mb-1.5 px-3 text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+              {g.title}
+            </p>
+          )}
           <div className="flex flex-col gap-0.5">
             {g.items.map((n) => {
               const active = isActive(n.to, n.exact);
@@ -197,7 +344,9 @@ function SideNav({ isActive, onNavigate, collapsed }: { isActive: (to: string, e
                       : "text-foreground/70 hover:bg-muted hover:text-foreground"
                   }`}
                 >
-                  <n.icon className={`h-4 w-4 ${active ? "" : "text-muted-foreground group-hover:text-foreground"}`} />
+                  <n.icon
+                    className={`h-4 w-4 ${active ? "" : "text-muted-foreground group-hover:text-foreground"}`}
+                  />
                   {!collapsed && <span className="text-[13px]">{n.label}</span>}
                 </Link>
               );
@@ -206,7 +355,10 @@ function SideNav({ isActive, onNavigate, collapsed }: { isActive: (to: string, e
         </div>
       ))}
       <button
-        onClick={() => { onNavigate?.(); void signOutUser(); }}
+        onClick={() => {
+          onNavigate?.();
+          void signOutUser();
+        }}
         title="Sair do admin"
         className={`mt-2 flex items-center gap-3 rounded-xl py-2.5 text-sm text-muted-foreground hover:bg-muted ${collapsed ? "justify-center px-0" : "px-3"}`}
       >

@@ -8,7 +8,10 @@ import { upsertUserProfile } from "@/lib/firebase/user-data";
 import { watchStaff } from "@/lib/firebase/roles";
 import { initOrdersBridge, watchOrders } from "@/lib/firebase/orders";
 import { rememberEmail } from "@/lib/firebase/email-index";
-import { captureReferralFromUrl, recordReferralOnce } from "@/lib/firebase/referrals";
+import {
+  captureReferralFromUrl,
+  recordReferralOnce,
+} from "@/lib/firebase/referrals";
 import { bindFollows } from "@/lib/firebase/follows";
 import { bindNotifications } from "@/lib/firebase/notifications";
 import { setOrdersOwner } from "@/lib/orders-store";

@@ -40,7 +40,7 @@ export type Review = {
 async function verifyPurchase(
   orderId: string,
   productId: string,
-  uid: string
+  uid: string,
 ): Promise<boolean> {
   const db = getDb();
   if (!db) return false;
@@ -50,10 +50,10 @@ async function verifyPurchase(
     const q = query(
       ordersRef,
       where("id", "==", orderId),
-      where("uid", "==", uid)
+      where("uid", "==", uid),
     );
     const snap = await getDocs(q);
-    
+
     if (snap.empty) return false;
 
     const order = snap.docs[0].data() as Order;
@@ -68,7 +68,9 @@ async function verifyPurchase(
  * Adiciona uma review verificada ao Firestore.
  * Apenas persiste se a compra for legítima.
  */
-export async function addReviewToFirebase(review: Omit<Review, "id" | "createdAt" | "verified" | "createdAtTimestamp">) {
+export async function addReviewToFirebase(
+  review: Omit<Review, "id" | "createdAt" | "verified" | "createdAtTimestamp">,
+) {
   const db = getDb();
   const auth = getFirebaseAuth();
   if (!db || !auth?.currentUser) return null;
@@ -77,7 +79,10 @@ export async function addReviewToFirebase(review: Omit<Review, "id" | "createdAt
   const verified = await verifyPurchase(review.orderId, review.productId, uid);
 
   if (!verified) {
-    console.warn("Avaliação rejeitada: compra não verificada", { orderId: review.orderId, productId: review.productId });
+    console.warn("Avaliação rejeitada: compra não verificada", {
+      orderId: review.orderId,
+      productId: review.productId,
+    });
     return null;
   }
 
@@ -106,7 +111,7 @@ export async function addReviewToFirebase(review: Omit<Review, "id" | "createdAt
  */
 export function watchProductReviews(
   productId: string,
-  callback: (reviews: Review[]) => void
+  callback: (reviews: Review[]) => void,
 ) {
   const db = getDb();
   if (!db) return () => {};
@@ -115,7 +120,7 @@ export function watchProductReviews(
   const q = query(
     reviewsRef,
     where("productId", "==", productId),
-    where("verified", "==", true)
+    where("verified", "==", true),
   );
 
   return onSnapshot(
@@ -125,16 +130,16 @@ export function watchProductReviews(
         id: d.id,
         ...d.data(),
       })) as Review[];
-      
+
       // Ordena por mais recentes primeiro
       reviews.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
 
       callback(reviews);
     },
-    (error) => console.error("Erro ao observar reviews:", error)
+    (error) => console.error("Erro ao observar reviews:", error),
   );
 }
 
@@ -148,8 +153,14 @@ export function watchAllReviews(callback: (reviews: Review[]) => void) {
   return onSnapshot(
     q,
     (snap) => {
-      const reviews = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as Review[];
-      reviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      const reviews = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data(),
+      })) as Review[];
+      reviews.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
       callback(reviews);
     },
     () => callback([]),
@@ -168,7 +179,7 @@ export async function getProductReviews(productId: string): Promise<Review[]> {
     const q = query(
       reviewsRef,
       where("productId", "==", productId),
-      where("verified", "==", true)
+      where("verified", "==", true),
     );
 
     const snap = await getDocs(q);
@@ -180,7 +191,7 @@ export async function getProductReviews(productId: string): Promise<Review[]> {
     // Ordena por mais recentes primeiro
     reviews.sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
 
     return reviews;
@@ -193,7 +204,9 @@ export async function getProductReviews(productId: string): Promise<Review[]> {
 /**
  * Calcula a média de rating de um produto baseado em reviews verificadas.
  */
-export async function calculateAverageRating(productId: string): Promise<number> {
+export async function calculateAverageRating(
+  productId: string,
+): Promise<number> {
   const reviews = await getProductReviews(productId);
   if (reviews.length === 0) return 0;
 
@@ -204,7 +217,10 @@ export async function calculateAverageRating(productId: string): Promise<number>
 /**
  * Verifica se um pedido já foi avaliado.
  */
-export async function isOrderReviewedInFirebase(orderId: string, uid: string): Promise<boolean> {
+export async function isOrderReviewedInFirebase(
+  orderId: string,
+  uid: string,
+): Promise<boolean> {
   const db = getDb();
   if (!db) return false;
 
@@ -214,7 +230,7 @@ export async function isOrderReviewedInFirebase(orderId: string, uid: string): P
       reviewsRef,
       where("orderId", "==", orderId),
       where("uid", "==", uid),
-      where("verified", "==", true)
+      where("verified", "==", true),
     );
 
     const snap = await getDocs(q);

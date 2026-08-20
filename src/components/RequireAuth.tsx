@@ -9,13 +9,21 @@ import { firebaseEnabled } from "@/lib/firebase/client";
  * Protege rotas privadas (pedidos, checkout, carteira, seguir loja…).
  * Sem sessão: no desktop abre o modal de login, no mobile vai para /auth.
  */
-export function RequireAuth({ children, title = "Entre para continuar" }: { children: React.ReactNode; title?: string }) {
+export function RequireAuth({
+  children,
+  title = "Entre para continuar",
+}: {
+  children: React.ReactNode;
+  title?: string;
+}) {
   const { user } = useStore();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user || !firebaseEnabled) return;
-    const desktop = typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches;
+    const desktop =
+      typeof window !== "undefined" &&
+      window.matchMedia("(min-width: 768px)").matches;
     if (desktop) actions.openLogin();
     else void navigate({ to: "/auth" });
   }, [user, navigate]);

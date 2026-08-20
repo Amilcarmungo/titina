@@ -1,5 +1,11 @@
 import { useSyncExternalStore } from "react";
-import { collection, deleteDoc, doc, onSnapshot, setDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  setDoc,
+} from "firebase/firestore";
 
 import { type Product } from "@/lib/products";
 import { useAllProducts } from "@/lib/products-store";
@@ -30,15 +36,20 @@ let slidesData: SlideData[] = (() => {
   try {
     const s = JSON.parse(localStorage.getItem(KEY) || "");
     if (Array.isArray(s) && s.length) return s;
-  } catch {}
+  } catch {
+    return EMPTY;
+  }
   return EMPTY;
 })();
 
-let status: "loading" | "ready" | "error" = slidesData.length ? "ready" : "loading";
+let status: "loading" | "ready" | "error" = slidesData.length
+  ? "ready"
+  : "loading";
 
 const listeners = new Set<() => void>();
 function emit() {
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(slidesData));
+  if (typeof window !== "undefined")
+    localStorage.setItem(KEY, JSON.stringify(slidesData));
   status = "ready";
   listeners.forEach((l) => l());
 }
@@ -53,15 +64,27 @@ const retrier = createRetrier(() => {
 function subscribe() {
   if (typeof window === "undefined" || unsubscribe) return;
   const db = getDb();
-  if (!db) { status = "error"; listeners.forEach((l) => l()); retrier.schedule(); return; }
+  if (!db) {
+    status = "error";
+    listeners.forEach((l) => l());
+    retrier.schedule();
+    return;
+  }
   unsubscribe = onSnapshot(
     collection(db, "banners"),
     (snap) => {
-      slidesData = snap.docs.map((d) => ({ ...(d.data() as SlideData), id: d.id }));
+      slidesData = snap.docs.map((d) => ({
+        ...(d.data() as SlideData),
+        id: d.id,
+      }));
       retrier.cancel();
       emit();
     },
-    () => { status = slidesData.length ? "ready" : "error"; listeners.forEach((l) => l()); retrier.schedule(); },
+    () => {
+      status = slidesData.length ? "ready" : "error";
+      listeners.forEach((l) => l());
+      retrier.schedule();
+    },
   );
 }
 
@@ -78,13 +101,20 @@ export function retryBanners() {
 async function publishBanner(slide: SlideData): Promise<void> {
   const db = getDb();
   if (!db) throw new Error("Sem ligação ao banco de dados.");
-  if (!canSyncSiteData()) throw new Error("Sem permissão para publicar banners.");
-  await setDoc(doc(db, "banners", slide.id), stripUndefined(slide) as SlideData);
+  if (!canSyncSiteData())
+    throw new Error("Sem permissão para publicar banners.");
+  await setDoc(
+    doc(db, "banners", slide.id),
+    stripUndefined(slide) as SlideData,
+  );
 }
 
 export function useBannersStatus(): "loading" | "ready" | "error" {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => status,
     () => "loading" as const,
   );
@@ -92,7 +122,10 @@ export function useBannersStatus(): "loading" | "ready" | "error" {
 
 export function useSlidesRaw(): SlideData[] {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => slidesData,
     () => EMPTY,
   );
@@ -103,7 +136,9 @@ export function useSlides(): Slide[] {
   const products = useAllProducts();
   return raw.map((s) => ({
     ...s,
-    picks: (s.pickIds ?? []).map((id) => products.find((p) => p.id === id)).filter(Boolean) as Product[],
+    picks: (s.pickIds ?? [])
+      .map((id) => products.find((p) => p.id === id))
+      .filter(Boolean) as Product[],
   }));
 }
 
@@ -140,7 +175,10 @@ export function setBannerIndex(i: number) {
 
 export function useBannerIndex() {
   return useSyncExternalStore(
-    (l) => { idxListeners.add(l); return () => idxListeners.delete(l); },
+    (l) => {
+      idxListeners.add(l);
+      return () => idxListeners.delete(l);
+    },
     () => currentIndex,
     () => 0,
   );

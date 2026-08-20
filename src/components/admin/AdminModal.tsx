@@ -18,13 +18,26 @@ const sizes = {
   xl: "md:max-w-4xl",
 };
 
-export function AdminModal({ open, onClose, title, subtitle, size = "lg", footer, children }: Props) {
+export function AdminModal({
+  open,
+  onClose,
+  title,
+  subtitle,
+  size = "lg",
+  footer,
+  children,
+}: Props) {
   useEffect(() => {
     if (!open) return;
-    const h = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const h = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     window.addEventListener("keydown", h);
     document.body.style.overflow = "hidden";
-    return () => { window.removeEventListener("keydown", h); document.body.style.overflow = ""; };
+    return () => {
+      window.removeEventListener("keydown", h);
+      document.body.style.overflow = "";
+    };
   }, [open, onClose]);
 
   if (!open) return null;
@@ -37,8 +50,12 @@ export function AdminModal({ open, onClose, title, subtitle, size = "lg", footer
       >
         <div className="flex items-start justify-between gap-3 border-b border-border px-6 py-4">
           <div className="min-w-0">
-            <h2 className="font-display text-xl font-black tracking-tight">{title}</h2>
-            {subtitle && <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>}
+            <h2 className="font-display text-xl font-black tracking-tight">
+              {title}
+            </h2>
+            {subtitle && (
+              <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -65,13 +82,31 @@ export function AdminModal({ open, onClose, title, subtitle, size = "lg", footer
   );
 }
 
-export function AdminField({ label, hint, error, children }: { label: string; hint?: string; error?: string; children: ReactNode }) {
+export function AdminField({
+  label,
+  hint,
+  error,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  error?: string;
+  children: ReactNode;
+}) {
   return (
     <label className="block">
-      <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">{label}</span>
+      <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
       <div className="mt-1.5">{children}</div>
-      {hint && !error && <span className="mt-1 block text-[11px] text-muted-foreground">{hint}</span>}
-      {error && <span className="mt-1 block text-[11px] text-destructive">{error}</span>}
+      {hint && !error && (
+        <span className="mt-1 block text-[11px] text-muted-foreground">
+          {hint}
+        </span>
+      )}
+      {error && (
+        <span className="mt-1 block text-[11px] text-destructive">{error}</span>
+      )}
     </label>
   );
 }
@@ -85,7 +120,9 @@ export function AdminInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   );
 }
 
-export function AdminTextarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+export function AdminTextarea(
+  props: React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+) {
   return (
     <textarea
       {...props}
@@ -94,7 +131,9 @@ export function AdminTextarea(props: React.TextareaHTMLAttributes<HTMLTextAreaEl
   );
 }
 
-export function AdminSelect(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
+export function AdminSelect(
+  props: React.SelectHTMLAttributes<HTMLSelectElement>,
+) {
   return (
     <select
       {...props}

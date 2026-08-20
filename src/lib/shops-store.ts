@@ -22,28 +22,39 @@ function read(): Shop[] {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) || "");
     if (Array.isArray(raw) && raw.length) return raw;
-  } catch {}
+  } catch {
+    return defaults;
+  }
   return defaults;
 }
 
 let list: Shop[] = read();
 const listeners = new Set<() => void>();
 function emit() {
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(list));
+  if (typeof window !== "undefined")
+    localStorage.setItem(KEY, JSON.stringify(list));
   listeners.forEach((l) => l());
   sync.push();
 }
 
-const sync = attachSync<Shop[]>("shops", () => list, (value) => {
-  if (!Array.isArray(value)) return;
-  list = value;
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(list));
-  listeners.forEach((l) => l());
-});
+const sync = attachSync<Shop[]>(
+  "shops",
+  () => list,
+  (value) => {
+    if (!Array.isArray(value)) return;
+    list = value;
+    if (typeof window !== "undefined")
+      localStorage.setItem(KEY, JSON.stringify(list));
+    listeners.forEach((l) => l());
+  },
+);
 
 export function useShops(): Shop[] {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => list,
     () => defaults,
   );
@@ -56,7 +67,10 @@ export function getShop(id: string): Shop | undefined {
 export const shopActions = {
   add(s: Omit<Shop, "id" | "createdAt">) {
     const id = `sh-${Date.now()}`;
-    list = [...list, { ...s, id, createdAt: new Date().toLocaleDateString("pt-BR") }];
+    list = [
+      ...list,
+      { ...s, id, createdAt: new Date().toLocaleDateString("pt-BR") },
+    ];
     emit();
     return id;
   },

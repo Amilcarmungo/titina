@@ -32,7 +32,9 @@ function read(): Goal[] {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) || "");
     return Array.isArray(raw) ? raw : [];
-  } catch { return []; }
+  } catch {
+    return [];
+  }
 }
 
 let list: Goal[] = read();
@@ -40,7 +42,8 @@ const empty: Goal[] = [];
 const listeners = new Set<() => void>();
 
 function cache() {
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(list));
+  if (typeof window !== "undefined")
+    localStorage.setItem(KEY, JSON.stringify(list));
 }
 
 function emit() {
@@ -62,7 +65,10 @@ const sync = attachSync<Goal[]>(
 
 export function useGoals(): Goal[] {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => list,
     () => empty,
   );
@@ -70,7 +76,11 @@ export function useGoals(): Goal[] {
 
 export const goalActions = {
   add(g: Omit<Goal, "id" | "createdAt">) {
-    const goal: Goal = { ...g, id: `goal-${Date.now()}`, createdAt: new Date().toISOString() };
+    const goal: Goal = {
+      ...g,
+      id: `goal-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
     list = [goal, ...list];
     emit();
     return goal.id;

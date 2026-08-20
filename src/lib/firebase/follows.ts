@@ -3,7 +3,14 @@
  * Sem sessão o botão pede login (nenhum dado anónimo é gravado).
  */
 import { useSyncExternalStore } from "react";
-import { collection, deleteDoc, doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
 
 import { getDb } from "./client";
 
@@ -24,7 +31,10 @@ export function bindFollows(uid: string | null) {
   current = uid;
   stop?.();
   stop = null;
-  if (!uid) { emit(empty); return; }
+  if (!uid) {
+    emit(empty);
+    return;
+  }
   const db = getDb();
   if (!db) return;
   stop = onSnapshot(
@@ -36,7 +46,10 @@ export function bindFollows(uid: string | null) {
 
 export function useFollowedShops(): string[] {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => ids,
     () => empty,
   );
@@ -47,7 +60,10 @@ export function isFollowing(shopId: string) {
 }
 
 /** Alterna o seguir/deixar de seguir. Devolve o novo estado. */
-export async function toggleFollow(shopId: string, shopName?: string): Promise<boolean> {
+export async function toggleFollow(
+  shopId: string,
+  shopName?: string,
+): Promise<boolean> {
   const db = getDb();
   if (!db || !current) throw new Error("Entre na sua conta para seguir lojas.");
   const ref = doc(db, "users", current, "follows", shopId);
@@ -58,6 +74,10 @@ export async function toggleFollow(shopId: string, shopName?: string): Promise<b
     return false;
   }
   emit([...ids, shopId]);
-  await setDoc(ref, { shopId, shopName: shopName ?? null, createdAt: serverTimestamp() });
+  await setDoc(ref, {
+    shopId,
+    shopName: shopName ?? null,
+    createdAt: serverTimestamp(),
+  });
   return true;
 }

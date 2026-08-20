@@ -22,7 +22,12 @@ export type SyncOptions = {
   onSettled?: (hasValue: boolean, failed?: boolean) => void;
 };
 
-export function attachSync<T>(key: string, getLocal: () => T, setLocal: (value: T) => void, options?: SyncOptions): SyncHandle {
+export function attachSync<T>(
+  key: string,
+  getLocal: () => T,
+  setLocal: (value: T) => void,
+  options?: SyncOptions,
+): SyncHandle {
   let lastRemote = "";
 
   const push = () => {
@@ -34,19 +39,33 @@ export function attachSync<T>(key: string, getLocal: () => T, setLocal: (value: 
     lastRemote = json;
     void setDoc(
       doc(db, "siteData", key),
-      { value, updatedAt: serverTimestamp(), updatedBy: getFirebaseAuth()?.currentUser?.uid ?? null },
+      {
+        value,
+        updatedAt: serverTimestamp(),
+        updatedBy: getFirebaseAuth()?.currentUser?.uid ?? null,
+      },
       { merge: true },
-    ).catch(() => { lastRemote = ""; });
+    ).catch(() => {
+      lastRemote = "";
+    });
   };
 
   if (typeof window !== "undefined") {
     let stop: (() => void) | null = null;
-    const retrier = createRetrier(() => { stop?.(); stop = null; start(); });
+    const retrier = createRetrier(() => {
+      stop?.();
+      stop = null;
+      start();
+    });
 
     // Espera o app montar para não bloquear a hidratação.
     function start() {
       const db = getDb();
-      if (!db) { options?.onSettled?.(false, true); retrier.schedule(); return; }
+      if (!db) {
+        options?.onSettled?.(false, true);
+        retrier.schedule();
+        return;
+      }
       stop = onSnapshot(
         doc(db, "siteData", key),
         (snap) => {
@@ -59,7 +78,10 @@ export function attachSync<T>(key: string, getLocal: () => T, setLocal: (value: 
           lastRemote = json;
           setLocal(value as T);
         },
-        () => { options?.onSettled?.(false, true); retrier.schedule(); },
+        () => {
+          options?.onSettled?.(false, true);
+          retrier.schedule();
+        },
       );
     }
     start();

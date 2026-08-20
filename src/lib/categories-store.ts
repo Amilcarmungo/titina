@@ -42,7 +42,9 @@ function read(): CategoryFull[] {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) || "");
     if (Array.isArray(raw) && raw.length) return raw;
-  } catch {}
+  } catch {
+    return EMPTY;
+  }
   return EMPTY;
 }
 
@@ -57,32 +59,52 @@ function setStatus(next: typeof status) {
 
 export function useCategoriesStatus(): "loading" | "ready" | "error" {
   return useSyncExternalStore(
-    (l) => { statusListeners.add(l); return () => statusListeners.delete(l); },
+    (l) => {
+      statusListeners.add(l);
+      return () => statusListeners.delete(l);
+    },
     () => status,
     () => "loading" as const,
   );
 }
 const listeners = new Set<() => void>();
 function emit() {
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(list));
+  if (typeof window !== "undefined")
+    localStorage.setItem(KEY, JSON.stringify(list));
   listeners.forEach((l) => l());
   setStatus("ready");
   sync.push();
 }
 
-const sync = attachSync<CategoryFull[]>("categories", () => list, (value) => {
-  if (!Array.isArray(value)) return;
-  list = value;
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(list));
-  listeners.forEach((l) => l());
-  setStatus("ready");
-}, {
-  onSettled: (hasValue, failed) => setStatus(failed && !list.length ? "error" : hasValue || !failed ? "ready" : status),
-});
+const sync = attachSync<CategoryFull[]>(
+  "categories",
+  () => list,
+  (value) => {
+    if (!Array.isArray(value)) return;
+    list = value;
+    if (typeof window !== "undefined")
+      localStorage.setItem(KEY, JSON.stringify(list));
+    listeners.forEach((l) => l());
+    setStatus("ready");
+  },
+  {
+    onSettled: (hasValue, failed) =>
+      setStatus(
+        failed && !list.length
+          ? "error"
+          : hasValue || !failed
+            ? "ready"
+            : status,
+      ),
+  },
+);
 
 export function useCategories(): CategoryFull[] {
   return useSyncExternalStore(
-    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    (l) => {
+      listeners.add(l);
+      return () => listeners.delete(l);
+    },
     () => list,
     () => EMPTY,
   );
@@ -106,21 +128,38 @@ export const categoryActions = {
     emit();
   },
   addSub(slug: string, sub: string) {
-    list = list.map((c) => c.slug === slug ? { ...c, subcategories: [...c.subcategories, sub] } : c);
+    list = list.map((c) =>
+      c.slug === slug ? { ...c, subcategories: [...c.subcategories, sub] } : c,
+    );
     emit();
   },
   removeSub(slug: string, sub: string) {
-    list = list.map((c) => c.slug === slug ? {
-      ...c,
-      subcategories: c.subcategories.filter(s => s !== sub),
-      subImages: c.subImages ? Object.fromEntries(Object.entries(c.subImages).filter(([k]) => k !== sub)) : undefined,
-    } : c);
+    list = list.map((c) =>
+      c.slug === slug
+        ? {
+            ...c,
+            subcategories: c.subcategories.filter((s) => s !== sub),
+            subImages: c.subImages
+              ? Object.fromEntries(
+                  Object.entries(c.subImages).filter(([k]) => k !== sub),
+                )
+              : undefined,
+          }
+        : c,
+    );
     emit();
   },
   setSubImage(slug: string, sub: string, image: string) {
-    list = list.map((c) => c.slug === slug ? { ...c, subImages: { ...(c.subImages ?? {}), [sub]: image } } : c);
+    list = list.map((c) =>
+      c.slug === slug
+        ? { ...c, subImages: { ...(c.subImages ?? {}), [sub]: image } }
+        : c,
+    );
     emit();
   },
   /** Semeia as categorias de demonstração no banco (acção manual do gestor). */
-  seed() { list = seedCategoriesFull; emit(); },
+  seed() {
+    list = seedCategoriesFull;
+    emit();
+  },
 };

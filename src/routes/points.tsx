@@ -5,7 +5,11 @@ import { Coins, Copy, Gift, Share2, Star, UserPlus, Users } from "lucide-react";
 
 import { Layout } from "@/components/Layout";
 import { useStore } from "@/lib/store";
-import { usePointsState, POINTS_PER_REFERRAL, POINTS_PER_REVIEW } from "@/lib/points";
+import {
+  usePointsState,
+  POINTS_PER_REFERRAL,
+  POINTS_PER_REVIEW,
+} from "@/lib/points";
 import { referralLink } from "@/lib/firebase/referrals";
 import { requireAuth } from "@/lib/auth-guard";
 
@@ -13,9 +17,16 @@ export const Route = createFileRoute("/points")({
   head: () => ({
     meta: [
       { title: "Meus pontos e convites — Bazarixy" },
-      { name: "description", content: "Veja os seus pontos Bazarixy, convide amigos com o seu link único e ganhe pontos por cada avaliação." },
+      {
+        name: "description",
+        content:
+          "Veja os seus pontos Bazarixy, convide amigos com o seu link único e ganhe pontos por cada avaliação.",
+      },
       { property: "og:title", content: "Meus pontos e convites — Bazarixy" },
-      { property: "og:description", content: "Ganhe pontos por avaliações e por cada amigo convidado." },
+      {
+        property: "og:description",
+        content: "Ganhe pontos por avaliações e por cada amigo convidado.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -43,9 +54,18 @@ function PointsPage() {
 
   async function share() {
     if (!requireAuth(user)) return;
-    const data = { title: "Bazarixy", text: "Compra na Bazarixy com o meu convite:", url: link };
+    const data = {
+      title: "Bazarixy",
+      text: "Compra na Bazarixy com o meu convite:",
+      url: link,
+    };
     if (typeof navigator !== "undefined" && "share" in navigator) {
-      try { await (navigator as Navigator).share(data); return; } catch { /* cancelado */ }
+      try {
+        await (navigator as Navigator).share(data);
+        return;
+      } catch {
+        /* cancelado */
+      }
     }
     void copy();
   }
@@ -58,9 +78,12 @@ function PointsPage() {
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest opacity-90">
             <Coins className="h-4 w-4" /> Meus pontos
           </div>
-          <p className="mt-2 font-display text-5xl font-black leading-none">{total}</p>
+          <p className="mt-2 font-display text-5xl font-black leading-none">
+            {total}
+          </p>
           <p className="mt-2 text-xs opacity-90">
-            {POINTS_PER_REVIEW} pontos por avaliação · {POINTS_PER_REFERRAL} pontos por amigo convidado
+            {POINTS_PER_REVIEW} pontos por avaliação · {POINTS_PER_REFERRAL}{" "}
+            pontos por amigo convidado
           </p>
           <div className="mt-4 grid grid-cols-2 gap-2">
             <div className="rounded-xl bg-white/20 px-3 py-2 backdrop-blur">
@@ -81,24 +104,40 @@ function PointsPage() {
               <UserPlus className="h-4.5 w-4.5" />
             </span>
             <div className="min-w-0">
-              <h2 className="font-display text-base font-black">Convidar amigo</h2>
-              <p className="text-xs text-muted-foreground">Cada amigo que criar conta pelo seu link vale {POINTS_PER_REFERRAL} pontos.</p>
+              <h2 className="font-display text-base font-black">
+                Convidar amigo
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Cada amigo que criar conta pelo seu link vale{" "}
+                {POINTS_PER_REFERRAL} pontos.
+              </p>
             </div>
           </div>
 
           {user ? (
             <>
               <div className="mt-4 flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-3 py-2.5">
-                <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">{link}</p>
-                <button onClick={copy} className="shrink-0 rounded-lg bg-foreground px-3 py-1.5 text-xs font-bold text-background">
+                <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                  {link}
+                </p>
+                <button
+                  onClick={copy}
+                  className="shrink-0 rounded-lg bg-foreground px-3 py-1.5 text-xs font-bold text-background"
+                >
                   {copied ? "Copiado" : "Copiar"}
                 </button>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <button onClick={share} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-4 py-2.5 text-sm font-bold text-white">
+                <button
+                  onClick={share}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-4 py-2.5 text-sm font-bold text-white"
+                >
                   <Share2 className="h-4 w-4" /> Partilhar
                 </button>
-                <button onClick={copy} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-bold">
+                <button
+                  onClick={copy}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-2.5 text-sm font-bold"
+                >
                   <Copy className="h-4 w-4" /> Copiar link
                 </button>
               </div>
@@ -115,12 +154,28 @@ function PointsPage() {
 
         {/* Como ganhar */}
         <section className="mt-3 rounded-2xl bg-card p-5 shadow-[var(--shadow-card)]">
-          <h2 className="font-display text-base font-black">Como ganhar pontos</h2>
+          <h2 className="font-display text-base font-black">
+            Como ganhar pontos
+          </h2>
           <ul className="mt-3 space-y-3">
             {[
-              { icon: Star, title: `Avalie os seus pedidos`, body: `Ganha ${POINTS_PER_REVIEW} pontos por cada avaliação de um pedido entregue.`, to: "/orders" },
-              { icon: Users, title: "Convide amigos", body: `${POINTS_PER_REFERRAL} pontos por cada amigo que criar conta com o seu link.` },
-              { icon: Gift, title: "Use em cupões", body: "Troque os pontos por descontos disponíveis na página de cupões.", to: "/coupons" },
+              {
+                icon: Star,
+                title: `Avalie os seus pedidos`,
+                body: `Ganha ${POINTS_PER_REVIEW} pontos por cada avaliação de um pedido entregue.`,
+                to: "/orders",
+              },
+              {
+                icon: Users,
+                title: "Convide amigos",
+                body: `${POINTS_PER_REFERRAL} pontos por cada amigo que criar conta com o seu link.`,
+              },
+              {
+                icon: Gift,
+                title: "Use em cupões",
+                body: "Troque os pontos por descontos disponíveis na página de cupões.",
+                to: "/coupons",
+              },
             ].map((r) => (
               <li key={r.title} className="flex gap-3">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-muted text-foreground">
@@ -129,7 +184,14 @@ function PointsPage() {
                 <div className="min-w-0">
                   <p className="text-sm font-bold">{r.title}</p>
                   <p className="text-xs text-muted-foreground">{r.body}</p>
-                  {r.to && <Link to={r.to} className="mt-1 inline-block text-xs font-bold text-brand-strong">Ver mais</Link>}
+                  {r.to && (
+                    <Link
+                      to={r.to}
+                      className="mt-1 inline-block text-xs font-bold text-brand-strong"
+                    >
+                      Ver mais
+                    </Link>
+                  )}
                 </div>
               </li>
             ))}

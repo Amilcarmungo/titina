@@ -18,7 +18,6 @@ import {
   type User,
 } from "firebase/auth";
 
-
 import { getFirebaseAuth } from "./client";
 import { emailIsRegistered, rememberEmail } from "./email-index";
 
@@ -56,7 +55,6 @@ function requireAuthInstance() {
   return auth;
 }
 
-
 /**
  * Descobre se o email já tem conta (passo 1 do login) sem permitir enumeração:
  * consultamos apenas o hash SHA-256 do email no índice do Firestore.
@@ -69,14 +67,26 @@ export async function emailHasAccount(email: string): Promise<boolean | null> {
 
 export async function signInWithEmail(email: string, password: string) {
   const auth = requireAuthInstance();
-  const cred = await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+  const cred = await signInWithEmailAndPassword(
+    auth,
+    email.trim().toLowerCase(),
+    password,
+  );
   void rememberEmail(email);
   return toAppUser(cred.user);
 }
 
-export async function signUpWithEmail(email: string, password: string, name?: string) {
+export async function signUpWithEmail(
+  email: string,
+  password: string,
+  name?: string,
+) {
   const auth = requireAuthInstance();
-  const cred = await createUserWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+  const cred = await createUserWithEmailAndPassword(
+    auth,
+    email.trim().toLowerCase(),
+    password,
+  );
   if (name) await updateProfile(cred.user, { displayName: name });
   void rememberEmail(email);
   return toAppUser(cred.user);
@@ -88,8 +98,13 @@ export async function signUpWithEmail(email: string, password: string, name?: st
  * utilizador passa a poder entrar com Google **ou** com a senha.
  */
 export class NeedsPasswordLinkError extends Error {
-  constructor(readonly email: string, readonly credential: AuthCredential) {
-    super("Esta conta já usa email e senha. Confirme a senha para ligar o Google.");
+  constructor(
+    readonly email: string,
+    readonly credential: AuthCredential,
+  ) {
+    super(
+      "Esta conta já usa email e senha. Confirme a senha para ligar o Google.",
+    );
     this.name = "NeedsPasswordLinkError";
   }
 }
@@ -106,28 +121,42 @@ export async function signInWithGoogle() {
   } catch (err) {
     const code = (err as { code?: string }).code ?? "";
     // Popup bloqueado (comum em mobile/webviews): cai para redirect.
-    if (code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment") {
+    if (
+      code === "auth/popup-blocked" ||
+      code === "auth/operation-not-supported-in-this-environment"
+    ) {
       await signInWithRedirect(auth, provider);
       return null;
     }
     if (code === "auth/account-exists-with-different-credential") {
       const credential = GoogleAuthProvider.credentialFromError(err as never);
-      const email = (err as { customData?: { email?: string } }).customData?.email ?? "";
-      if (credential && email) throw new NeedsPasswordLinkError(email, credential);
+      const email =
+        (err as { customData?: { email?: string } }).customData?.email ?? "";
+      if (credential && email)
+        throw new NeedsPasswordLinkError(email, credential);
     }
     throw err;
   }
 }
 
 /** Entra com a senha existente e liga o Google à mesma conta (dois métodos activos). */
-export async function linkGoogleToPasswordAccount(email: string, password: string, credential: AuthCredential) {
+export async function linkGoogleToPasswordAccount(
+  email: string,
+  password: string,
+  credential: AuthCredential,
+) {
   const auth = requireAuthInstance();
-  const cred = await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
+  const cred = await signInWithEmailAndPassword(
+    auth,
+    email.trim().toLowerCase(),
+    password,
+  );
   try {
     await linkWithCredential(cred.user, credential);
   } catch (err) {
     // Já estava ligado — não é um erro para o utilizador.
-    if ((err as { code?: string }).code !== "auth/provider-already-linked") throw err;
+    if ((err as { code?: string }).code !== "auth/provider-already-linked")
+      throw err;
   }
   void rememberEmail(email);
   return toAppUser(cred.user);
@@ -137,7 +166,10 @@ export async function linkGoogleToPasswordAccount(email: string, password: strin
 export function activeSignInMethods(): { password: boolean; google: boolean } {
   const user = getFirebaseAuth()?.currentUser;
   const ids = user?.providerData.map((p) => p.providerId) ?? [];
-  return { password: ids.includes("password"), google: ids.includes("google.com") };
+  return {
+    password: ids.includes("password"),
+    google: ids.includes("google.com"),
+  };
 }
 
 /** Acrescenta (ou actualiza) a senha da conta — o Google continua activo. */
@@ -150,7 +182,10 @@ export async function ensurePasswordMethod(password: string) {
     await updatePassword(user, password);
     return;
   }
-  await linkWithCredential(user, EmailAuthProvider.credential(user.email, password));
+  await linkWithCredential(
+    user,
+    EmailAuthProvider.credential(user.email, password),
+  );
 }
 
 /** Liga o Google a uma conta que hoje só tem senha (a partir das configurações). */
@@ -203,6 +238,9 @@ export function authErrorMessage(err: unknown): string {
     case "auth/unauthorized-domain":
       return "Domínio não autorizado no Firebase Auth.";
     default:
-      return (err as Error)?.message?.replace("Firebase: ", "") || "Não foi possível continuar.";
+      return (
+        (err as Error)?.message?.replace("Firebase: ", "") ||
+        "Não foi possível continuar."
+      );
   }
 }

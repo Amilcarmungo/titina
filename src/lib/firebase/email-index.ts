@@ -23,7 +23,9 @@ export async function emailHash(email: string): Promise<string | null> {
 }
 
 /** true = já existe conta · false = não existe · null = não foi possível saber */
-export async function emailIsRegistered(email: string): Promise<boolean | null> {
+export async function emailIsRegistered(
+  email: string,
+): Promise<boolean | null> {
   const db = getDb();
   const hash = await emailHash(email);
   if (!db || !hash) return null;
@@ -41,7 +43,11 @@ export async function rememberEmail(email: string) {
   const hash = await emailHash(email);
   if (!db || !hash) return;
   try {
-    await setDoc(doc(db, "emailIndex", hash), { createdAt: serverTimestamp() }, { merge: true });
+    await setDoc(
+      doc(db, "emailIndex", hash),
+      { createdAt: serverTimestamp() },
+      { merge: true },
+    );
   } catch {
     /* silencioso — é apenas um índice auxiliar */
   }

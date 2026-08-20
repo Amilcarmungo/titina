@@ -30,7 +30,8 @@ const byHex = new Map(COLOR_PALETTE.map((c) => [c.hex.toLowerCase(), c.name]));
 
 function expand(hex: string) {
   const h = hex.trim().toLowerCase();
-  if (/^#[0-9a-f]{3}$/.test(h)) return `#${h[1]}${h[1]}${h[2]}${h[2]}${h[3]}${h[3]}`;
+  if (/^#[0-9a-f]{3}$/.test(h))
+    return `#${h[1]}${h[1]}${h[2]}${h[2]}${h[3]}${h[3]}`;
   return h;
 }
 
@@ -45,6 +46,8 @@ export function colorName(value?: string) {
 export function colorSwatch(value?: string) {
   if (!value) return "transparent";
   if (value.startsWith("#") || value.startsWith("rgb")) return value;
-  const found = COLOR_PALETTE.find((c) => c.name.toLowerCase() === value.toLowerCase());
+  const found = COLOR_PALETTE.find(
+    (c) => c.name.toLowerCase() === value.toLowerCase(),
+  );
   return found?.hex ?? value;
 }

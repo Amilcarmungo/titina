@@ -19,15 +19,22 @@ export type PendingPayment = {
   items: PendingItem[];
   customer?: string;
   shippingAddress?: {
-    name?: string; phone?: string; street?: string; complement?: string;
-    city?: string; state?: string; cep?: string; country?: string;
+    name?: string;
+    phone?: string;
+    street?: string;
+    complement?: string;
+    city?: string;
+    state?: string;
+    cep?: string;
+    country?: string;
   };
 };
 
 const KEY = "shop_pending_payment_v1";
 
 export function setPendingPayment(p: PendingPayment) {
-  if (typeof window !== "undefined") localStorage.setItem(KEY, JSON.stringify(p));
+  if (typeof window !== "undefined")
+    localStorage.setItem(KEY, JSON.stringify(p));
 }
 
 export function getPendingPayment(): PendingPayment | null {
