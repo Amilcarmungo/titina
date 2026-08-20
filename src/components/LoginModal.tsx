@@ -18,6 +18,7 @@ import {
   linkGoogleToPasswordAccount,
   NeedsPasswordLinkError,
   resetPassword,
+  signInWithFacebook,
   signInWithEmail,
   signInWithGoogle,
   signUpWithEmail,
@@ -173,6 +174,11 @@ export function LoginModal() {
         throw err;
       }
     });
+  const doFacebook = () =>
+    void guard(async () => {
+      const u = await signInWithFacebook();
+      if (u) actions.closeLogin();
+    });
   const doReset = () =>
     void guard(async () => {
       await resetPassword(email);
@@ -265,6 +271,8 @@ export function LoginModal() {
                   <button
                     key={label}
                     aria-label={label}
+                    onClick={label === "Facebook" ? doFacebook : undefined}
+                    disabled={busy || label === "Apple"}
                     className="grid h-11 w-11 place-items-center rounded-full border border-border bg-background shadow-sm transition hover:bg-muted"
                   >
                     <Icon />

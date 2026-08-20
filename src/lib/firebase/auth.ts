@@ -1,5 +1,6 @@
 import {
   EmailAuthProvider,
+  FacebookAuthProvider,
   GoogleAuthProvider,
   browserLocalPersistence,
   createUserWithEmailAndPassword,
@@ -139,6 +140,26 @@ export async function signInWithGoogle() {
   }
 }
 
+export async function signInWithFacebook() {
+  const auth = requireAuthInstance();
+  const provider = new FacebookAuthProvider();
+  try {
+    const cred = await signInWithPopup(auth, provider);
+    if (cred.user.email) void rememberEmail(cred.user.email);
+    return toAppUser(cred.user);
+  } catch (err) {
+    const code = (err as { code?: string }).code ?? "";
+    if (
+      code === "auth/popup-blocked" ||
+      code === "auth/operation-not-supported-in-this-environment"
+    ) {
+      await signInWithRedirect(auth, provider);
+      return null;
+    }
+    throw err;
+  }
+}
+
 /** Entra com a senha existente e liga o Google à mesma conta (dois métodos activos). */
 export async function linkGoogleToPasswordAccount(
   email: string,
@@ -232,7 +253,7 @@ export function authErrorMessage(err: unknown): string {
       return "Muitas tentativas. Tente novamente em alguns minutos.";
     case "auth/popup-closed-by-user":
     case "auth/cancelled-popup-request":
-      return "Login com Google cancelado.";
+      return "Login social cancelado.";
     case "auth/network-request-failed":
       return "Sem conexão. Verifique sua internet.";
     case "auth/unauthorized-domain":

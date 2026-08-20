@@ -1,6 +1,6 @@
 import { n as __exportAll } from "../_runtime.mjs";
 import { a as setUserProperties, i as logEvent, n as initializeAnalytics, p as registerVersion, r as isSupported, t as getAnalytics } from "./@firebase/analytics+[...].mjs";
-import { c as linkWithPopup } from "./firebase__auth.mjs";
+import { l as linkWithPopup } from "./firebase__auth.mjs";
 import "./@firebase/firestore+[...].mjs";
 import "./firebase__storage.mjs";
 //#region node_modules/firebase/app/dist/esm/index.esm.js

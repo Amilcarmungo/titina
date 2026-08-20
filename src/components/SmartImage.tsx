@@ -83,7 +83,7 @@ export function SmartImage({
       {src && state !== "error" && (
         <img
           src={src}
-          alt={alt}
+          alt={state === "ready" ? alt : ""}
           draggable={draggable}
           loading={eager ? "eager" : "lazy"}
           decoding={eager ? "sync" : "async"}

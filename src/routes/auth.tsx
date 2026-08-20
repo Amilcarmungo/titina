@@ -16,6 +16,7 @@ import {
   linkGoogleToPasswordAccount,
   NeedsPasswordLinkError,
   resetPassword,
+  signInWithFacebook,
   signInWithEmail,
   signInWithGoogle,
   signUpWithEmail,
@@ -220,6 +221,11 @@ function AuthPage() {
         throw err;
       }
     });
+  const doFacebook = () =>
+    guard(async () => {
+      const u = await signInWithFacebook();
+      if (u) finish();
+    });
   const doReset = () =>
     guard(async () => {
       await resetPassword(email);
@@ -327,6 +333,8 @@ function AuthPage() {
                 <button
                   key={label}
                   aria-label={label}
+                  onClick={label === "Facebook" ? doFacebook : undefined}
+                  disabled={busy || label === "Apple"}
                   className="grid h-12 w-12 place-items-center rounded-full border border-border bg-background shadow-sm transition hover:bg-muted"
                 >
                   <Icon />

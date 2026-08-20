@@ -7292,4 +7292,4 @@ _setExternalJSProvider({
 });
 registerAuth("Browser");
 //#endregion
-export { updateProfile as _, getAuth as a, linkWithPopup as c, setPersistence as d, signInWithEmailAndPassword as f, updatePassword as g, signOut as h, createUserWithEmailAndPassword as i, onAuthStateChanged as l, signInWithRedirect as m, GoogleAuthProvider as n, getRedirectResult as o, signInWithPopup as p, browserLocalPersistence as r, linkWithCredential as s, EmailAuthProvider as t, sendPasswordResetEmail as u };
+export { updatePassword as _, createUserWithEmailAndPassword as a, linkWithCredential as c, sendPasswordResetEmail as d, setPersistence as f, signOut as g, signInWithRedirect as h, browserLocalPersistence as i, linkWithPopup as l, signInWithPopup as m, FacebookAuthProvider as n, getAuth as o, signInWithEmailAndPassword as p, GoogleAuthProvider as r, getRedirectResult as s, EmailAuthProvider as t, onAuthStateChanged as u, updateProfile as v };

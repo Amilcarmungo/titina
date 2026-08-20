@@ -616,6 +616,26 @@ var Eye = createLucideIcon("eye", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var FileCheckCorner = createLucideIcon("file-check-corner", [
+	["path", {
+		d: "M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6",
+		key: "g5mvt7"
+	}],
+	["path", {
+		d: "M14 2v5a1 1 0 0 0 1 1h5",
+		key: "wfsgrz"
+	}],
+	["path", {
+		d: "m14 20 2 2 4-4",
+		key: "15kota"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var FileText = createLucideIcon("file-text", [
 	["path", {
 		d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z",
@@ -2274,4 +2294,4 @@ var Zap = createLucideIcon("zap", [["path", {
 	key: "1xq2db"
 }]]);
 //#endregion
-export { LoaderCircle as $, Rows3 as A, Coins as At, Pencil as B, CheckCheck as Bt, ShoppingBag as C, Eye as Ct, Settings as D, DollarSign as Dt, Share2 as E, Download as Et, QrCode as F, ChevronUp as Ft, MessageSquare as G, BadgeCheck as Gt, Package as H, Camera as Ht, Printer as I, ChevronRight as It, MapPin as J, ArrowRight as Jt, MessageCircle as K, ArrowUp as Kt, Power as L, ChevronLeft as Lt, Repeat2 as M, ClipboardList as Mt, RefreshCcw as N, CircleCheck as Nt, Send as O, CreditCard as Ot, Receipt as P, CircleAlert as Pt, LockKeyhole as Q, Plus as R, ChevronDown as Rt, ShoppingCart as S, FileText as St, ShieldAlert as T, ExternalLink as Tt, PackageOpen as U, Bike as Ut, Palette as V, ChartPie as Vt, Minus as W, BellOff as Wt, LogOut as X, ArrowLeft as Xt, Mail as Y, ArrowRightLeft as Yt, Lock as Z, ArrowDown as Zt, Store as _, Globe as _t, User as a, Instagram as at, Sparkle as b, FolderTree as bt, Undo2 as c, Images as ct, TriangleAlert as d, House as dt, ListChecks as et, TrendingUp as f, Heart as ft, Tag as g, GripVertical as gt, Target as h, Handshake as ht, Users as i, Layers as it, RotateCcw as j, Clock as jt, Search as k, Copy as kt, Trophy as l, ImagePlus as lt, Ticket as m, Headphones as mt, X as n, LayoutList as nt, UserPlus as o, Info as ot, Trash2 as p, Headset as pt, Menu as q, ArrowUpRight as qt, Wallet as r, LayoutGrid as rt, Upload as s, Image as st, Zap as t, Link2 as tt, Truck as u, ImageOff as ut, Star as v, Gift as vt, ShieldCheck as w, EyeOff as wt, SlidersHorizontal as x, Flame as xt, Sparkles as y, Funnel as yt, Phone as z, Check as zt };
+export { LoaderCircle as $, Rows3 as A, Copy as At, Pencil as B, Check as Bt, ShoppingBag as C, FileCheckCorner as Ct, Settings as D, Download as Dt, Share2 as E, ExternalLink as Et, QrCode as F, CircleAlert as Ft, MessageSquare as G, BellOff as Gt, Package as H, ChartPie as Ht, Printer as I, ChevronUp as It, MapPin as J, ArrowUpRight as Jt, MessageCircle as K, BadgeCheck as Kt, Power as L, ChevronRight as Lt, Repeat2 as M, Clock as Mt, RefreshCcw as N, ClipboardList as Nt, Send as O, DollarSign as Ot, Receipt as P, CircleCheck as Pt, LockKeyhole as Q, ArrowDown as Qt, Plus as R, ChevronLeft as Rt, ShoppingCart as S, FileText as St, ShieldAlert as T, EyeOff as Tt, PackageOpen as U, Camera as Ut, Palette as V, CheckCheck as Vt, Minus as W, Bike as Wt, LogOut as X, ArrowRightLeft as Xt, Mail as Y, ArrowRight as Yt, Lock as Z, ArrowLeft as Zt, Store as _, Globe as _t, User as a, Instagram as at, Sparkle as b, FolderTree as bt, Undo2 as c, Images as ct, TriangleAlert as d, House as dt, ListChecks as et, TrendingUp as f, Heart as ft, Tag as g, GripVertical as gt, Target as h, Handshake as ht, Users as i, Layers as it, RotateCcw as j, Coins as jt, Search as k, CreditCard as kt, Trophy as l, ImagePlus as lt, Ticket as m, Headphones as mt, X as n, LayoutList as nt, UserPlus as o, Info as ot, Trash2 as p, Headset as pt, Menu as q, ArrowUp as qt, Wallet as r, LayoutGrid as rt, Upload as s, Image as st, Zap as t, Link2 as tt, Truck as u, ImageOff as ut, Star as v, Gift as vt, ShieldCheck as w, Eye as wt, SlidersHorizontal as x, Flame as xt, Sparkles as y, Funnel as yt, Phone as z, ChevronDown as zt };
