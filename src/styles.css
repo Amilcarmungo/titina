@@ -190,19 +190,27 @@
 /* ---------- Skeleton / Shimmer ---------- */
 @keyframes bz-shimmer {
   0% {
-    background-position: 200% 0;
+    background-position: 180% 0;
   }
   100% {
-    background-position: -200% 0;
+    background-position: -180% 0;
   }
 }
 .shimmer {
+  background-color: oklch(0.9 0 0);
   background-image: linear-gradient(
-    90deg,
-    color-mix(in oklab, var(--muted) 92%, transparent) 25%,
-    color-mix(in oklab, var(--muted) 55%, white) 50%,
-    color-mix(in oklab, var(--muted) 92%, transparent) 75%
+    110deg,
+    oklch(0.86 0 0) 0%,
+    oklch(0.86 0 0) 35%,
+    oklch(0.96 0 0) 50%,
+    oklch(0.86 0 0) 65%,
+    oklch(0.86 0 0) 100%
   );
-  background-size: 200% 100%;
-  animation: bz-shimmer 1.4s linear infinite;
+  background-size: 240% 100%;
+  animation: bz-shimmer 1.35s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+  }
 }
