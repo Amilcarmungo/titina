@@ -35,7 +35,7 @@ import { ImageGallery } from "@/components/admin/ImageGallery";
 import { storagePaths } from "@/lib/firebase/storage";
 import { uploadImageFile } from "@/lib/firebase/upload";
 
-export const Route = createFileRoute("/admin/produtos")({
+export const Route = createFileRoute("/justina/produtos")({
   component: ProductsPage,
 });
 

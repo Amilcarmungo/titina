@@ -200,7 +200,7 @@ function printInvoiceBatch(orders: Order[]) {
   openInvoiceWindow(cards);
 }
 
-export const Route = createFileRoute("/admin/pedidos")({
+export const Route = createFileRoute("/justina/pedidos")({
   component: OrdersPage,
 });
 

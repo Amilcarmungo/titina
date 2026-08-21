@@ -42,6 +42,7 @@ import {
   absoluteUrl,
   paths,
   productUrl,
+  SHARE_IMAGE,
   seoDescription,
   shareText,
   SITE_NAME,
@@ -59,6 +60,7 @@ export const Route = createFileRoute("/product/$id")({
     }
     const url = productUrl(params.id);
     const image = absoluteUrl(loaderData.image);
+    const shareImage = SHARE_IMAGE;
     const price = loaderData.price;
     const desc = seoDescription(
       loaderData.description,
@@ -74,14 +76,14 @@ export const Route = createFileRoute("/product/$id")({
         { property: "og:title", content: loaderData.name },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
-        { property: "og:image", content: image },
+        { property: "og:image", content: shareImage },
         { property: "og:image:alt", content: loaderData.name },
         { property: "product:price:amount", content: String(price) },
         { property: "product:price:currency", content: "AOA" },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: loaderData.name },
         { name: "twitter:description", content: desc },
-        { name: "twitter:image", content: image },
+        { name: "twitter:image", content: shareImage },
         { name: "twitter:image:alt", content: loaderData.name },
       ],
       links: [{ rel: "canonical", href: url }],

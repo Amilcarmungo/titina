@@ -29,7 +29,7 @@ import { AdminTabs } from "@/components/admin/AdminTabs";
 import { storagePaths } from "@/lib/firebase/storage";
 import { uploadImageFile } from "@/lib/firebase/upload";
 
-export const Route = createFileRoute("/admin/home")({
+export const Route = createFileRoute("/justina/home")({
   component: HomePage,
 });
 
@@ -198,7 +198,7 @@ function HomePage() {
         </div>
         <div className="flex gap-2">
           <Link
-            to="/admin/categorias"
+            to="/justina/categorias"
             className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-bold hover:bg-muted"
           >
             <ExternalLink className="h-3 w-3" /> Categorias
@@ -243,7 +243,7 @@ function HomePage() {
           desc="Cada aba tem as suas categorias e os seus próprios banners. Ao tocar na aba, a home troca banners e produtos."
           action={
             <Link
-              to="/admin/abas/$id"
+              to="/justina/abas/$id"
               params={{ id: "novo" }}
               className="inline-flex items-center gap-1.5 rounded-full bg-foreground px-4 py-2 text-xs font-bold text-background shadow-lg shadow-foreground/20"
             >
@@ -337,7 +337,7 @@ function HomePage() {
                     )}
                     <div className="mt-3 flex gap-2">
                       <Link
-                        to="/admin/abas/$id"
+                        to="/justina/abas/$id"
                         params={{ id: t.id }}
                         className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-foreground px-3 py-1.5 text-xs font-bold text-background"
                       >
@@ -364,7 +364,7 @@ function HomePage() {
               );
             })}
             <Link
-              to="/admin/abas/$id"
+              to="/justina/abas/$id"
               params={{ id: "novo" }}
               className="grid min-h-[180px] place-items-center rounded-2xl border-2 border-dashed border-border text-xs font-bold text-muted-foreground transition hover:border-foreground hover:text-foreground"
             >

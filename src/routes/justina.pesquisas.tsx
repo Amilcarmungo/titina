@@ -7,7 +7,7 @@ import { getDb } from "@/lib/firebase/client";
 import { useStaff } from "@/lib/firebase/roles";
 import { useCustomProducts } from "@/lib/products-store";
 
-export const Route = createFileRoute("/admin/pesquisas")({
+export const Route = createFileRoute("/justina/pesquisas")({
   head: () => ({
     meta: [
       { title: "Pesquisas dos clientes — Bazarixy Admin" },

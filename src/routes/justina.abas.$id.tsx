@@ -26,7 +26,7 @@ import {
 import { storagePaths } from "@/lib/firebase/storage";
 import { uploadImageFile } from "@/lib/firebase/upload";
 
-export const Route = createFileRoute("/admin/abas/$id")({
+export const Route = createFileRoute("/justina/abas/$id")({
   head: () => ({
     meta: [
       { title: "Gerir aba da home — Bazarixy Admin" },
@@ -89,7 +89,7 @@ function TabEditor() {
     return (
       <div className="space-y-3">
         <p className="text-sm font-bold">Aba não encontrada.</p>
-        <Link to="/admin/home" className="text-xs font-bold underline">
+        <Link to="/justina/home" className="text-xs font-bold underline">
           Voltar à página inicial
         </Link>
       </div>
@@ -125,7 +125,7 @@ function TabEditor() {
         ],
       });
       toast.success("Aba criada");
-      navigate({ to: "/admin/abas/$id", params: { id: newId } });
+      navigate({ to: "/justina/abas/$id", params: { id: newId } });
     } else {
       persist({ label: label.trim(), slugs, slideIds });
       toast.success("Aba salva");
@@ -207,7 +207,7 @@ function TabEditor() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link
-            to="/admin/home"
+            to="/justina/home"
             className="grid h-9 w-9 place-items-center rounded-full border border-border hover:bg-muted"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -256,7 +256,7 @@ function TabEditor() {
             </p>
           </div>
           <Link
-            to="/admin/categorias"
+            to="/justina/categorias"
             className="rounded-full border border-border px-3 py-1.5 text-[11px] font-bold hover:bg-muted"
           >
             Gerir categorias

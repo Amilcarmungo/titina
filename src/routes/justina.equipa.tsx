@@ -19,7 +19,7 @@ import {
   type StaffRole,
 } from "@/lib/firebase/roles";
 
-export const Route = createFileRoute("/admin/equipa")({
+export const Route = createFileRoute("/justina/equipa")({
   head: () => ({
     meta: [
       { title: "Equipa — Admin Bazarixy" },
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/admin/equipa")({
   component: EquipaPage,
 });
 
-const ROLES: StaffRole[] = ["admin", "gerente", "atendente"];
+const ROLES: StaffRole[] = ["justina", "gerente", "atendente"];
 
 const ROLE_HINT: Record<StaffRole, string> = {
   admin: "Acesso total, incluindo equipa e configurações.",

@@ -31,7 +31,7 @@ import {
   AdminInput,
 } from "@/components/admin/AdminModal";
 
-export const Route = createFileRoute("/admin/logistica")({
+export const Route = createFileRoute("/justina/logistica")({
   component: LogisticsPage,
 });
 

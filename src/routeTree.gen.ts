@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as CategoriesRouteImport } from './routes/categories'
@@ -18,6 +17,7 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ComoPagarRouteImport } from './routes/como-pagar'
 import { Route as CouponsRouteImport } from './routes/coupons'
 import { Route as FavoritesRouteImport } from './routes/favorites'
+import { Route as JustinaRouteImport } from './routes/justina'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as OrdersRouteImport } from './routes/orders'
@@ -30,37 +30,32 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as TermosRouteImport } from './routes/termos'
 import { Route as TrocasDevolucoesRouteImport } from './routes/trocas-devolucoes'
 import { Route as WalletRouteImport } from './routes/wallet'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as AdminCategoriasRouteImport } from './routes/admin.categorias'
-import { Route as AdminConfigRouteImport } from './routes/admin.config'
-import { Route as AdminCuponsRouteImport } from './routes/admin.cupons'
-import { Route as AdminEquipaRouteImport } from './routes/admin.equipa'
-import { Route as AdminHomeRouteImport } from './routes/admin.home'
-import { Route as AdminLogisticaRouteImport } from './routes/admin.logistica'
-import { Route as AdminLojasRouteImport } from './routes/admin.lojas'
-import { Route as AdminMetasRouteImport } from './routes/admin.metas'
-import { Route as AdminPagamentosRouteImport } from './routes/admin.pagamentos'
-import { Route as AdminPedidosRouteImport } from './routes/admin.pedidos'
-import { Route as AdminPesquisasRouteImport } from './routes/admin.pesquisas'
-import { Route as AdminProdutosRouteImport } from './routes/admin.produtos'
-import { Route as AdminReceitaRouteImport } from './routes/admin.receita'
-import { Route as AdminUsuariosRouteImport } from './routes/admin.usuarios'
 import { Route as ApiEmailRouteImport } from './routes/api/email'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as JustinaIndexRouteImport } from './routes/justina.index'
+import { Route as JustinaCategoriasRouteImport } from './routes/justina.categorias'
+import { Route as JustinaConfigRouteImport } from './routes/justina.config'
+import { Route as JustinaCuponsRouteImport } from './routes/justina.cupons'
+import { Route as JustinaEquipaRouteImport } from './routes/justina.equipa'
+import { Route as JustinaHomeRouteImport } from './routes/justina.home'
+import { Route as JustinaLogisticaRouteImport } from './routes/justina.logistica'
+import { Route as JustinaLojasRouteImport } from './routes/justina.lojas'
+import { Route as JustinaMetasRouteImport } from './routes/justina.metas'
+import { Route as JustinaPagamentosRouteImport } from './routes/justina.pagamentos'
+import { Route as JustinaPedidosRouteImport } from './routes/justina.pedidos'
+import { Route as JustinaPesquisasRouteImport } from './routes/justina.pesquisas'
+import { Route as JustinaProdutosRouteImport } from './routes/justina.produtos'
+import { Route as JustinaReceitaRouteImport } from './routes/justina.receita'
+import { Route as JustinaUsuariosRouteImport } from './routes/justina.usuarios'
 import { Route as PayMethodRouteImport } from './routes/pay.$method'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as ShopIdRouteImport } from './routes/shop.$id'
-import { Route as AdminAbasIdRouteImport } from './routes/admin.abas.$id'
-import { Route as AdminLojasIdRouteImport } from './routes/admin.lojas.$id'
+import { Route as JustinaAbasIdRouteImport } from './routes/justina.abas.$id'
+import { Route as JustinaLojasIdRouteImport } from './routes/justina.lojas.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -96,6 +91,11 @@ const CouponsRoute = CouponsRouteImport.update({
 const FavoritesRoute = FavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JustinaRoute = JustinaRouteImport.update({
+  id: '/justina',
+  path: '/justina',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MeRoute = MeRouteImport.update({
@@ -158,81 +158,6 @@ const WalletRoute = WalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCategoriasRoute = AdminCategoriasRouteImport.update({
-  id: '/categorias',
-  path: '/categorias',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminConfigRoute = AdminConfigRouteImport.update({
-  id: '/config',
-  path: '/config',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminCuponsRoute = AdminCuponsRouteImport.update({
-  id: '/cupons',
-  path: '/cupons',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminEquipaRoute = AdminEquipaRouteImport.update({
-  id: '/equipa',
-  path: '/equipa',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminHomeRoute = AdminHomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLogisticaRoute = AdminLogisticaRouteImport.update({
-  id: '/logistica',
-  path: '/logistica',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminLojasRoute = AdminLojasRouteImport.update({
-  id: '/lojas',
-  path: '/lojas',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminMetasRoute = AdminMetasRouteImport.update({
-  id: '/metas',
-  path: '/metas',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPagamentosRoute = AdminPagamentosRouteImport.update({
-  id: '/pagamentos',
-  path: '/pagamentos',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPedidosRoute = AdminPedidosRouteImport.update({
-  id: '/pedidos',
-  path: '/pedidos',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPesquisasRoute = AdminPesquisasRouteImport.update({
-  id: '/pesquisas',
-  path: '/pesquisas',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminProdutosRoute = AdminProdutosRouteImport.update({
-  id: '/produtos',
-  path: '/produtos',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminReceitaRoute = AdminReceitaRouteImport.update({
-  id: '/receita',
-  path: '/receita',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
-  id: '/usuarios',
-  path: '/usuarios',
-  getParentRoute: () => AdminRoute,
-} as any)
 const ApiEmailRoute = ApiEmailRouteImport.update({
   id: '/api/email',
   path: '/api/email',
@@ -242,6 +167,81 @@ const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const JustinaIndexRoute = JustinaIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaCategoriasRoute = JustinaCategoriasRouteImport.update({
+  id: '/categorias',
+  path: '/categorias',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaConfigRoute = JustinaConfigRouteImport.update({
+  id: '/config',
+  path: '/config',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaCuponsRoute = JustinaCuponsRouteImport.update({
+  id: '/cupons',
+  path: '/cupons',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaEquipaRoute = JustinaEquipaRouteImport.update({
+  id: '/equipa',
+  path: '/equipa',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaHomeRoute = JustinaHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaLogisticaRoute = JustinaLogisticaRouteImport.update({
+  id: '/logistica',
+  path: '/logistica',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaLojasRoute = JustinaLojasRouteImport.update({
+  id: '/lojas',
+  path: '/lojas',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaMetasRoute = JustinaMetasRouteImport.update({
+  id: '/metas',
+  path: '/metas',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaPagamentosRoute = JustinaPagamentosRouteImport.update({
+  id: '/pagamentos',
+  path: '/pagamentos',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaPedidosRoute = JustinaPedidosRouteImport.update({
+  id: '/pedidos',
+  path: '/pedidos',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaPesquisasRoute = JustinaPesquisasRouteImport.update({
+  id: '/pesquisas',
+  path: '/pesquisas',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaProdutosRoute = JustinaProdutosRouteImport.update({
+  id: '/produtos',
+  path: '/produtos',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaReceitaRoute = JustinaReceitaRouteImport.update({
+  id: '/receita',
+  path: '/receita',
+  getParentRoute: () => JustinaRoute,
+} as any)
+const JustinaUsuariosRoute = JustinaUsuariosRouteImport.update({
+  id: '/usuarios',
+  path: '/usuarios',
+  getParentRoute: () => JustinaRoute,
 } as any)
 const PayMethodRoute = PayMethodRouteImport.update({
   id: '/pay/$method',
@@ -258,20 +258,19 @@ const ShopIdRoute = ShopIdRouteImport.update({
   path: '/shop/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminAbasIdRoute = AdminAbasIdRouteImport.update({
+const JustinaAbasIdRoute = JustinaAbasIdRouteImport.update({
   id: '/abas/$id',
   path: '/abas/$id',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => JustinaRoute,
 } as any)
-const AdminLojasIdRoute = AdminLojasIdRouteImport.update({
+const JustinaLojasIdRoute = JustinaLojasIdRouteImport.update({
   id: '/$id',
   path: '/$id',
-  getParentRoute: () => AdminLojasRoute,
+  getParentRoute: () => JustinaLojasRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
@@ -279,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/como-pagar': typeof ComoPagarRoute
   '/coupons': typeof CouponsRoute
   '/favorites': typeof FavoritesRoute
+  '/justina': typeof JustinaRouteWithChildren
   '/me': typeof MeRoute
   '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
@@ -291,28 +291,28 @@ export interface FileRoutesByFullPath {
   '/termos': typeof TermosRoute
   '/trocas-devolucoes': typeof TrocasDevolucoesRoute
   '/wallet': typeof WalletRoute
-  '/admin/categorias': typeof AdminCategoriasRoute
-  '/admin/config': typeof AdminConfigRoute
-  '/admin/cupons': typeof AdminCuponsRoute
-  '/admin/equipa': typeof AdminEquipaRoute
-  '/admin/home': typeof AdminHomeRoute
-  '/admin/logistica': typeof AdminLogisticaRoute
-  '/admin/lojas': typeof AdminLojasRouteWithChildren
-  '/admin/metas': typeof AdminMetasRoute
-  '/admin/pagamentos': typeof AdminPagamentosRoute
-  '/admin/pedidos': typeof AdminPedidosRoute
-  '/admin/pesquisas': typeof AdminPesquisasRoute
-  '/admin/produtos': typeof AdminProdutosRoute
-  '/admin/receita': typeof AdminReceitaRoute
-  '/admin/usuarios': typeof AdminUsuariosRoute
   '/api/email': typeof ApiEmailRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/justina/categorias': typeof JustinaCategoriasRoute
+  '/justina/config': typeof JustinaConfigRoute
+  '/justina/cupons': typeof JustinaCuponsRoute
+  '/justina/equipa': typeof JustinaEquipaRoute
+  '/justina/home': typeof JustinaHomeRoute
+  '/justina/logistica': typeof JustinaLogisticaRoute
+  '/justina/lojas': typeof JustinaLojasRouteWithChildren
+  '/justina/metas': typeof JustinaMetasRoute
+  '/justina/pagamentos': typeof JustinaPagamentosRoute
+  '/justina/pedidos': typeof JustinaPedidosRoute
+  '/justina/pesquisas': typeof JustinaPesquisasRoute
+  '/justina/produtos': typeof JustinaProdutosRoute
+  '/justina/receita': typeof JustinaReceitaRoute
+  '/justina/usuarios': typeof JustinaUsuariosRoute
   '/pay/$method': typeof PayMethodRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
-  '/admin/': typeof AdminIndexRoute
-  '/admin/abas/$id': typeof AdminAbasIdRoute
-  '/admin/lojas/$id': typeof AdminLojasIdRoute
+  '/justina/': typeof JustinaIndexRoute
+  '/justina/abas/$id': typeof JustinaAbasIdRoute
+  '/justina/lojas/$id': typeof JustinaLojasIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -335,33 +335,32 @@ export interface FileRoutesByTo {
   '/termos': typeof TermosRoute
   '/trocas-devolucoes': typeof TrocasDevolucoesRoute
   '/wallet': typeof WalletRoute
-  '/admin/categorias': typeof AdminCategoriasRoute
-  '/admin/config': typeof AdminConfigRoute
-  '/admin/cupons': typeof AdminCuponsRoute
-  '/admin/equipa': typeof AdminEquipaRoute
-  '/admin/home': typeof AdminHomeRoute
-  '/admin/logistica': typeof AdminLogisticaRoute
-  '/admin/lojas': typeof AdminLojasRouteWithChildren
-  '/admin/metas': typeof AdminMetasRoute
-  '/admin/pagamentos': typeof AdminPagamentosRoute
-  '/admin/pedidos': typeof AdminPedidosRoute
-  '/admin/pesquisas': typeof AdminPesquisasRoute
-  '/admin/produtos': typeof AdminProdutosRoute
-  '/admin/receita': typeof AdminReceitaRoute
-  '/admin/usuarios': typeof AdminUsuariosRoute
   '/api/email': typeof ApiEmailRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/justina/categorias': typeof JustinaCategoriasRoute
+  '/justina/config': typeof JustinaConfigRoute
+  '/justina/cupons': typeof JustinaCuponsRoute
+  '/justina/equipa': typeof JustinaEquipaRoute
+  '/justina/home': typeof JustinaHomeRoute
+  '/justina/logistica': typeof JustinaLogisticaRoute
+  '/justina/lojas': typeof JustinaLojasRouteWithChildren
+  '/justina/metas': typeof JustinaMetasRoute
+  '/justina/pagamentos': typeof JustinaPagamentosRoute
+  '/justina/pedidos': typeof JustinaPedidosRoute
+  '/justina/pesquisas': typeof JustinaPesquisasRoute
+  '/justina/produtos': typeof JustinaProdutosRoute
+  '/justina/receita': typeof JustinaReceitaRoute
+  '/justina/usuarios': typeof JustinaUsuariosRoute
   '/pay/$method': typeof PayMethodRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
-  '/admin': typeof AdminIndexRoute
-  '/admin/abas/$id': typeof AdminAbasIdRoute
-  '/admin/lojas/$id': typeof AdminLojasIdRoute
+  '/justina': typeof JustinaIndexRoute
+  '/justina/abas/$id': typeof JustinaAbasIdRoute
+  '/justina/lojas/$id': typeof JustinaLojasIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
@@ -369,6 +368,7 @@ export interface FileRoutesById {
   '/como-pagar': typeof ComoPagarRoute
   '/coupons': typeof CouponsRoute
   '/favorites': typeof FavoritesRoute
+  '/justina': typeof JustinaRouteWithChildren
   '/me': typeof MeRoute
   '/notifications': typeof NotificationsRoute
   '/orders': typeof OrdersRoute
@@ -381,34 +381,33 @@ export interface FileRoutesById {
   '/termos': typeof TermosRoute
   '/trocas-devolucoes': typeof TrocasDevolucoesRoute
   '/wallet': typeof WalletRoute
-  '/admin/categorias': typeof AdminCategoriasRoute
-  '/admin/config': typeof AdminConfigRoute
-  '/admin/cupons': typeof AdminCuponsRoute
-  '/admin/equipa': typeof AdminEquipaRoute
-  '/admin/home': typeof AdminHomeRoute
-  '/admin/logistica': typeof AdminLogisticaRoute
-  '/admin/lojas': typeof AdminLojasRouteWithChildren
-  '/admin/metas': typeof AdminMetasRoute
-  '/admin/pagamentos': typeof AdminPagamentosRoute
-  '/admin/pedidos': typeof AdminPedidosRoute
-  '/admin/pesquisas': typeof AdminPesquisasRoute
-  '/admin/produtos': typeof AdminProdutosRoute
-  '/admin/receita': typeof AdminReceitaRoute
-  '/admin/usuarios': typeof AdminUsuariosRoute
   '/api/email': typeof ApiEmailRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/justina/categorias': typeof JustinaCategoriasRoute
+  '/justina/config': typeof JustinaConfigRoute
+  '/justina/cupons': typeof JustinaCuponsRoute
+  '/justina/equipa': typeof JustinaEquipaRoute
+  '/justina/home': typeof JustinaHomeRoute
+  '/justina/logistica': typeof JustinaLogisticaRoute
+  '/justina/lojas': typeof JustinaLojasRouteWithChildren
+  '/justina/metas': typeof JustinaMetasRoute
+  '/justina/pagamentos': typeof JustinaPagamentosRoute
+  '/justina/pedidos': typeof JustinaPedidosRoute
+  '/justina/pesquisas': typeof JustinaPesquisasRoute
+  '/justina/produtos': typeof JustinaProdutosRoute
+  '/justina/receita': typeof JustinaReceitaRoute
+  '/justina/usuarios': typeof JustinaUsuariosRoute
   '/pay/$method': typeof PayMethodRoute
   '/product/$id': typeof ProductIdRoute
   '/shop/$id': typeof ShopIdRoute
-  '/admin/': typeof AdminIndexRoute
-  '/admin/abas/$id': typeof AdminAbasIdRoute
-  '/admin/lojas/$id': typeof AdminLojasIdRoute
+  '/justina/': typeof JustinaIndexRoute
+  '/justina/abas/$id': typeof JustinaAbasIdRoute
+  '/justina/lojas/$id': typeof JustinaLojasIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
     | '/auth'
     | '/cart'
     | '/categories'
@@ -416,6 +415,7 @@ export interface FileRouteTypes {
     | '/como-pagar'
     | '/coupons'
     | '/favorites'
+    | '/justina'
     | '/me'
     | '/notifications'
     | '/orders'
@@ -428,28 +428,28 @@ export interface FileRouteTypes {
     | '/termos'
     | '/trocas-devolucoes'
     | '/wallet'
-    | '/admin/categorias'
-    | '/admin/config'
-    | '/admin/cupons'
-    | '/admin/equipa'
-    | '/admin/home'
-    | '/admin/logistica'
-    | '/admin/lojas'
-    | '/admin/metas'
-    | '/admin/pagamentos'
-    | '/admin/pedidos'
-    | '/admin/pesquisas'
-    | '/admin/produtos'
-    | '/admin/receita'
-    | '/admin/usuarios'
     | '/api/email'
     | '/category/$slug'
+    | '/justina/categorias'
+    | '/justina/config'
+    | '/justina/cupons'
+    | '/justina/equipa'
+    | '/justina/home'
+    | '/justina/logistica'
+    | '/justina/lojas'
+    | '/justina/metas'
+    | '/justina/pagamentos'
+    | '/justina/pedidos'
+    | '/justina/pesquisas'
+    | '/justina/produtos'
+    | '/justina/receita'
+    | '/justina/usuarios'
     | '/pay/$method'
     | '/product/$id'
     | '/shop/$id'
-    | '/admin/'
-    | '/admin/abas/$id'
-    | '/admin/lojas/$id'
+    | '/justina/'
+    | '/justina/abas/$id'
+    | '/justina/lojas/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -472,32 +472,31 @@ export interface FileRouteTypes {
     | '/termos'
     | '/trocas-devolucoes'
     | '/wallet'
-    | '/admin/categorias'
-    | '/admin/config'
-    | '/admin/cupons'
-    | '/admin/equipa'
-    | '/admin/home'
-    | '/admin/logistica'
-    | '/admin/lojas'
-    | '/admin/metas'
-    | '/admin/pagamentos'
-    | '/admin/pedidos'
-    | '/admin/pesquisas'
-    | '/admin/produtos'
-    | '/admin/receita'
-    | '/admin/usuarios'
     | '/api/email'
     | '/category/$slug'
+    | '/justina/categorias'
+    | '/justina/config'
+    | '/justina/cupons'
+    | '/justina/equipa'
+    | '/justina/home'
+    | '/justina/logistica'
+    | '/justina/lojas'
+    | '/justina/metas'
+    | '/justina/pagamentos'
+    | '/justina/pedidos'
+    | '/justina/pesquisas'
+    | '/justina/produtos'
+    | '/justina/receita'
+    | '/justina/usuarios'
     | '/pay/$method'
     | '/product/$id'
     | '/shop/$id'
-    | '/admin'
-    | '/admin/abas/$id'
-    | '/admin/lojas/$id'
+    | '/justina'
+    | '/justina/abas/$id'
+    | '/justina/lojas/$id'
   id:
     | '__root__'
     | '/'
-    | '/admin'
     | '/auth'
     | '/cart'
     | '/categories'
@@ -505,6 +504,7 @@ export interface FileRouteTypes {
     | '/como-pagar'
     | '/coupons'
     | '/favorites'
+    | '/justina'
     | '/me'
     | '/notifications'
     | '/orders'
@@ -517,33 +517,32 @@ export interface FileRouteTypes {
     | '/termos'
     | '/trocas-devolucoes'
     | '/wallet'
-    | '/admin/categorias'
-    | '/admin/config'
-    | '/admin/cupons'
-    | '/admin/equipa'
-    | '/admin/home'
-    | '/admin/logistica'
-    | '/admin/lojas'
-    | '/admin/metas'
-    | '/admin/pagamentos'
-    | '/admin/pedidos'
-    | '/admin/pesquisas'
-    | '/admin/produtos'
-    | '/admin/receita'
-    | '/admin/usuarios'
     | '/api/email'
     | '/category/$slug'
+    | '/justina/categorias'
+    | '/justina/config'
+    | '/justina/cupons'
+    | '/justina/equipa'
+    | '/justina/home'
+    | '/justina/logistica'
+    | '/justina/lojas'
+    | '/justina/metas'
+    | '/justina/pagamentos'
+    | '/justina/pedidos'
+    | '/justina/pesquisas'
+    | '/justina/produtos'
+    | '/justina/receita'
+    | '/justina/usuarios'
     | '/pay/$method'
     | '/product/$id'
     | '/shop/$id'
-    | '/admin/'
-    | '/admin/abas/$id'
-    | '/admin/lojas/$id'
+    | '/justina/'
+    | '/justina/abas/$id'
+    | '/justina/lojas/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRoute
@@ -551,6 +550,7 @@ export interface RootRouteChildren {
   ComoPagarRoute: typeof ComoPagarRoute
   CouponsRoute: typeof CouponsRoute
   FavoritesRoute: typeof FavoritesRoute
+  JustinaRoute: typeof JustinaRouteWithChildren
   MeRoute: typeof MeRoute
   NotificationsRoute: typeof NotificationsRoute
   OrdersRoute: typeof OrdersRoute
@@ -577,13 +577,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -633,6 +626,13 @@ declare module '@tanstack/react-router' {
       path: '/favorites'
       fullPath: '/favorites'
       preLoaderRoute: typeof FavoritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/justina': {
+      id: '/justina'
+      path: '/justina'
+      fullPath: '/justina'
+      preLoaderRoute: typeof JustinaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/me': {
@@ -719,111 +719,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WalletRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/categorias': {
-      id: '/admin/categorias'
-      path: '/categorias'
-      fullPath: '/admin/categorias'
-      preLoaderRoute: typeof AdminCategoriasRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/config': {
-      id: '/admin/config'
-      path: '/config'
-      fullPath: '/admin/config'
-      preLoaderRoute: typeof AdminConfigRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/cupons': {
-      id: '/admin/cupons'
-      path: '/cupons'
-      fullPath: '/admin/cupons'
-      preLoaderRoute: typeof AdminCuponsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/equipa': {
-      id: '/admin/equipa'
-      path: '/equipa'
-      fullPath: '/admin/equipa'
-      preLoaderRoute: typeof AdminEquipaRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/home': {
-      id: '/admin/home'
-      path: '/home'
-      fullPath: '/admin/home'
-      preLoaderRoute: typeof AdminHomeRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/logistica': {
-      id: '/admin/logistica'
-      path: '/logistica'
-      fullPath: '/admin/logistica'
-      preLoaderRoute: typeof AdminLogisticaRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/lojas': {
-      id: '/admin/lojas'
-      path: '/lojas'
-      fullPath: '/admin/lojas'
-      preLoaderRoute: typeof AdminLojasRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/metas': {
-      id: '/admin/metas'
-      path: '/metas'
-      fullPath: '/admin/metas'
-      preLoaderRoute: typeof AdminMetasRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/pagamentos': {
-      id: '/admin/pagamentos'
-      path: '/pagamentos'
-      fullPath: '/admin/pagamentos'
-      preLoaderRoute: typeof AdminPagamentosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/pedidos': {
-      id: '/admin/pedidos'
-      path: '/pedidos'
-      fullPath: '/admin/pedidos'
-      preLoaderRoute: typeof AdminPedidosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/pesquisas': {
-      id: '/admin/pesquisas'
-      path: '/pesquisas'
-      fullPath: '/admin/pesquisas'
-      preLoaderRoute: typeof AdminPesquisasRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/produtos': {
-      id: '/admin/produtos'
-      path: '/produtos'
-      fullPath: '/admin/produtos'
-      preLoaderRoute: typeof AdminProdutosRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/receita': {
-      id: '/admin/receita'
-      path: '/receita'
-      fullPath: '/admin/receita'
-      preLoaderRoute: typeof AdminReceitaRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/usuarios': {
-      id: '/admin/usuarios'
-      path: '/usuarios'
-      fullPath: '/admin/usuarios'
-      preLoaderRoute: typeof AdminUsuariosRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/api/email': {
       id: '/api/email'
       path: '/api/email'
@@ -837,6 +732,111 @@ declare module '@tanstack/react-router' {
       fullPath: '/category/$slug'
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/justina/': {
+      id: '/justina/'
+      path: '/'
+      fullPath: '/justina/'
+      preLoaderRoute: typeof JustinaIndexRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/categorias': {
+      id: '/justina/categorias'
+      path: '/categorias'
+      fullPath: '/justina/categorias'
+      preLoaderRoute: typeof JustinaCategoriasRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/config': {
+      id: '/justina/config'
+      path: '/config'
+      fullPath: '/justina/config'
+      preLoaderRoute: typeof JustinaConfigRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/cupons': {
+      id: '/justina/cupons'
+      path: '/cupons'
+      fullPath: '/justina/cupons'
+      preLoaderRoute: typeof JustinaCuponsRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/equipa': {
+      id: '/justina/equipa'
+      path: '/equipa'
+      fullPath: '/justina/equipa'
+      preLoaderRoute: typeof JustinaEquipaRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/home': {
+      id: '/justina/home'
+      path: '/home'
+      fullPath: '/justina/home'
+      preLoaderRoute: typeof JustinaHomeRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/logistica': {
+      id: '/justina/logistica'
+      path: '/logistica'
+      fullPath: '/justina/logistica'
+      preLoaderRoute: typeof JustinaLogisticaRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/lojas': {
+      id: '/justina/lojas'
+      path: '/lojas'
+      fullPath: '/justina/lojas'
+      preLoaderRoute: typeof JustinaLojasRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/metas': {
+      id: '/justina/metas'
+      path: '/metas'
+      fullPath: '/justina/metas'
+      preLoaderRoute: typeof JustinaMetasRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/pagamentos': {
+      id: '/justina/pagamentos'
+      path: '/pagamentos'
+      fullPath: '/justina/pagamentos'
+      preLoaderRoute: typeof JustinaPagamentosRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/pedidos': {
+      id: '/justina/pedidos'
+      path: '/pedidos'
+      fullPath: '/justina/pedidos'
+      preLoaderRoute: typeof JustinaPedidosRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/pesquisas': {
+      id: '/justina/pesquisas'
+      path: '/pesquisas'
+      fullPath: '/justina/pesquisas'
+      preLoaderRoute: typeof JustinaPesquisasRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/produtos': {
+      id: '/justina/produtos'
+      path: '/produtos'
+      fullPath: '/justina/produtos'
+      preLoaderRoute: typeof JustinaProdutosRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/receita': {
+      id: '/justina/receita'
+      path: '/receita'
+      fullPath: '/justina/receita'
+      preLoaderRoute: typeof JustinaReceitaRouteImport
+      parentRoute: typeof JustinaRoute
+    }
+    '/justina/usuarios': {
+      id: '/justina/usuarios'
+      path: '/usuarios'
+      fullPath: '/justina/usuarios'
+      preLoaderRoute: typeof JustinaUsuariosRouteImport
+      parentRoute: typeof JustinaRoute
     }
     '/pay/$method': {
       id: '/pay/$method'
@@ -859,78 +859,78 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/abas/$id': {
-      id: '/admin/abas/$id'
+    '/justina/abas/$id': {
+      id: '/justina/abas/$id'
       path: '/abas/$id'
-      fullPath: '/admin/abas/$id'
-      preLoaderRoute: typeof AdminAbasIdRouteImport
-      parentRoute: typeof AdminRoute
+      fullPath: '/justina/abas/$id'
+      preLoaderRoute: typeof JustinaAbasIdRouteImport
+      parentRoute: typeof JustinaRoute
     }
-    '/admin/lojas/$id': {
-      id: '/admin/lojas/$id'
+    '/justina/lojas/$id': {
+      id: '/justina/lojas/$id'
       path: '/$id'
-      fullPath: '/admin/lojas/$id'
-      preLoaderRoute: typeof AdminLojasIdRouteImport
-      parentRoute: typeof AdminLojasRoute
+      fullPath: '/justina/lojas/$id'
+      preLoaderRoute: typeof JustinaLojasIdRouteImport
+      parentRoute: typeof JustinaLojasRoute
     }
   }
 }
 
-interface AdminLojasRouteChildren {
-  AdminLojasIdRoute: typeof AdminLojasIdRoute
+interface JustinaLojasRouteChildren {
+  JustinaLojasIdRoute: typeof JustinaLojasIdRoute
 }
 
-const AdminLojasRouteChildren: AdminLojasRouteChildren = {
-  AdminLojasIdRoute: AdminLojasIdRoute,
+const JustinaLojasRouteChildren: JustinaLojasRouteChildren = {
+  JustinaLojasIdRoute: JustinaLojasIdRoute,
 }
 
-const AdminLojasRouteWithChildren = AdminLojasRoute._addFileChildren(
-  AdminLojasRouteChildren,
+const JustinaLojasRouteWithChildren = JustinaLojasRoute._addFileChildren(
+  JustinaLojasRouteChildren,
 )
 
-interface AdminRouteChildren {
-  AdminCategoriasRoute: typeof AdminCategoriasRoute
-  AdminConfigRoute: typeof AdminConfigRoute
-  AdminCuponsRoute: typeof AdminCuponsRoute
-  AdminEquipaRoute: typeof AdminEquipaRoute
-  AdminHomeRoute: typeof AdminHomeRoute
-  AdminLogisticaRoute: typeof AdminLogisticaRoute
-  AdminLojasRoute: typeof AdminLojasRouteWithChildren
-  AdminMetasRoute: typeof AdminMetasRoute
-  AdminPagamentosRoute: typeof AdminPagamentosRoute
-  AdminPedidosRoute: typeof AdminPedidosRoute
-  AdminPesquisasRoute: typeof AdminPesquisasRoute
-  AdminProdutosRoute: typeof AdminProdutosRoute
-  AdminReceitaRoute: typeof AdminReceitaRoute
-  AdminUsuariosRoute: typeof AdminUsuariosRoute
-  AdminIndexRoute: typeof AdminIndexRoute
-  AdminAbasIdRoute: typeof AdminAbasIdRoute
+interface JustinaRouteChildren {
+  JustinaCategoriasRoute: typeof JustinaCategoriasRoute
+  JustinaConfigRoute: typeof JustinaConfigRoute
+  JustinaCuponsRoute: typeof JustinaCuponsRoute
+  JustinaEquipaRoute: typeof JustinaEquipaRoute
+  JustinaHomeRoute: typeof JustinaHomeRoute
+  JustinaLogisticaRoute: typeof JustinaLogisticaRoute
+  JustinaLojasRoute: typeof JustinaLojasRouteWithChildren
+  JustinaMetasRoute: typeof JustinaMetasRoute
+  JustinaPagamentosRoute: typeof JustinaPagamentosRoute
+  JustinaPedidosRoute: typeof JustinaPedidosRoute
+  JustinaPesquisasRoute: typeof JustinaPesquisasRoute
+  JustinaProdutosRoute: typeof JustinaProdutosRoute
+  JustinaReceitaRoute: typeof JustinaReceitaRoute
+  JustinaUsuariosRoute: typeof JustinaUsuariosRoute
+  JustinaIndexRoute: typeof JustinaIndexRoute
+  JustinaAbasIdRoute: typeof JustinaAbasIdRoute
 }
 
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminCategoriasRoute: AdminCategoriasRoute,
-  AdminConfigRoute: AdminConfigRoute,
-  AdminCuponsRoute: AdminCuponsRoute,
-  AdminEquipaRoute: AdminEquipaRoute,
-  AdminHomeRoute: AdminHomeRoute,
-  AdminLogisticaRoute: AdminLogisticaRoute,
-  AdminLojasRoute: AdminLojasRouteWithChildren,
-  AdminMetasRoute: AdminMetasRoute,
-  AdminPagamentosRoute: AdminPagamentosRoute,
-  AdminPedidosRoute: AdminPedidosRoute,
-  AdminPesquisasRoute: AdminPesquisasRoute,
-  AdminProdutosRoute: AdminProdutosRoute,
-  AdminReceitaRoute: AdminReceitaRoute,
-  AdminUsuariosRoute: AdminUsuariosRoute,
-  AdminIndexRoute: AdminIndexRoute,
-  AdminAbasIdRoute: AdminAbasIdRoute,
+const JustinaRouteChildren: JustinaRouteChildren = {
+  JustinaCategoriasRoute: JustinaCategoriasRoute,
+  JustinaConfigRoute: JustinaConfigRoute,
+  JustinaCuponsRoute: JustinaCuponsRoute,
+  JustinaEquipaRoute: JustinaEquipaRoute,
+  JustinaHomeRoute: JustinaHomeRoute,
+  JustinaLogisticaRoute: JustinaLogisticaRoute,
+  JustinaLojasRoute: JustinaLojasRouteWithChildren,
+  JustinaMetasRoute: JustinaMetasRoute,
+  JustinaPagamentosRoute: JustinaPagamentosRoute,
+  JustinaPedidosRoute: JustinaPedidosRoute,
+  JustinaPesquisasRoute: JustinaPesquisasRoute,
+  JustinaProdutosRoute: JustinaProdutosRoute,
+  JustinaReceitaRoute: JustinaReceitaRoute,
+  JustinaUsuariosRoute: JustinaUsuariosRoute,
+  JustinaIndexRoute: JustinaIndexRoute,
+  JustinaAbasIdRoute: JustinaAbasIdRoute,
 }
 
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+const JustinaRouteWithChildren =
+  JustinaRoute._addFileChildren(JustinaRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   CategoriesRoute: CategoriesRoute,
@@ -938,6 +938,7 @@ const rootRouteChildren: RootRouteChildren = {
   ComoPagarRoute: ComoPagarRoute,
   CouponsRoute: CouponsRoute,
   FavoritesRoute: FavoritesRoute,
+  JustinaRoute: JustinaRouteWithChildren,
   MeRoute: MeRoute,
   NotificationsRoute: NotificationsRoute,
   OrdersRoute: OrdersRoute,

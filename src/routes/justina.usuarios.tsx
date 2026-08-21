@@ -6,7 +6,7 @@ import { Search, ShieldCheck, Users } from "lucide-react";
 import { getDb } from "@/lib/firebase/client";
 import { useStaff } from "@/lib/firebase/roles";
 
-export const Route = createFileRoute("/admin/usuarios")({
+export const Route = createFileRoute("/justina/usuarios")({
   component: UsersPage,
 });
 

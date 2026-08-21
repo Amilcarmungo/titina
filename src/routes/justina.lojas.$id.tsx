@@ -15,12 +15,12 @@ import { useReviews } from "@/lib/reviews";
 import { formatKz } from "@/lib/format";
 import { AdminTabs } from "@/components/admin/AdminTabs";
 
-export const Route = createFileRoute("/admin/lojas/$id")({
+export const Route = createFileRoute("/justina/lojas/$id")({
   component: ShopDetail,
 });
 
 function ShopDetail() {
-  const { id } = useParams({ from: "/admin/lojas/$id" });
+  const { id } = useParams({ from: "/justina/lojas/$id" });
   const shop = getShop(id);
   const products = useAllProducts();
   const orders = useOrders();
@@ -52,7 +52,7 @@ function ShopDetail() {
       <div className="rounded-2xl bg-background p-10 text-center shadow-[var(--shadow-card)]">
         <p className="text-sm text-muted-foreground">Loja não encontrada.</p>
         <Link
-          to="/admin/lojas"
+          to="/justina/lojas"
           className="mt-3 inline-flex text-xs font-bold text-foreground underline"
         >
           Voltar
@@ -64,7 +64,7 @@ function ShopDetail() {
   return (
     <div className="space-y-5">
       <Link
-        to="/admin/lojas"
+        to="/justina/lojas"
         className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="h-3.5 w-3.5" /> Todas as lojas
@@ -173,7 +173,7 @@ function ShopDetail() {
                 </p>
               </div>
               <Link
-                to="/admin/produtos"
+                to="/justina/produtos"
                 className="text-[11px] font-bold text-muted-foreground hover:text-foreground"
               >
                 Editar
@@ -185,7 +185,7 @@ function ShopDetail() {
               <p className="text-sm text-muted-foreground">
                 Nenhum produto nesta loja.{" "}
                 <Link
-                  to="/admin/produtos"
+                  to="/justina/produtos"
                   className="font-bold text-foreground underline"
                 >
                   Adicionar produto

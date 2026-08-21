@@ -5,7 +5,7 @@ import { categoryActions } from "@/lib/categories-store";
 import { productActions } from "@/lib/products-store";
 import { seedProducts } from "@/lib/products";
 
-export const Route = createFileRoute("/admin/config")({
+export const Route = createFileRoute("/justina/config")({
   component: ConfigPage,
 });
 

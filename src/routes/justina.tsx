@@ -42,7 +42,7 @@ import { useStore } from "@/lib/store";
 import { setOrdersOwner } from "@/lib/orders-store";
 import { useEffect } from "react";
 
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/justina")({
   head: () => ({
     meta: [
       { title: "Admin — Bazarixy" },
@@ -70,21 +70,21 @@ const GROUPS: NavGroup[] = [
   {
     title: "Visão geral",
     items: [
-      { to: "/admin", label: "Dashboard", icon: LayoutGrid, exact: true },
+      { to: "/justina", label: "Dashboard", icon: LayoutGrid, exact: true },
       {
-        to: "/admin/receita",
+        to: "/justina/receita",
         label: "Receita total",
         icon: TrendingUp,
         perm: "settings.write",
       },
       {
-        to: "/admin/metas",
+        to: "/justina/metas",
         label: "Metas",
         icon: Target,
         perm: "settings.write",
       },
       {
-        to: "/admin/pesquisas",
+        to: "/justina/pesquisas",
         label: "Pesquisas dos clientes",
         icon: BarChart3,
         perm: "settings.write",
@@ -95,25 +95,25 @@ const GROUPS: NavGroup[] = [
     title: "Loja",
     items: [
       {
-        to: "/admin/produtos",
+        to: "/justina/produtos",
         label: "Produtos",
         icon: Package,
         perm: "catalog.write",
       },
       {
-        to: "/admin/categorias",
+        to: "/justina/categorias",
         label: "Categorias",
         icon: FolderTree,
         perm: "catalog.write",
       },
       {
-        to: "/admin/pedidos",
+        to: "/justina/pedidos",
         label: "Pedidos",
         icon: ShoppingBag,
         perm: "orders.status",
       },
       {
-        to: "/admin/lojas",
+        to: "/justina/lojas",
         label: "Lojas",
         icon: StoreIcon,
         perm: "catalog.write",
@@ -124,13 +124,13 @@ const GROUPS: NavGroup[] = [
     title: "Pessoas",
     items: [
       {
-        to: "/admin/usuarios",
+        to: "/justina/usuarios",
         label: "Usuários",
         icon: Users,
         perm: "orders.status",
       },
       {
-        to: "/admin/equipa",
+        to: "/justina/equipa",
         label: "Equipa",
         icon: ShieldCheck,
         perm: "staff.manage",
@@ -141,7 +141,7 @@ const GROUPS: NavGroup[] = [
     title: "Conteúdo",
     items: [
       {
-        to: "/admin/home",
+        to: "/justina/home",
         label: "Página inicial",
         icon: HomeIcon,
         perm: "catalog.write",
@@ -152,7 +152,7 @@ const GROUPS: NavGroup[] = [
     title: "Marketing",
     items: [
       {
-        to: "/admin/cupons",
+        to: "/justina/cupons",
         label: "Cupons",
         icon: Ticket,
         perm: "catalog.write",
@@ -163,19 +163,19 @@ const GROUPS: NavGroup[] = [
     title: "Sistema",
     items: [
       {
-        to: "/admin/logistica",
+        to: "/justina/logistica",
         label: "Logística & fretes",
         icon: Truck,
         perm: "settings.write",
       },
       {
-        to: "/admin/pagamentos",
+        to: "/justina/pagamentos",
         label: "Pagamentos",
         icon: CreditCard,
         perm: "settings.write",
       },
       {
-        to: "/admin/config",
+        to: "/justina/config",
         label: "Configurações",
         icon: Settings,
         perm: "settings.write",
@@ -234,7 +234,7 @@ function AdminLayout() {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <Link to="/admin" className="flex items-center gap-2.5">
+        <Link to="/justina" className="flex items-center gap-2.5">
           <img src={logoAsset.url} alt="Bazarixy" className="h-7 w-auto" />
           <span className="hidden sm:inline rounded-full bg-foreground px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-background">
             Admin

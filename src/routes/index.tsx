@@ -27,6 +27,12 @@ import { SmartImage, Skeleton } from "@/components/SmartImage";
 import type { Product } from "@/lib/products";
 import { formatKz } from "@/lib/format";
 import { Zap, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  HOME_DESCRIPTION,
+  HOME_TITLE,
+  SHARE_IMAGE,
+  SITE_URL,
+} from "@/lib/site";
 import promo1 from "@/assets/promo-1.png";
 import promo2 from "@/assets/promo-2.png";
 import promo3 from "@/assets/promo-3.png";
@@ -36,17 +42,20 @@ const promos = [promo1, promo2, promo3];
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bazarixy — Moda online com preços incríveis" },
+      { title: HOME_TITLE },
+      { name: "description", content: HOME_DESCRIPTION },
+      { property: "og:title", content: HOME_TITLE },
+      { property: "og:description", content: HOME_DESCRIPTION },
+      { property: "og:url", content: SITE_URL },
+      { property: "og:image", content: SHARE_IMAGE },
       {
-        name: "description",
-        content:
-          "Compre moda feminina, masculina e infantil com até 70% off. Frete grátis a partir de Kz 120.000.",
+        property: "og:image:alt",
+        content: "Bazarixy - Compras online em Angola",
       },
-      { property: "og:title", content: "Bazarixy — Moda online" },
-      {
-        property: "og:description",
-        content: "Tendências da moda com preços imperdíveis.",
-      },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: HOME_TITLE },
+      { name: "twitter:description", content: HOME_DESCRIPTION },
+      { name: "twitter:image", content: SHARE_IMAGE },
     ],
   }),
   component: Home,

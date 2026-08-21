@@ -20,7 +20,7 @@ import {
   Receipt,
 } from "lucide-react";
 
-export const Route = createFileRoute("/admin/receita")({
+export const Route = createFileRoute("/justina/receita")({
   component: RevenuePage,
 });
 
@@ -127,7 +127,7 @@ function RevenuePage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <Link
-            to="/admin"
+            to="/justina"
             className="mb-1 inline-flex items-center gap-1 text-[11px] font-bold text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-3 w-3" /> Dashboard
@@ -262,7 +262,7 @@ function RevenuePage() {
               </div>
             </div>
             <Link
-              to="/admin/logistica"
+              to="/justina/logistica"
               className="mt-3 block rounded-xl border border-border p-3 text-center text-xs font-bold hover:bg-muted"
             >
               Gerir fretes e transportadoras ›

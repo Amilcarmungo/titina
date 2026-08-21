@@ -22,7 +22,7 @@ import {
   Truck,
 } from "lucide-react";
 
-export const Route = createFileRoute("/admin/")({
+export const Route = createFileRoute("/justina/")({
   component: Dashboard,
 });
 
@@ -77,7 +77,7 @@ function Dashboard() {
 
   const stats = [
     {
-      to: "/admin/receita",
+      to: "/justina/receita",
       label: "Receita total",
       value: formatKz(rev.gross),
       sub: `Bazarixy ${Math.round(PLATFORM_FEE * 100)}% · ${formatKz(rev.platform)}`,
@@ -87,7 +87,7 @@ function Dashboard() {
       trend,
     },
     {
-      to: "/admin/pedidos",
+      to: "/justina/pedidos",
       label: "Pedidos",
       value: `${orders.length}`,
       sub: `${pending} pendentes`,
@@ -97,7 +97,7 @@ function Dashboard() {
       trend: trend.map((v) => v * 0.6),
     },
     {
-      to: "/admin/produtos",
+      to: "/justina/produtos",
       label: "Produtos",
       value: `${customs.length}`,
       sub: "publicados por você",
@@ -107,7 +107,7 @@ function Dashboard() {
       trend: trend.map((v) => v * 0.4),
     },
     {
-      to: "/admin/categorias",
+      to: "/justina/categorias",
       label: "Categorias",
       value: `${cats.length}`,
       sub: "editar categorias",
@@ -117,7 +117,7 @@ function Dashboard() {
       trend: trend.map((v) => v * 0.3),
     },
     {
-      to: "/admin/lojas",
+      to: "/justina/lojas",
       label: "Lojas",
       value: `${shops.length}`,
       sub: "gerir vitrines",
@@ -130,28 +130,28 @@ function Dashboard() {
 
   const quick = [
     {
-      to: "/admin/produtos",
+      to: "/justina/produtos",
       label: "Adicionar produto",
       desc: "Publique um novo item",
       icon: Plus,
       color: "bg-emerald-500",
     },
     {
-      to: "/admin/home",
+      to: "/justina/home",
       label: "Novo banner",
       desc: "Destaque na home",
       icon: ImageIcon,
       color: "bg-amber-500",
     },
     {
-      to: "/admin/logistica",
+      to: "/justina/logistica",
       label: "Fretes",
       desc: `${carriers.filter((c) => c.active).length} opções ativas`,
       icon: Truck,
       color: "bg-blue-600",
     },
     {
-      to: "/admin/pedidos",
+      to: "/justina/pedidos",
       label: "Ver pedidos",
       desc: `${pending} aguardando`,
       icon: ClipboardList,
@@ -219,7 +219,7 @@ function Dashboard() {
 
       {/* Revenue split */}
       <Link
-        to="/admin/receita"
+        to="/justina/receita"
         className="block rounded-2xl bg-background p-5 shadow-[var(--shadow-card)] transition hover:shadow-xl"
       >
         <div className="flex flex-wrap items-end justify-between gap-3">
@@ -300,7 +300,7 @@ function Dashboard() {
               Pedidos recentes
             </h2>
             <Link
-              to="/admin/pedidos"
+              to="/justina/pedidos"
               className="text-xs font-bold text-muted-foreground hover:text-foreground"
             >
               Ver todos ›

@@ -15,7 +15,7 @@ import {
   type GoalMetric,
 } from "@/lib/goals-store";
 
-export const Route = createFileRoute("/admin/metas")({
+export const Route = createFileRoute("/justina/metas")({
   component: GoalsPage,
 });
 

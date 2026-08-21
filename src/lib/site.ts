@@ -6,6 +6,10 @@
  */
 export const SITE_URL = "https://bazarixy.com";
 export const SITE_NAME = "Bazarixy";
+export const HOME_TITLE = "Bazarixy | Compras Online em Angola";
+export const HOME_DESCRIPTION =
+  "Bazarixy — Compra online em Angola. Encontra promoções em roupas, telemóveis, eletrónicos, calçados, beleza, casa, desporto e muito mais. Descobre ofertas, produtos de lojas verificadas e compra com segurança.";
+export const SHARE_IMAGE = absoluteUrl("/detalhesdolinks.png");
 
 /** Normaliza uma descrição para snippets do Google e prévias sociais. */
 export function seoDescription(

@@ -11,7 +11,7 @@ import {
 import { useCoupons, couponActions, type Coupon } from "@/lib/coupons-store";
 import { formatKz } from "@/lib/format";
 
-export const Route = createFileRoute("/admin/cupons")({
+export const Route = createFileRoute("/justina/cupons")({
   component: CouponsAdmin,
 });
 

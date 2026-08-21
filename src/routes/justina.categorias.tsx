@@ -25,7 +25,7 @@ import { AdminTabs } from "@/components/admin/AdminTabs";
 import { storagePaths } from "@/lib/firebase/storage";
 import { uploadImageFile } from "@/lib/firebase/upload";
 
-export const Route = createFileRoute("/admin/categorias")({
+export const Route = createFileRoute("/justina/categorias")({
   component: CategoriesPage,
 });
 

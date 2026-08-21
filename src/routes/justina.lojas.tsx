@@ -21,7 +21,7 @@ import {
 import { storagePaths } from "@/lib/firebase/storage";
 import { uploadImageFile } from "@/lib/firebase/upload";
 
-export const Route = createFileRoute("/admin/lojas")({
+export const Route = createFileRoute("/justina/lojas")({
   component: ShopsPage,
 });
 
@@ -206,7 +206,7 @@ function ShopsPage() {
                   produto(s)
                 </span>
                 <Link
-                  to="/admin/lojas/$id"
+                  to="/justina/lojas/$id"
                   params={{ id: s.id }}
                   className="inline-flex items-center gap-1 font-bold text-foreground"
                 >

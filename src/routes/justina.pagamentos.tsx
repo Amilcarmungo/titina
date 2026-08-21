@@ -11,7 +11,7 @@ import {
 import { storagePaths } from "@/lib/firebase/storage";
 import { uploadImageFile } from "@/lib/firebase/upload";
 
-export const Route = createFileRoute("/admin/pagamentos")({
+export const Route = createFileRoute("/justina/pagamentos")({
   component: PaymentsAdmin,
 });
 
