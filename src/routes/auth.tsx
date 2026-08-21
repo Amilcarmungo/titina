@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import {
   authErrorMessage,
+  completePasswordReset,
   emailHasAccount,
   linkGoogleToPasswordAccount,
   NeedsPasswordLinkError,
@@ -20,6 +21,7 @@ import {
   signInWithEmail,
   signInWithGoogle,
   signUpWithEmail,
+  validatePasswordResetCode,
 } from "@/lib/firebase/auth";
 import type { AuthCredential } from "firebase/auth";
 import { captureReferralFromUrl } from "@/lib/firebase/referrals";
@@ -80,12 +82,15 @@ function AppleIcon() {
 }
 
 function AuthPage() {
-  const [step, setStep] = useState<"email" | "signin" | "signup" | "verify">(
-    "email",
-  );
+  const [step, setStep] = useState<
+    "email" | "signin" | "signup" | "verify" | "reset"
+  >("email");
   const [code, setCode] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [resetCode, setResetCode] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
@@ -103,12 +108,28 @@ function AuthPage() {
     captureReferralFromUrl();
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get("mode");
+    const code = params.get("oobCode");
+    if (mode !== "resetPassword" || !code) return;
+    setResetCode(code);
+    setStep("reset");
+    setBusy(true);
+    void validatePasswordResetCode(code)
+      .then((resetEmail) => setEmail(resetEmail))
+      .catch(() =>
+        setError("Este link expirou ou já foi utilizado. Peça um novo link."),
+      )
+      .finally(() => setBusy(false));
+  }, []);
+
   /**
    * Sessão activa → a página de login desaparece sozinha. Funciona para
    * email/senha, Google (popup ou redirect) e para quem já estava entrado.
    */
   useEffect(() => {
-    if (!user || step === "verify") return;
+    if (!user || step === "verify" || step === "reset") return;
     const back = typeof window !== "undefined" && window.history.length > 1;
     if (back) router.history.back();
     else void router.navigate({ to: "/", replace: true });
@@ -224,6 +245,29 @@ function AuthPage() {
     guard(async () => {
       await resetPassword(email);
       setInfo("Enviamos um link de recuperação para seu email.");
+    });
+  const doCompleteReset = () =>
+    guard(async () => {
+      if (
+        newPassword.length < 8 ||
+        !/[a-zA-Z]/.test(newPassword) ||
+        !/\d/.test(newPassword)
+      ) {
+        setError(
+          "A nova senha precisa de 8 caracteres, uma letra e um número.",
+        );
+        return;
+      }
+      if (newPassword !== confirmNewPassword) {
+        setError("As senhas não coincidem.");
+        return;
+      }
+      await completePasswordReset(resetCode, newPassword);
+      setInfo("Senha alterada com sucesso. Já pode entrar na sua conta.");
+      setNewPassword("");
+      setConfirmNewPassword("");
+      setStep("signin");
+      window.history.replaceState({}, "", "/auth");
     });
 
   const goBack = () => {
@@ -460,6 +504,61 @@ function AuthPage() {
                 Confirmar mais tarde
               </button>
             </div>
+          </div>
+        )}
+
+        {step === "reset" && (
+          <div className="mt-4">
+            <h1 className="text-2xl font-bold">Crie uma nova senha</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {email
+                ? `Defina uma nova senha para ${email}.`
+                : "Defina uma nova senha segura para a sua conta."}
+            </p>
+
+            <label className="mt-6 block text-xs text-muted-foreground">
+              Nova senha
+            </label>
+            <div className="relative mt-1">
+              <input
+                type={showPass ? "text" : "password"}
+                value={newPassword}
+                onChange={(event) => setNewPassword(event.target.value)}
+                className="h-12 w-full rounded-full border border-border bg-background px-4 pr-11 outline-none focus:border-brand-strong"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass((value) => !value)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+              >
+                {showPass ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            <label className="mt-4 block text-xs text-muted-foreground">
+              Confirmar nova senha
+            </label>
+            <input
+              type={showPass ? "text" : "password"}
+              value={confirmNewPassword}
+              onChange={(event) => setConfirmNewPassword(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") doCompleteReset();
+              }}
+              className="mt-1 h-12 w-full rounded-full border border-border bg-background px-4 outline-none focus:border-brand-strong"
+            />
+            {error && <p className="mt-1 text-xs text-sale">{error}</p>}
+            {info && <p className="mt-1 text-xs text-emerald-600">{info}</p>}
+            <button
+              onClick={doCompleteReset}
+              disabled={busy || !resetCode}
+              className="mt-5 h-12 w-full rounded-full bg-brand-strong text-base font-bold text-white hover:opacity-90 disabled:opacity-60"
+            >
+              {busy ? "A validar…" : "Guardar nova senha"}
+            </button>
           </div>
         )}
 

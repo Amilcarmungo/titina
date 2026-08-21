@@ -3,6 +3,7 @@ import {
   FacebookAuthProvider,
   GoogleAuthProvider,
   browserLocalPersistence,
+  confirmPasswordReset,
   createUserWithEmailAndPassword,
   getRedirectResult,
   linkWithCredential,
@@ -15,6 +16,7 @@ import {
   signOut,
   updatePassword,
   updateProfile,
+  verifyPasswordResetCode,
   type AuthCredential,
   type User,
 } from "firebase/auth";
@@ -225,6 +227,16 @@ export async function resetPassword(email: string) {
   await sendPasswordResetEmail(auth, email.trim().toLowerCase(), {
     url: `${window.location.origin}/auth`,
   });
+}
+
+export async function validatePasswordResetCode(code: string) {
+  const auth = requireAuthInstance();
+  return verifyPasswordResetCode(auth, code);
+}
+
+export async function completePasswordReset(code: string, password: string) {
+  const auth = requireAuthInstance();
+  await confirmPasswordReset(auth, code, password);
 }
 
 export async function signOutUser() {

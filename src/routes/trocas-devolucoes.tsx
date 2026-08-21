@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Layout } from "@/components/Layout";
-import logoAsset from "@/assets/bazarixy-logo.webp.asset.json";
 import { ShieldCheck, Mail, RefreshCcw, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/trocas-devolucoes")({
@@ -143,7 +142,7 @@ function ReturnPolicyPage() {
         <header className="border-b border-slate-200 pb-6 text-center md:pb-8">
           <div className="flex justify-center">
             <img
-              src={logoAsset.url}
+              src="/logotipo.webp"
               alt="Bazarixy"
               className="h-20 w-auto object-contain md:h-24"
             />

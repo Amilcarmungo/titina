@@ -27,7 +27,6 @@ import {
   NotificationsDrawer,
 } from "@/components/SideDrawers";
 import { requireAuth } from "@/lib/auth-guard";
-import LOGO from "../../logotipo.webp";
 
 /** Coração das notificações: só fica dourado (e a piscar) quando há avisos novos. */
 export function NotificationBell({
@@ -434,7 +433,7 @@ function BrandLogo({ className = "" }: { className?: string }) {
   return (
     <span className={`relative inline-flex items-center ${className}`}>
       <img
-        src={LOGO}
+        src="/logotipo.webp"
         alt="Bazarixy"
         className="h-full w-auto"
         onError={(event) => {

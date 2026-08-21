@@ -32,7 +32,6 @@ import {
   Menu,
 } from "lucide-react";
 import { SearchIcon } from "@/components/SearchIcon";
-import logo from "../../logotipo.webp";
 import { toastAdded } from "@/lib/toast-added";
 import { useReviews, type Review } from "@/lib/reviews";
 import { useShops, type Shop } from "@/lib/shops-store";
@@ -400,7 +399,7 @@ function ProductPage() {
               to="/"
               className="mx-auto flex min-w-0 items-center justify-center"
             >
-              <img src={logo} alt="Bazarixy" className="h-7 w-auto" />
+              <img src="/logotipo.webp" alt="Bazarixy" className="h-7 w-auto" />
             </Link>
             <Link
               to="/categories"

@@ -13,7 +13,7 @@ const BRAND_PALE = "#fff0f6";
 const TEXT = "#24202a";
 const MUTED = "#766d78";
 const BORDER = "#f1e5ec";
-const LOGO_URL = absoluteUrl("/img/bazarixy-mark.webp");
+const LOGO_URL = absoluteUrl("/logotipo.webp");
 
 /** Escapa texto vindo de dados do utilizador (nunca injectar HTML cru). */
 export function esc(value: unknown): string {
@@ -110,7 +110,7 @@ export function shell(bodyHtml: string, preheader = ""): string {
   <tr><td align="center">
     <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;border:1px solid ${BORDER};border-radius:18px;overflow:hidden">
       <tr><td style="padding:22px 28px;border-bottom:1px solid ${BORDER};background:#fff">
-        <a href="${SITE_URL}" style="font:800 20px Arial,Helvetica,sans-serif;color:${TEXT};text-decoration:none"><img src="${LOGO_URL}" width="42" height="42" alt="${SITE_NAME}" style="display:inline-block;vertical-align:middle;border-radius:12px;margin-right:10px" /><span style="vertical-align:middle">${SITE_NAME}</span></a>
+        <a href="${SITE_URL}" style="display:inline-block;text-decoration:none"><img src="${LOGO_URL}" width="164" alt="${SITE_NAME}" style="display:block;width:164px;height:auto;max-height:58px;object-fit:contain;object-position:left center" /></a>
       </td></tr>
       <tr><td style="padding:26px 28px">${bodyHtml}</td></tr>
       <tr><td style="padding:24px 28px;background:${BRAND_PALE};font:400 12px/1.7 Arial,Helvetica,sans-serif;color:${MUTED}">
