@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /justina
+
+Sitemap: https://bazarixy.com/sitemap.xml

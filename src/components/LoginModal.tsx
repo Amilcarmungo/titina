@@ -23,6 +23,10 @@ import {
   signInWithGoogle,
   signUpWithEmail,
 } from "@/lib/firebase/auth";
+import {
+  requestSignupVerification,
+  verifySignupVerification,
+} from "@/lib/firebase/email-verification";
 import type { AuthCredential } from "firebase/auth";
 import { firebaseEnabled } from "@/lib/firebase/client";
 
@@ -72,11 +76,12 @@ function AppleIcon() {
 /** Desktop-only login modal (square corners, no rounding). */
 export function LoginModal() {
   const { loginOpen } = useStore();
-  const [step, setStep] = React.useState<"email" | "signin" | "signup">(
-    "email",
-  );
+  const [step, setStep] = React.useState<
+    "email" | "signin" | "signup" | "verify"
+  >("email");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [code, setCode] = React.useState("");
   const [showPass, setShowPass] = React.useState(false);
   const [error, setError] = React.useState("");
   const [agree, setAgree] = React.useState(false);
@@ -91,6 +96,7 @@ export function LoginModal() {
       setStep("email");
       setEmail("");
       setPassword("");
+      setCode("");
       setError("");
       setAgree(false);
       setShowPass(false);
@@ -153,8 +159,9 @@ export function LoginModal() {
         setError("Você precisa aceitar os termos.");
         return;
       }
-      await signUpWithEmail(email, password);
-      actions.closeLogin();
+      await requestSignupVerification(email);
+      setCode("");
+      setStep("verify");
     });
   const doGoogle = () =>
     void guard(async () => {
@@ -183,6 +190,22 @@ export function LoginModal() {
     void guard(async () => {
       await resetPassword(email);
       setError("Enviamos um link de recuperação para seu email.");
+    });
+  const doVerify = () =>
+    void guard(async () => {
+      const result = await verifySignupVerification(code);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      await signUpWithEmail(email, password);
+      actions.closeLogin();
+    });
+  const resendCode = () =>
+    void guard(async () => {
+      await requestSignupVerification(email);
+      setCode("");
+      setError("Novo código enviado para o seu email.");
     });
 
   return (
@@ -340,6 +363,47 @@ export function LoginModal() {
                 className="mt-3 block w-full text-center text-sm text-brand-strong disabled:opacity-60"
               >
                 Esqueci minha senha
+              </button>
+            </>
+          )}
+
+          {step === "verify" && (
+            <>
+              <h2 className="mt-2 text-xl font-bold">Verifique o seu email</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Enviámos um código de 6 dígitos para <strong>{email}</strong>. A
+                conta só será criada depois da confirmação.
+              </p>
+              <label className="mt-5 block text-xs text-muted-foreground">
+                Código de verificação
+              </label>
+              <input
+                value={code}
+                onChange={(event) =>
+                  setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") doVerify();
+                }}
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                placeholder="000000"
+                className="mt-1 h-14 w-full border border-border bg-background text-center text-2xl font-black tracking-[10px] outline-none focus:border-brand-strong"
+              />
+              {error && <p className="mt-1 text-xs text-sale">{error}</p>}
+              <button
+                onClick={doVerify}
+                disabled={busy || code.length !== 6}
+                className="mt-5 h-11 w-full bg-brand-strong text-base font-bold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {busy ? "A confirmar…" : "Confirmar e criar conta"}
+              </button>
+              <button
+                onClick={resendCode}
+                disabled={busy}
+                className="mt-4 block w-full text-center text-sm font-medium text-brand-strong disabled:opacity-60"
+              >
+                Reenviar código
               </button>
             </>
           )}
