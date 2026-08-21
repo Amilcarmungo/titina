@@ -202,22 +202,22 @@ function RootComponent() {
             </span>
           ),
         }}
-        className="!fixed !inset-x-0 !top-1/2 !left-0 !mx-auto !flex !w-fit !max-w-[92vw] !-translate-y-1/2 !transform !flex-col !items-center sm:!max-w-[420px]"
+        className="!fixed !inset-x-0 !left-0 !top-1/2 !mx-auto !flex !w-[calc(100vw-24px)] !max-w-[420px] !-translate-y-1/2 !transform !flex-col !items-center"
         toastOptions={{
           unstyled: true,
           duration: 2600,
           classNames: {
             toast:
-              "pointer-events-auto mx-auto flex w-fit max-w-[92vw] items-center gap-3 rounded-2xl border border-black/5 bg-white/95 px-4 py-3 text-left text-foreground shadow-[0_18px_50px_-18px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:max-w-[420px]",
-            content: "flex min-w-0 flex-col gap-0.5",
+              "pointer-events-auto mx-auto flex w-full min-w-0 items-center justify-center gap-2.5 rounded-2xl border border-black/5 bg-white/95 px-3.5 py-3 text-center text-foreground shadow-[0_18px_50px_-18px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:px-4",
+            content: "flex min-w-0 flex-1 flex-col items-center gap-0.5",
             title:
-              "truncate text-[13.5px] font-bold leading-snug text-neutral-900",
+              "w-full break-words text-[13px] font-bold leading-snug text-neutral-900 sm:text-[13.5px]",
             description:
-              "line-clamp-2 text-[12px] font-medium leading-relaxed text-neutral-500",
+              "w-full break-words text-[11.5px] font-medium leading-[1.35] text-neutral-500 sm:text-[12px]",
             actionButton:
-              "ml-2 shrink-0 rounded-full bg-foreground px-3 py-1.5 text-[11px] font-bold text-background",
+              "shrink-0 rounded-full bg-foreground px-3 py-1.5 text-[11px] font-bold text-background",
             cancelButton:
-              "ml-1 shrink-0 rounded-full border border-border px-3 py-1.5 text-[11px] font-bold",
+              "shrink-0 rounded-full border border-border px-3 py-1.5 text-[11px] font-bold",
             icon: "shrink-0",
           },
         }}
