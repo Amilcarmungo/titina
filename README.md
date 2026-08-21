@@ -140,6 +140,39 @@ O projeto utiliza tecnologias modernas para garantir desempenho, escalabilidade 
 
 - Resend
 
+## Configurar e-mails e suporte com IA
+
+As chaves abaixo são usadas apenas no servidor. Nunca coloque
+`RESEND_API_KEY`, `LOVABLE_API_KEY` ou qualquer chave secreta num componente
+React, numa variável iniciada por `VITE_` ou no Git.
+
+### Desenvolvimento local
+
+1. Copie `.env.example` para `.env`.
+2. Preencha `RESEND_API_KEY` com uma chave criada no [Resend](https://resend.com/api-keys).
+3. No Resend, verifique `mail.bazarixy.com`; depois use `Bazarixy <notificacoes@mail.bazarixy.com>` em `EMAIL_FROM`.
+4. Preencha `LOVABLE_API_KEY` com a chave do AI Gateway da Lovable. O suporte usa Gemini através desse gateway.
+5. Reinicie o servidor depois de alterar o `.env`.
+
+O Resend já envia o código de verificação, a confirmação da compra e as
+notificações de alteração do estado do pedido. O endpoint interno é
+`POST /api/email` e exige autenticação Firebase.
+
+### Produção
+
+Adicione as mesmas variáveis no painel de Environment Variables da plataforma
+onde a aplicação está publicada. Para Cloudflare/Wrangler, use secrets:
+
+```sh
+npx wrangler secret put RESEND_API_KEY
+npx wrangler secret put LOVABLE_API_KEY
+```
+
+`EMAIL_FROM` pode ser uma variável normal, desde que `mail.bazarixy.com` esteja
+verificado no Resend. Depois de alterar secrets, faça um novo deploy. Sem
+`RESEND_API_KEY`, os e-mails não são enviados; sem `LOVABLE_API_KEY`, o suporte
+continua disponível com respostas locais.
+
 ---
 
 ## 🏗️ Arquitetura

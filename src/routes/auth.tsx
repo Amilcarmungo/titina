@@ -26,8 +26,8 @@ import { captureReferralFromUrl } from "@/lib/firebase/referrals";
 import { useStore } from "@/lib/store";
 import { firebaseEnabled } from "@/lib/firebase/client";
 import {
-  confirmVerificationCode,
-  sendVerificationCode,
+  requestSignupVerification,
+  verifySignupVerification,
 } from "@/lib/firebase/email-verification";
 import logoMark from "../../img/bazarixy-mark.webp";
 
@@ -173,35 +173,29 @@ function AuthPage() {
         setError("Você precisa aceitar os termos.");
         return;
       }
-      const created = await signUpWithEmail(email, password);
-      // Código de verificação por e-mail (Resend) — a conta já está activa.
+      await requestSignupVerification(email);
+      setCode("");
       setStep("verify");
-      setInfo("Enviámos um código de 6 dígitos para o seu e-mail.");
-      void sendVerificationCode(created.uid, created.email, created.name);
+      setInfo(
+        "Enviámos um código de 6 dígitos. A conta só será criada depois da confirmação.",
+      );
     });
   const doVerify = () =>
     guard(async () => {
-      if (!user?.uid) {
-        setError("Sessão não encontrada.");
-        return;
-      }
-      const res = await confirmVerificationCode(user.uid, code);
+      const res = await verifySignupVerification(code);
       if (!res.ok) {
         setError(res.error);
         return;
       }
+      await signUpWithEmail(email, password);
       setStep("email");
       void router.navigate({ to: "/", replace: true });
     });
   const resendCode = () =>
     guard(async () => {
-      if (!user?.uid || !user.email) return;
-      const sent = await sendVerificationCode(user.uid, user.email, user.name);
-      setInfo(
-        sent
-          ? "Novo código enviado."
-          : "Não foi possível enviar agora. Tente mais tarde.",
-      );
+      await requestSignupVerification(email);
+      setCode("");
+      setInfo("Novo código enviado.");
     });
   const doGoogle = () =>
     guard(async () => {

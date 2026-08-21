@@ -16,7 +16,7 @@ export async function sendWithResend(input: {
   if (!apiKey) throw new Error("RESEND_API_KEY não configurada.");
 
   const from =
-    process.env["EMAIL_FROM"] ?? "Bazarixy <nao-responder@bazarixy.com>";
+    process.env["EMAIL_FROM"] ?? "Bazarixy <notificacoes@mail.bazarixy.com>";
 
   const res = await fetch(RESEND_ENDPOINT, {
     method: "POST",

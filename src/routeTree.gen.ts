@@ -31,6 +31,7 @@ import { Route as TermosRouteImport } from './routes/termos'
 import { Route as TrocasDevolucoesRouteImport } from './routes/trocas-devolucoes'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as ApiEmailRouteImport } from './routes/api/email'
+import { Route as ApiSignupVerificationRouteImport } from './routes/api/signup-verification'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 import { Route as JustinaIndexRouteImport } from './routes/justina.index'
 import { Route as JustinaCategoriasRouteImport } from './routes/justina.categorias'
@@ -163,6 +164,11 @@ const ApiEmailRoute = ApiEmailRouteImport.update({
   path: '/api/email',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSignupVerificationRoute = ApiSignupVerificationRouteImport.update({
+  id: '/api/signup-verification',
+  path: '/api/signup-verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
@@ -292,6 +298,7 @@ export interface FileRoutesByFullPath {
   '/trocas-devolucoes': typeof TrocasDevolucoesRoute
   '/wallet': typeof WalletRoute
   '/api/email': typeof ApiEmailRoute
+  '/api/signup-verification': typeof ApiSignupVerificationRoute
   '/category/$slug': typeof CategorySlugRoute
   '/justina/categorias': typeof JustinaCategoriasRoute
   '/justina/config': typeof JustinaConfigRoute
@@ -336,6 +343,7 @@ export interface FileRoutesByTo {
   '/trocas-devolucoes': typeof TrocasDevolucoesRoute
   '/wallet': typeof WalletRoute
   '/api/email': typeof ApiEmailRoute
+  '/api/signup-verification': typeof ApiSignupVerificationRoute
   '/category/$slug': typeof CategorySlugRoute
   '/justina/categorias': typeof JustinaCategoriasRoute
   '/justina/config': typeof JustinaConfigRoute
@@ -382,6 +390,7 @@ export interface FileRoutesById {
   '/trocas-devolucoes': typeof TrocasDevolucoesRoute
   '/wallet': typeof WalletRoute
   '/api/email': typeof ApiEmailRoute
+  '/api/signup-verification': typeof ApiSignupVerificationRoute
   '/category/$slug': typeof CategorySlugRoute
   '/justina/categorias': typeof JustinaCategoriasRoute
   '/justina/config': typeof JustinaConfigRoute
@@ -429,6 +438,7 @@ export interface FileRouteTypes {
     | '/trocas-devolucoes'
     | '/wallet'
     | '/api/email'
+    | '/api/signup-verification'
     | '/category/$slug'
     | '/justina/categorias'
     | '/justina/config'
@@ -473,6 +483,7 @@ export interface FileRouteTypes {
     | '/trocas-devolucoes'
     | '/wallet'
     | '/api/email'
+    | '/api/signup-verification'
     | '/category/$slug'
     | '/justina/categorias'
     | '/justina/config'
@@ -518,6 +529,7 @@ export interface FileRouteTypes {
     | '/trocas-devolucoes'
     | '/wallet'
     | '/api/email'
+    | '/api/signup-verification'
     | '/category/$slug'
     | '/justina/categorias'
     | '/justina/config'
@@ -564,6 +576,7 @@ export interface RootRouteChildren {
   TrocasDevolucoesRoute: typeof TrocasDevolucoesRoute
   WalletRoute: typeof WalletRoute
   ApiEmailRoute: typeof ApiEmailRoute
+  ApiSignupVerificationRoute: typeof ApiSignupVerificationRoute
   CategorySlugRoute: typeof CategorySlugRoute
   PayMethodRoute: typeof PayMethodRoute
   ProductIdRoute: typeof ProductIdRoute
@@ -724,6 +737,13 @@ declare module '@tanstack/react-router' {
       path: '/api/email'
       fullPath: '/api/email'
       preLoaderRoute: typeof ApiEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/signup-verification': {
+      id: '/api/signup-verification'
+      path: '/api/signup-verification'
+      fullPath: '/api/signup-verification'
+      preLoaderRoute: typeof ApiSignupVerificationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/category/$slug': {
@@ -952,6 +972,7 @@ const rootRouteChildren: RootRouteChildren = {
   TrocasDevolucoesRoute: TrocasDevolucoesRoute,
   WalletRoute: WalletRoute,
   ApiEmailRoute: ApiEmailRoute,
+  ApiSignupVerificationRoute: ApiSignupVerificationRoute,
   CategorySlugRoute: CategorySlugRoute,
   PayMethodRoute: PayMethodRoute,
   ProductIdRoute: ProductIdRoute,
