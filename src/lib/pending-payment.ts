@@ -7,10 +7,12 @@ export type PendingItem = {
   size?: string;
   color?: string;
   unitPrice: number;
+  image?: string;
 };
 
 export type PendingPayment = {
   code: string;
+  orderId?: string;
   methodId: string;
   total: number;
   subtotal?: number;

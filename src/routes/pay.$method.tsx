@@ -88,7 +88,8 @@ function PayMethodPage() {
       getPaymentMethod(pending?.methodId),
     [methods, methodId, pending],
   );
-  const isExpress = (method?.id ?? methodId) === "multicaixa-express";
+  const selectedMethod = method?.id ?? methodId;
+  const isExpress = selectedMethod === "multicaixa-express";
 
   const message = useMemo(
     () =>
@@ -155,26 +156,38 @@ function PayMethodPage() {
       finishLock.current = false;
       return;
     }
-    const id = orderActions.add({
-      id: pending.code,
-      status: "processing",
-      items: pending.items.map((i) => ({
-        productId: i.productId,
-        qty: i.qty,
-        size: i.size,
-        color: i.color,
-        unitPrice: i.unitPrice,
-      })),
-      subtotal: pending.subtotal,
-      discount: pending.discount,
-      shipping: pending.shipping,
-      total: pending.total,
-      customer: pending.customer,
-      paymentMethod: method?.id ?? methodId,
-      paymentProof: url,
-      shippingAddress: pending.shippingAddress,
-      notes: `Pagamento enviado por ${method?.label ?? methodId} · Comprovativo: ${proof.name}`,
-    });
+    const notes = `Pagamento enviado por ${method?.label ?? methodId} · Comprovativo: ${proof.name}`;
+    const id = pending.orderId ?? pending.code;
+    if (pending.orderId) {
+      orderActions.update(id, {
+        status: "processing",
+        paymentMethod: method?.id ?? methodId,
+        paymentProof: url,
+        notes,
+      });
+    } else {
+      orderActions.add({
+        id: pending.code,
+        status: "processing",
+        items: pending.items.map((i) => ({
+          productId: i.productId,
+          qty: i.qty,
+          size: i.size,
+          color: i.color,
+          unitPrice: i.unitPrice,
+          image: i.image,
+        })),
+        subtotal: pending.subtotal,
+        discount: pending.discount,
+        shipping: pending.shipping,
+        total: pending.total,
+        customer: pending.customer,
+        paymentMethod: method?.id ?? methodId,
+        paymentProof: url,
+        shippingAddress: pending.shippingAddress,
+        notes,
+      });
+    }
     clearPendingPayment();
     if (proof.preview) URL.revokeObjectURL(proof.preview);
     setDone(id);
@@ -370,6 +383,33 @@ function PayMethodPage() {
           </div>
 
           <div className="space-y-3 rounded-2xl bg-card p-4 shadow-[var(--shadow-card)]">
+            <div>
+              <label className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                Método de pagamento
+              </label>
+              <select
+                value={selectedMethod}
+                onChange={(event) =>
+                  void navigate({
+                    to: "/pay/$method",
+                    params: { method: event.target.value },
+                    replace: true,
+                  })
+                }
+                className="mt-1 h-11 w-full rounded-xl border border-border bg-background px-3 text-sm font-bold outline-none focus:border-brand-strong"
+              >
+                {methods
+                  .filter((item) => item.active)
+                  .map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.label}
+                    </option>
+                  ))}
+              </select>
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Pode escolher outro método antes de enviar o novo comprovativo.
+              </p>
+            </div>
             <CopyRow
               label="Número de telemóvel / conta"
               value={method?.phone || "923 000 000"}

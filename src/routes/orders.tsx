@@ -1,3 +1,4 @@
+import { setPendingPayment } from "@/lib/pending-payment";
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { Layout } from "@/components/Layout";
 import { getAnyProduct } from "@/lib/products-store";
@@ -212,6 +213,33 @@ function OrderCard({
   }, [order.id, user?.uid]);
 
   const pay = () => {
+    orderActions.reopenPayment(
+      order.id,
+      order.paymentMethod || "multicaixa-express",
+    );
+    setPendingPayment({
+      orderId: order.id,
+      code: order.id,
+      methodId: order.paymentMethod || "multicaixa-express",
+      total: order.total,
+      subtotal: order.subtotal,
+      discount: order.discount,
+      shipping: order.shipping,
+      items: order.items.map((item) => {
+        const product = getAnyProduct(item.productId);
+        return {
+          productId: item.productId,
+          name: item.name ?? product?.name ?? "Produto",
+          qty: item.qty,
+          size: item.size,
+          color: item.color,
+          unitPrice: item.unitPrice ?? product?.price ?? 0,
+          image: item.image ?? product?.image,
+        };
+      }),
+      customer: order.customer,
+      shippingAddress: order.shippingAddress,
+    });
     void navigate({
       to: "/pay/$method",
       params: { method: order.paymentMethod || "multicaixa-express" },

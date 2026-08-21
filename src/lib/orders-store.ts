@@ -395,6 +395,28 @@ export const orderActions = {
     });
   },
 
+  /** Reabre um pedido recusado para o cliente enviar um novo comprovativo. */
+  reopenPayment(id: string, methodId: string) {
+    const order = orders.find((o) => o.id === id);
+    if (!order) return;
+    const previous = packagesOf(order);
+    const packages = previous.map((pkg) => ({
+      ...pkg,
+      stage: "awaiting_payment" as PackageStage,
+      timeline: [
+        ...pkg.timeline,
+        { stage: "awaiting_payment" as PackageStage, at: now() },
+      ],
+    }));
+    put({
+      ...order,
+      status: "unpaid",
+      paymentMethod: methodId,
+      paymentProof: "",
+      packages,
+    });
+  },
+
   /** Avança um pacote (loja) e, se pedido, notifica o cliente. */
   setPackageStage(
     orderId: string,
@@ -485,9 +507,20 @@ export const orderActions = {
     const order = orders.find((o) => o.id === id);
     if (!order) return;
     const next = { ...order, ...patch };
+    if (!order.paymentProof && next.paymentProof) {
+      next.status = "processing";
+      next.packages = packagesOf(next).map((pkg) => ({
+        ...pkg,
+        stage: "payment_review" as PackageStage,
+        timeline: [
+          ...pkg.timeline,
+          { stage: "payment_review" as PackageStage, at: now() },
+        ],
+      }));
+    }
     put(next);
     if (!order.paymentProof && next.paymentProof) {
-      const packages = packagesOf(next);
+      const packages = next.packages ?? [];
       packages.forEach((pkg) => {
         if (pkg.stage === "payment_review") notifyCustomer(next, pkg);
       });
