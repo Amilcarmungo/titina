@@ -13,7 +13,9 @@ import {
   esc,
   heading,
   itemsTable,
+  messageBlock,
   muted,
+  noticeLabel,
   paragraph,
   shell,
   summaryRow,
@@ -80,7 +82,8 @@ export const EMAIL_TEMPLATES: {
   "verify-email": (d) => ({
     subject: `${d.code} é o seu código de verificação — Bazarixy`,
     html: shell(
-      heading("Confirme o seu e-mail") +
+      noticeLabel("Segurança da conta") +
+        heading("Confirme o seu e-mail") +
         hello(d.name) +
         paragraph(
           "Use o código abaixo para confirmar a sua conta na Bazarixy.",
@@ -112,7 +115,8 @@ export const EMAIL_TEMPLATES: {
   "order-confirmation": (d) => ({
     subject: `Pedido ${d.orderCode} confirmado — Bazarixy`,
     html: shell(
-      heading("Pedido confirmado!") +
+      noticeLabel("Compra recebida") +
+        heading("Pedido confirmado!") +
         hello(d.name) +
         paragraph(
           `Obrigado pela sua compra. O seu pedido <strong>${esc(d.orderCode)}</strong> foi registado e já está a ser tratado.`,
@@ -130,13 +134,17 @@ export const EMAIL_TEMPLATES: {
   }),
 
   notification: (d) => ({
-    subject: d.title,
+    subject: `${d.title} — Bazarixy`,
     html: shell(
-      heading(d.title) +
+      noticeLabel("Actualização da encomenda") +
+        heading(d.title) +
         hello(d.name) +
-        paragraph(esc(d.message)) +
+        messageBlock(d.message) +
+        muted(
+          "Consulte os detalhes e acompanhe o progresso da sua encomenda a qualquer momento.",
+        ) +
         (d.ctaLabel ? button(d.ctaLabel, url(d.ctaPath)) : ""),
-      d.title,
+      `Actualização da encomenda: ${d.title}`,
     ),
   }),
 
