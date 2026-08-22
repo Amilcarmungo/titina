@@ -1,6 +1,6 @@
 import { d as getApps, f as initializeApp } from "../_libs/@firebase/analytics+[...].mjs";
 import "../_libs/firebase.mjs";
-import { o as getAuth } from "../_libs/firebase__auth.mjs";
+import { s as getAuth } from "../_libs/firebase__auth.mjs";
 import { _ as initializeFirestore, h as getFirestore, o as persistentLocalCache, s as persistentMultipleTabManager } from "../_libs/@firebase/firestore+[...].mjs";
 import { n as getStorage } from "../_libs/firebase__storage.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/client-C80F8PZn.js

@@ -1,1 +1,0 @@
-import{s as e}from"./roles-BKB0Oipk.js";import{t}from"./Layout-7ONJ6dyK.js";var n=e(),r=()=>(0,n.jsx)(t,{title:`Categoria`,showBack:!0,children:(0,n.jsx)(`p`,{className:`p-6`,children:`Categoria não encontrada.`})});export{r as notFoundComponent};

@@ -5,13 +5,12 @@ import {
   collection,
   deleteDoc,
   doc,
-  onSnapshot,
+  getDocs,
   setDoc,
 } from "firebase/firestore";
 import { getDb } from "@/lib/firebase/client";
 import { canSyncSiteData } from "@/lib/firebase/roles";
 import { stripUndefined } from "@/lib/firebase/sanitize";
-import { createRetrier } from "@/lib/firebase/retry";
 
 const KEY = "shop_custom_products_v1";
 
@@ -65,45 +64,37 @@ const sync = attachSync<Product[]>(
   },
 );
 
-let unsubscribe: (() => void) | null = null;
-const retrier = createRetrier(() => {
-  unsubscribe?.();
-  unsubscribe = null;
-  subscribe();
-});
+let loading = false;
 
 function subscribe() {
-  if (typeof window === "undefined" || unsubscribe) return;
+  if (typeof window === "undefined" || loading) return;
   const db = getDb();
   if (!db) {
     status = "error";
     notify();
-    retrier.schedule();
     return;
   }
-  unsubscribe = onSnapshot(
-    collection(db, "products"),
-    (snap) => {
+  loading = true;
+  getDocs(collection(db, "products"))
+    .then((snap) => {
       list = snap.docs.map((d) => ({ ...(d.data() as Product), id: d.id }));
       status = "ready";
-      retrier.cancel();
       cache();
       notify();
-    },
-    () => {
+    })
+    .catch(() => {
       status = list.length ? "ready" : "error";
       notify();
-      retrier.schedule();
-    },
-  );
+    })
+    .finally(() => {
+      loading = false;
+    });
 }
 
 if (typeof window !== "undefined") subscribe();
 
 /** Tenta ligar de novo ao banco (usado pelos estados de erro na UI). */
 export function retryProducts() {
-  unsubscribe?.();
-  unsubscribe = null;
   status = "loading";
   notify();
   subscribe();

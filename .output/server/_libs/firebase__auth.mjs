@@ -2589,6 +2589,9 @@ var AuthCredential = class {
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+async function resetPassword(auth, request) {
+	return _performApiRequest(auth, "POST", "/v1/accounts:resetPassword", _addTidIfNecessary(auth, request));
+}
 async function updateEmailPassword(auth, request) {
 	return _performApiRequest(auth, "POST", "/v1/accounts:update", request);
 }
@@ -4060,6 +4063,36 @@ async function linkWithCredential(user, credential) {
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
+var MultiFactorInfoImpl = class {
+	constructor(factorId, response) {
+		this.factorId = factorId;
+		this.uid = response.mfaEnrollmentId;
+		this.enrollmentTime = new Date(response.enrolledAt).toUTCString();
+		this.displayName = response.displayName;
+	}
+	static _fromServerResponse(auth, enrollment) {
+		if ("phoneInfo" in enrollment) return PhoneMultiFactorInfoImpl._fromServerResponse(auth, enrollment);
+		else if ("totpInfo" in enrollment) return TotpMultiFactorInfoImpl._fromServerResponse(auth, enrollment);
+		return _fail(auth, "internal-error");
+	}
+};
+var PhoneMultiFactorInfoImpl = class PhoneMultiFactorInfoImpl extends MultiFactorInfoImpl {
+	constructor(response) {
+		super("phone", response);
+		this.phoneNumber = response.phoneInfo;
+	}
+	static _fromServerResponse(_auth, enrollment) {
+		return new PhoneMultiFactorInfoImpl(enrollment);
+	}
+};
+var TotpMultiFactorInfoImpl = class TotpMultiFactorInfoImpl extends MultiFactorInfoImpl {
+	constructor(response) {
+		super("totp", response);
+	}
+	static _fromServerResponse(_auth, enrollment) {
+		return new TotpMultiFactorInfoImpl(enrollment);
+	}
+};
 /**
 * @license
 * Copyright 2020 Google LLC
@@ -4172,6 +4205,72 @@ async function sendPasswordResetEmail(auth, email, actionCodeSettings) {
 	};
 	if (actionCodeSettings) _setActionCodeSettingsOnRequest(authInternal, request, actionCodeSettings);
 	await handleRecaptchaFlow(authInternal, request, "getOobCode", sendPasswordResetEmail$1, "EMAIL_PASSWORD_PROVIDER");
+}
+/**
+* Completes the password reset process, given a confirmation code and new password.
+*
+* @param auth - The {@link Auth} instance.
+* @param oobCode - A confirmation code sent to the user.
+* @param newPassword - The new password.
+*
+* @public
+*/
+async function confirmPasswordReset(auth, oobCode, newPassword) {
+	await resetPassword(getModularInstance(auth), {
+		oobCode,
+		newPassword
+	}).catch(async (error) => {
+		if (error.code === `auth/password-does-not-meet-requirements`) recachePasswordPolicy(auth);
+		throw error;
+	});
+}
+/**
+* Checks a verification code sent to the user by email or other out-of-band mechanism.
+*
+* @returns metadata about the code.
+*
+* @param auth - The {@link Auth} instance.
+* @param oobCode - A verification code sent to the user.
+*
+* @public
+*/
+async function checkActionCode(auth, oobCode) {
+	const authModular = getModularInstance(auth);
+	const response = await resetPassword(authModular, { oobCode });
+	const operation = response.requestType;
+	_assert(operation, authModular, "internal-error");
+	switch (operation) {
+		case "EMAIL_SIGNIN": break;
+		case "VERIFY_AND_CHANGE_EMAIL":
+			_assert(response.newEmail, authModular, "internal-error");
+			break;
+		case "REVERT_SECOND_FACTOR_ADDITION": _assert(response.mfaInfo, authModular, "internal-error");
+		default: _assert(response.email, authModular, "internal-error");
+	}
+	let multiFactorInfo = null;
+	if (response.mfaInfo) multiFactorInfo = MultiFactorInfoImpl._fromServerResponse(_castAuth(authModular), response.mfaInfo);
+	return {
+		data: {
+			email: (response.requestType === "VERIFY_AND_CHANGE_EMAIL" ? response.newEmail : response.email) || null,
+			previousEmail: (response.requestType === "VERIFY_AND_CHANGE_EMAIL" ? response.email : response.newEmail) || null,
+			multiFactorInfo
+		},
+		operation
+	};
+}
+/**
+* Checks a password reset code sent to the user by email or other out-of-band mechanism.
+*
+* @returns the user's email address if valid.
+*
+* @param auth - The {@link Auth} instance.
+* @param code - A verification code sent to the user.
+*
+* @public
+*/
+async function verifyPasswordResetCode(auth, code) {
+	const { data } = await checkActionCode(getModularInstance(auth), code);
+	return data.email;
 }
 /**
 * Creates a new user account associated with the specified email address and password.
@@ -7292,4 +7391,4 @@ _setExternalJSProvider({
 });
 registerAuth("Browser");
 //#endregion
-export { updatePassword as _, createUserWithEmailAndPassword as a, linkWithCredential as c, sendPasswordResetEmail as d, setPersistence as f, signOut as g, signInWithRedirect as h, browserLocalPersistence as i, linkWithPopup as l, signInWithPopup as m, FacebookAuthProvider as n, getAuth as o, signInWithEmailAndPassword as p, GoogleAuthProvider as r, getRedirectResult as s, EmailAuthProvider as t, onAuthStateChanged as u, updateProfile as v };
+export { signOut as _, confirmPasswordReset as a, verifyPasswordResetCode as b, getRedirectResult as c, onAuthStateChanged as d, sendPasswordResetEmail as f, signInWithRedirect as g, signInWithPopup as h, browserLocalPersistence as i, linkWithCredential as l, signInWithEmailAndPassword as m, FacebookAuthProvider as n, createUserWithEmailAndPassword as o, setPersistence as p, GoogleAuthProvider as r, getAuth as s, EmailAuthProvider as t, linkWithPopup as u, updatePassword as v, updateProfile as y };

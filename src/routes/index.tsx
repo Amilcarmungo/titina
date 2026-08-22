@@ -44,6 +44,7 @@ import promo2 from "@/assets/promo-2.png";
 import promo3 from "@/assets/promo-3.png";
 
 const promos = [promo1, promo2, promo3];
+const FEED_PAGE_SIZE = 8;
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -173,7 +174,14 @@ function Home() {
     sessionStorage.setItem(key, String(next));
     return next;
   });
-  const [visibleCount, setVisibleCount] = useState(10);
+  const feedVisibleKey = `bazarixy_feed_visible_v1_${active.id}`;
+  const [visibleCount, setVisibleCount] = useState(() => {
+    if (typeof window === "undefined") return FEED_PAGE_SIZE;
+    const saved = Number(sessionStorage.getItem(feedVisibleKey));
+    return Number.isFinite(saved) && saved >= FEED_PAGE_SIZE
+      ? saved
+      : FEED_PAGE_SIZE;
+  });
   const feedEndRef = useRef<HTMLDivElement>(null);
   const feedProducts = rankFeedProducts(products, {
     favorites,
@@ -185,15 +193,25 @@ function Home() {
   const visibleFeedProducts = feedProducts.slice(0, visibleCount);
 
   useEffect(() => {
-    setVisibleCount(10);
-  }, [active.id, products.length]);
+    const saved = Number(sessionStorage.getItem(feedVisibleKey));
+    setVisibleCount(
+      Number.isFinite(saved) && saved >= FEED_PAGE_SIZE
+        ? saved
+        : FEED_PAGE_SIZE,
+    );
+  }, [active.id, feedVisibleKey]);
+
+  useEffect(() => {
+    sessionStorage.setItem(feedVisibleKey, String(visibleCount));
+  }, [feedVisibleKey, visibleCount]);
 
   useEffect(() => {
     const node = feedEndRef.current;
     if (!node || visibleCount >= feedProducts.length) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting) setVisibleCount((count) => count + 10);
+        if (entry?.isIntersecting)
+          setVisibleCount((count) => count + FEED_PAGE_SIZE);
       },
       { rootMargin: "500px 0px" },
     );
@@ -561,8 +579,8 @@ function Home() {
         data-profile-views={signals.viewed.length}
       >
         {prodStatus === "loading" && !filtered.length ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-            {Array.from({ length: 10 }).map((_, k) => (
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+            {Array.from({ length: FEED_PAGE_SIZE }).map((_, k) => (
               <div key={`ps-${k}`}>
                 <Skeleton className="aspect-[3/4] w-full rounded-lg" />
                 <Skeleton className="mt-2 h-3 w-4/5" />
@@ -573,9 +591,9 @@ function Home() {
         ) : prodStatus === "error" && !filtered.length ? (
           <ErrorState onRetry={retryProducts} className="py-12" />
         ) : visibleFeedProducts.length > 0 ? (
-          <div className="columns-2 md:columns-4 lg:columns-5 gap-3 md:gap-4 [column-fill:_balance]">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
             {visibleFeedProducts.map((p, i) => (
-              <div key={p.id} className="mb-3 md:mb-4 break-inside-avoid">
+              <div key={p.id}>
                 <ProductCard
                   product={p}
                   aspect={
