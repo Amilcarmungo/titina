@@ -201,12 +201,17 @@ export function rankFeedProducts(
   options: {
     favorites?: string[];
     orders?: Order[];
-    category?: string | null;
+    category?: string | string[] | null;
     seed?: number;
   } = {},
 ) {
-  const source = options.category
-    ? products.filter((product) => product.category === options.category)
+  const categories = Array.isArray(options.category)
+    ? options.category
+    : options.category
+      ? [options.category]
+      : [];
+  const source = categories.length
+    ? products.filter((product) => categories.includes(product.category))
     : products;
   const signals = readSignals();
   const hasProfile =

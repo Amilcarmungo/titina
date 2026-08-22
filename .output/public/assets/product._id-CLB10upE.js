@@ -1,0 +1,1 @@
+import{s as e}from"./roles-BxRxBsbo.js";import{t}from"./Layout-Skvx9Srd.js";var n=e(),r=()=>(0,n.jsx)(t,{title:`Não encontrado`,showBack:!0,children:(0,n.jsx)(`p`,{className:`p-6 text-center`,children:`Produto não encontrado.`})});export{r as notFoundComponent};

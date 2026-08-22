@@ -12,7 +12,7 @@ const schema = z.object({
     .max(30),
 });
 
-const SYSTEM = `És a Siyo, a assistente virtual da Bazarixy — um marketplace angolano de moda, beleza, casa e electrónica.
+const SYSTEM = `És a Jilda IA, a assistente virtual da Bazarixy — um marketplace angolano de moda, beleza, casa e electrónica.
 Responde SEMPRE em português de Angola, de forma curta (máx. 4 frases), simpática e prática.
 Conhecimento da loja:
 - Pagamentos: Multicaixa Express, Unitel Money, PayPay e transferência. O cliente escolhe o método no checkout, copia os dados e envia o comprovativo (imagem ou PDF). O pedido só segue para envio depois da validação do comprovativo.
@@ -52,7 +52,7 @@ export function fallbackSupportReply(message: string): string {
 export const askSupport = createServerFn({ method: "POST" })
   .validator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
-    const key = process.env.LOVABLE_API_KEY;
+    const key = process.env.GEMINI_API_KEY;
     const lastMessage = data.messages.at(-1)?.content ?? "";
     if (!key) return { reply: fallbackSupportReply(lastMessage) };
 
@@ -60,16 +60,19 @@ export const askSupport = createServerFn({ method: "POST" })
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);
       const res = await fetch(
-        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
+          encodeURIComponent(key),
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${key}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
-            messages: [{ role: "system", content: SYSTEM }, ...data.messages],
+            systemInstruction: { parts: [{ text: SYSTEM }] },
+            contents: data.messages.map((message) => ({
+              role: message.role === "assistant" ? "model" : "user",
+              parts: [{ text: message.content }],
+            })),
           }),
           signal: controller.signal,
         },
@@ -79,11 +82,11 @@ export const askSupport = createServerFn({ method: "POST" })
       if (res.status === 429 || !res.ok)
         return { reply: fallbackSupportReply(lastMessage) };
       const json = (await res.json()) as {
-        choices?: { message?: { content?: string } }[];
+        candidates?: { content?: { parts?: { text?: string }[] } }[];
       };
       return {
         reply:
-          json.choices?.[0]?.message?.content?.trim() ||
+          json.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
           fallbackSupportReply(lastMessage),
       };
     } catch {

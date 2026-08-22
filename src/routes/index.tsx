@@ -185,10 +185,9 @@ function Home() {
   });
   const feedEndRef = useRef<HTMLDivElement>(null);
   const feedProducts = useMemo(() => {
-    const category =
-      tab === 0 ? null : active.slugs.length === 1 ? active.slugs[0] : null;
-    const source = category
-      ? products.filter((product) => product.category === category)
+    const category = tab === 0 ? null : active.slugs;
+    const source = category?.length
+      ? products.filter((product) => category.includes(product.category))
       : products;
     const productMap = new Map(source.map((product) => [product.id, product]));
 

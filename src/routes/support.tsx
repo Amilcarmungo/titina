@@ -17,7 +17,7 @@ import {
   Zap,
   ChevronRight,
 } from "lucide-react";
-import logoMark from "@/assets/bazarixy-mark.webp.asset.json";
+import supportLogo from "../../img/suportlogo.png";
 
 export const WHATSAPP = "https://wa.me/244934033532";
 export const INSTAGRAM = "https://www.instagram.com/bazarixy/";
@@ -30,7 +30,7 @@ export const Route = createFileRoute("/support")({
       {
         name: "description",
         content:
-          "Fale com a Siyo, a assistente virtual da Bazarixy, ou contacte a equipa por WhatsApp, Instagram e telefone.",
+          "Fale com a Jilda IA, a assistente virtual da Bazarixy, ou contacte a equipa por WhatsApp, Instagram e telefone.",
       },
       {
         property: "og:title",
@@ -177,7 +177,7 @@ function SupportPage() {
               Suporte Bazarixy
             </p>
             <p className="text-[11px] text-muted-foreground">
-              Assistente Siyo · online
+              Assistente Jilda IA · online
             </p>
           </div>
           <a
@@ -197,8 +197,8 @@ function SupportPage() {
               m.role === "assistant" ? (
                 <div key={i} className="flex items-start gap-2.5">
                   <img
-                    src={logoMark.url}
-                    alt="Siyo"
+                    src={supportLogo}
+                    alt="Jilda IA"
                     className="h-9 w-9 shrink-0 rounded-full bg-background object-contain ring-1 ring-border"
                   />
                   <div className="max-w-[85%] whitespace-pre-line rounded-2xl rounded-tl-sm bg-background px-4 py-3 text-sm shadow-[var(--shadow-card)]">
@@ -216,7 +216,7 @@ function SupportPage() {
             {loading && (
               <div className="flex items-start gap-2.5">
                 <img
-                  src={logoMark.url}
+                  src={supportLogo}
                   alt=""
                   className="h-9 w-9 shrink-0 rounded-full bg-background object-contain ring-1 ring-border"
                 />
@@ -303,7 +303,7 @@ function SupportPage() {
                           onClick={() => send(f.q)}
                           className="mt-2 rounded-full border border-border px-3 py-1 text-[11px] font-bold hover:bg-muted"
                         >
-                          Perguntar à Siyo
+                          Perguntar à Jilda IA
                         </button>
                       </div>
                     )}
