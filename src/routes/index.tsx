@@ -26,6 +26,12 @@ import {
 import { SmartImage, Skeleton } from "@/components/SmartImage";
 import type { Product } from "@/lib/products";
 import { formatKz } from "@/lib/format";
+import { useOrders } from "@/lib/orders-store";
+import {
+  recommendationSections,
+  useRecommendationSignals,
+} from "@/lib/recommendations";
+import { useStore } from "@/lib/store";
 import { Zap, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   HOME_DESCRIPTION,
@@ -67,6 +73,9 @@ function Home() {
   const categories: CategoryFull[] = useCategories();
   const catStatus = useCategoriesStatus();
   const products = useAllProducts();
+  const orders = useOrders();
+  const { favorites } = useStore();
+  const signals = useRecommendationSignals();
   const prodStatus = useProductsStatus();
   const bannerStatus = useBannersStatus();
   const orderedCats = useMemo(() => {
@@ -155,6 +164,10 @@ function Home() {
   );
 
   const slide = slides[Math.min(i, slides.length - 1)] ?? slides[0];
+  const recommendations = recommendationSections(products, {
+    favorites,
+    orders,
+  });
 
   return (
     <Layout transparentHeader>
@@ -553,7 +566,64 @@ function Home() {
           </p>
         )}
       </section>
+
+      <RecommendationRail
+        title={signals.viewed.length ? "Para ti" : "Descubra algo novo"}
+        subtitle={
+          signals.viewed.length
+            ? "Produtos escolhidos a partir do que tens explorado"
+            : "Uma selecção popular para começar a explorar"
+        }
+        items={recommendations.personalized}
+      />
+      {signals.viewed.length > 0 && (
+        <RecommendationRail
+          title="Porque viste estes produtos"
+          subtitle="Semelhantes às categorias e produtos que consultaste"
+          items={recommendations.similar}
+        />
+      )}
+      <RecommendationRail
+        title="Descubra algo novo"
+        subtitle="Produtos fora do teu padrão habitual"
+        items={recommendations.discovery}
+      />
     </Layout>
+  );
+}
+
+function RecommendationRail({
+  title,
+  subtitle,
+  items,
+}: {
+  title: string;
+  subtitle: string;
+  items: { product: Product; reason: string }[];
+}) {
+  if (!items.length) return null;
+  return (
+    <section className="mt-6 px-3 md:px-0">
+      <div className="mb-3 flex items-end justify-between gap-3">
+        <div>
+          <h2 className="font-display text-lg font-bold md:text-xl">{title}</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
+        </div>
+        <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.12em] text-brand-strong">
+          Siyo recomenda
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
+        {items.slice(0, 5).map(({ product, reason }) => (
+          <div key={product.id}>
+            <ProductCard product={product} />
+            <p className="mt-1 px-0.5 text-[10px] leading-snug text-muted-foreground">
+              {reason}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 

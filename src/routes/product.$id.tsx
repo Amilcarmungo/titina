@@ -5,7 +5,7 @@ import {
   notFound,
   useRouter,
 } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { ProductCard } from "@/components/ProductCard";
 import {
@@ -37,6 +37,7 @@ import { useReviews, type Review } from "@/lib/reviews";
 import { useShops, type Shop } from "@/lib/shops-store";
 import { SmartImage } from "@/components/SmartImage";
 import { ShareSheet, nativeShare } from "@/components/ShareSheet";
+import { recommendProducts, recordProductView } from "@/lib/recommendations";
 import {
   absoluteUrl,
   paths,
@@ -140,6 +141,21 @@ function ProductPage() {
   const [color, setColor] = useState(product?.colors[0] ?? "");
   const [imgIdx, setImgIdx] = useState(0);
   const [shareOpen, setShareOpen] = useState(false);
+
+  useEffect(() => {
+    if (product) recordProductView(product);
+  }, [product]);
+
+  const relatedProducts = useMemo(
+    () =>
+      product
+        ? recommendProducts(products, {
+            excludeIds: new Set([product.id]),
+            limit: 4,
+          }).map((item) => item.product)
+        : [],
+    [product],
+  );
 
   const variant = useMemo(
     () => variants.find((v: ProductVariant) => v.id === variantId),
@@ -586,12 +602,9 @@ function ProductPage() {
             Você também pode gostar
           </h3>
           <div className="mt-3 grid grid-cols-2 gap-3">
-            {products
-              .filter((p) => p.id !== product.id)
-              .slice(0, 4)
-              .map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
+            {relatedProducts.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
           </div>
         </div>
 

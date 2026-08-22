@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Star } from "lucide-react";
 import type { Product } from "@/lib/products";
 import { SmartImage } from "@/components/SmartImage";
+import { recordProductView } from "@/lib/recommendations";
 
 export function ProductCard({
   product,
@@ -17,7 +18,11 @@ export function ProductCard({
 
   return (
     <div className="group block">
-      <Link to="/product/$id" params={{ id: product.id }}>
+      <Link
+        to="/product/$id"
+        params={{ id: product.id }}
+        onClick={() => recordProductView(product)}
+      >
         <SmartImage
           src={product.image}
           alt={product.name}
@@ -27,7 +32,11 @@ export function ProductCard({
         />
       </Link>
       <div className="mt-2 px-0.5">
-        <Link to="/product/$id" params={{ id: product.id }}>
+        <Link
+          to="/product/$id"
+          params={{ id: product.id }}
+          onClick={() => recordProductView(product)}
+        >
           <h3 className="line-clamp-2 text-xs leading-snug text-foreground">
             {product.name}
           </h3>
