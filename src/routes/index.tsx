@@ -164,7 +164,15 @@ function Home() {
   );
 
   const slide = slides[Math.min(i, slides.length - 1)] ?? slides[0];
-  const [feedSeed] = useState(() => Date.now());
+  const [feedSeed] = useState(() => {
+    if (typeof window === "undefined") return 1;
+    const key = "bazarixy_feed_seed_v1";
+    const saved = Number(sessionStorage.getItem(key));
+    if (Number.isFinite(saved) && saved > 0) return saved;
+    const next = Date.now() + Math.floor(Math.random() * 100000);
+    sessionStorage.setItem(key, String(next));
+    return next;
+  });
   const [visibleCount, setVisibleCount] = useState(10);
   const feedEndRef = useRef<HTMLDivElement>(null);
   const feedProducts = rankFeedProducts(products, {
@@ -548,7 +556,10 @@ function Home() {
         {cfg.showViral && <ViralBlock items={filtered} />}
       </div>
 
-      <section className="mt-5 px-3 md:px-0">
+      <section
+        className="mt-5 px-3 md:px-0"
+        data-profile-views={signals.viewed.length}
+      >
         {prodStatus === "loading" && !filtered.length ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             {Array.from({ length: 10 }).map((_, k) => (

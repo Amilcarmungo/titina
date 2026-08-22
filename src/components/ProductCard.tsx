@@ -60,12 +60,23 @@ export function ProductCard({
           <div className="mt-1.5 flex items-center gap-1.5">
             <div className="flex -space-x-0.5">
               {product.variants.slice(0, 4).map((variant) => (
-                <span
+                <Link
                   key={variant.id}
-                  className="h-3 w-3 rounded-full border border-white ring-1 ring-border"
-                  style={{ backgroundColor: variant.color || "#e9d5df" }}
-                  title={variant.label}
-                />
+                  to="/product/$id"
+                  params={{ id: product.id }}
+                  search={{ variant: variant.id }}
+                  onClick={() => recordProductView(product)}
+                  className="relative h-7 w-7 overflow-hidden rounded-full border border-white bg-muted ring-1 ring-border transition hover:z-10 hover:ring-brand-strong"
+                  title={`Ver ${variant.label}`}
+                  aria-label={`Ver ${product.name} na variante ${variant.label}`}
+                >
+                  <SmartImage
+                    src={variant.image || product.image}
+                    alt={variant.label}
+                    wrapperClassName="h-full w-full"
+                    className="object-cover"
+                  />
+                </Link>
               ))}
             </div>
             <span className="text-[10px] text-muted-foreground">

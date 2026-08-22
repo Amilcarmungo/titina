@@ -3,6 +3,7 @@ import {
   createFileRoute,
   Link,
   notFound,
+  useSearch,
   useRouter,
 } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
@@ -49,6 +50,9 @@ import {
 } from "@/lib/site";
 
 export const Route = createFileRoute("/product/$id")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    variant: typeof search.variant === "string" ? search.variant : undefined,
+  }),
   loader: ({ params }) => getProduct(params.id) ?? null,
   head: ({ params, loaderData }) => {
     const path = paths.product(params.id);
@@ -125,6 +129,7 @@ export const Route = createFileRoute("/product/$id")({
 
 function ProductPage() {
   const { id } = Route.useParams();
+  const { variant: variantParam } = useSearch({ from: "/product/$id" });
   const loaded = Route.useLoaderData();
   const product = loaded ?? getAnyProduct(id);
   const router = useRouter();
@@ -141,6 +146,15 @@ function ProductPage() {
   const [color, setColor] = useState(product?.colors[0] ?? "");
   const [imgIdx, setImgIdx] = useState(0);
   const [shareOpen, setShareOpen] = useState(false);
+
+  useEffect(() => {
+    if (!variantParam) return;
+    const selected = variants.find((item) => item.id === variantParam);
+    if (selected) {
+      setVariantId(selected.id);
+      setImgIdx(0);
+    }
+  }, [variantParam, variants]);
 
   useEffect(() => {
     if (product) recordProductView(product);

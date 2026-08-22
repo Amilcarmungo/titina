@@ -277,6 +277,7 @@ function put(next: Order) {
 
 /** Avisa o DONO do pedido (notificação na conta dele + e-mail). */
 function notifyCustomer(order: Order, pkg: OrderPackage, note?: string) {
+  if (pkg.stage === "payment_review") return;
   const body = note?.trim()
     ? note.trim()
     : `${STAGE_DESC[pkg.stage]}${pkg.eta ? ` ${pkg.eta}.` : ""}`;
