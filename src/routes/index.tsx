@@ -174,6 +174,7 @@ function Home() {
     sessionStorage.setItem(key, String(next));
     return next;
   });
+  const feedOrderKey = `bazarixy_feed_order_v1_${active.id}`;
   const feedVisibleKey = `bazarixy_feed_visible_v1_${active.id}`;
   const [visibleCount, setVisibleCount] = useState(() => {
     if (typeof window === "undefined") return FEED_PAGE_SIZE;
@@ -183,13 +184,53 @@ function Home() {
       : FEED_PAGE_SIZE;
   });
   const feedEndRef = useRef<HTMLDivElement>(null);
-  const feedProducts = rankFeedProducts(products, {
-    favorites,
-    orders,
-    category:
-      tab === 0 ? null : active.slugs.length === 1 ? active.slugs[0] : null,
-    seed: feedSeed,
-  });
+  const feedProducts = useMemo(() => {
+    const category =
+      tab === 0 ? null : active.slugs.length === 1 ? active.slugs[0] : null;
+    const source = category
+      ? products.filter((product) => product.category === category)
+      : products;
+    const productMap = new Map(source.map((product) => [product.id, product]));
+
+    if (typeof window !== "undefined") {
+      try {
+        const saved = JSON.parse(
+          sessionStorage.getItem(feedOrderKey) || "[]",
+        ) as unknown;
+        if (Array.isArray(saved)) {
+          const savedProducts = saved
+            .filter((id): id is string => typeof id === "string")
+            .map((id) => productMap.get(id))
+            .filter((product): product is Product => Boolean(product));
+          if (savedProducts.length) {
+            const savedIds = new Set(
+              savedProducts.map((product) => product.id),
+            );
+            return [
+              ...savedProducts,
+              ...source.filter((product) => !savedIds.has(product.id)),
+            ];
+          }
+        }
+      } catch {
+        // Recalcula uma ordem válida se a sessão tiver dados corrompidos.
+      }
+    }
+
+    const ranked = rankFeedProducts(products, {
+      favorites,
+      orders,
+      category,
+      seed: feedSeed,
+    });
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(
+        feedOrderKey,
+        JSON.stringify(ranked.map((product) => product.id)),
+      );
+    }
+    return ranked;
+  }, [active.slugs, feedOrderKey, feedSeed, favorites, orders, products, tab]);
   const visibleFeedProducts = feedProducts.slice(0, visibleCount);
 
   useEffect(() => {
@@ -579,7 +620,7 @@ function Home() {
         data-profile-views={signals.viewed.length}
       >
         {prodStatus === "loading" && !filtered.length ? (
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
             {Array.from({ length: FEED_PAGE_SIZE }).map((_, k) => (
               <div key={`ps-${k}`}>
                 <Skeleton className="aspect-[3/4] w-full rounded-lg" />
@@ -591,7 +632,7 @@ function Home() {
         ) : prodStatus === "error" && !filtered.length ? (
           <ErrorState onRetry={retryProducts} className="py-12" />
         ) : visibleFeedProducts.length > 0 ? (
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
             {visibleFeedProducts.map((p, i) => (
               <div key={p.id}>
                 <ProductCard
