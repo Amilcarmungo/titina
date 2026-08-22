@@ -34,28 +34,36 @@ const PROJECT_ID = process.env.VITE_FIREBASE_PROJECT_ID;
 
 async function firestoreGet(path: string, token?: string) {
   if (!PROJECT_ID) return null;
-  const response = await fetch(
-    `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/${path}`,
-    {
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      signal: AbortSignal.timeout(4000),
-    },
-  );
-  if (!response.ok) return null;
-  return (await response.json()) as Record<string, unknown>;
+  try {
+    const response = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/${path}`,
+      {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        signal: AbortSignal.timeout(4000),
+      },
+    );
+    if (!response.ok) return null;
+    return (await response.json()) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
 }
 
 async function firestoreList(path: string) {
   if (!PROJECT_ID) return [];
-  const response = await fetch(
-    `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/${path}?pageSize=100`,
-    { signal: AbortSignal.timeout(4000) },
-  );
-  if (!response.ok) return [];
-  const body = (await response.json()) as {
-    documents?: Record<string, unknown>[];
-  };
-  return body.documents ?? [];
+  try {
+    const response = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/${path}?pageSize=100`,
+      { signal: AbortSignal.timeout(4000) },
+    );
+    if (!response.ok) return [];
+    const body = (await response.json()) as {
+      documents?: Record<string, unknown>[];
+    };
+    return body.documents ?? [];
+  } catch {
+    return [];
+  }
 }
 
 function orderIdFrom(text: string) {
@@ -178,12 +186,12 @@ export const askSupport = createServerFn({ method: "POST" })
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 8000);
       const res = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" +
-          encodeURIComponent(key),
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-goog-api-key": key,
           },
           body: JSON.stringify({
             systemInstruction: {
