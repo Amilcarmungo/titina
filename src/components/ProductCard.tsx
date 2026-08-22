@@ -56,6 +56,23 @@ export function ProductCard({
             -{discount}%
           </span>
         )}
+        {product.variants && product.variants.length > 0 && (
+          <div className="mt-1.5 flex items-center gap-1.5">
+            <div className="flex -space-x-0.5">
+              {product.variants.slice(0, 4).map((variant) => (
+                <span
+                  key={variant.id}
+                  className="h-3 w-3 rounded-full border border-white ring-1 ring-border"
+                  style={{ backgroundColor: variant.color || "#e9d5df" }}
+                  title={variant.label}
+                />
+              ))}
+            </div>
+            <span className="text-[10px] text-muted-foreground">
+              {product.variants.length} opções
+            </span>
+          </div>
+        )}
         <div className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
           <Star className="h-3 w-3 fill-gold text-gold" />
           <span>{product.rating}</span>

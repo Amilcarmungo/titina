@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { ProductCard } from "@/components/ProductCard";
 import {
@@ -28,7 +28,7 @@ import type { Product } from "@/lib/products";
 import { formatKz } from "@/lib/format";
 import { useOrders } from "@/lib/orders-store";
 import {
-  recommendationSections,
+  rankFeedProducts,
   useRecommendationSignals,
 } from "@/lib/recommendations";
 import { useStore } from "@/lib/store";
@@ -164,10 +164,34 @@ function Home() {
   );
 
   const slide = slides[Math.min(i, slides.length - 1)] ?? slides[0];
-  const recommendations = recommendationSections(products, {
+  const [feedSeed] = useState(() => Date.now());
+  const [visibleCount, setVisibleCount] = useState(10);
+  const feedEndRef = useRef<HTMLDivElement>(null);
+  const feedProducts = rankFeedProducts(products, {
     favorites,
     orders,
+    category:
+      tab === 0 ? null : active.slugs.length === 1 ? active.slugs[0] : null,
+    seed: feedSeed,
   });
+  const visibleFeedProducts = feedProducts.slice(0, visibleCount);
+
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [active.id, products.length]);
+
+  useEffect(() => {
+    const node = feedEndRef.current;
+    if (!node || visibleCount >= feedProducts.length) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) setVisibleCount((count) => count + 10);
+      },
+      { rootMargin: "500px 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [feedProducts.length, visibleCount]);
 
   return (
     <Layout transparentHeader>
@@ -525,11 +549,6 @@ function Home() {
       </div>
 
       <section className="mt-5 px-3 md:px-0">
-        <h2 className="mb-3 font-display text-xl md:text-2xl font-bold">
-          {!active.slugs.length
-            ? "Recomendados para você"
-            : `${active.label} — seleção`}
-        </h2>
         {prodStatus === "loading" && !filtered.length ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             {Array.from({ length: 10 }).map((_, k) => (
@@ -542,9 +561,9 @@ function Home() {
           </div>
         ) : prodStatus === "error" && !filtered.length ? (
           <ErrorState onRetry={retryProducts} className="py-12" />
-        ) : filtered.length > 0 ? (
+        ) : visibleFeedProducts.length > 0 ? (
           <div className="columns-2 md:columns-4 lg:columns-5 gap-3 md:gap-4 [column-fill:_balance]">
-            {filtered.map((p, i) => (
+            {visibleFeedProducts.map((p, i) => (
               <div key={p.id} className="mb-3 md:mb-4 break-inside-avoid">
                 <ProductCard
                   product={p}
@@ -558,6 +577,7 @@ function Home() {
                 />
               </div>
             ))}
+            <div ref={feedEndRef} className="h-8 w-full" aria-hidden="true" />
           </div>
         ) : (
           <p className="py-10 text-center text-sm text-muted-foreground">
@@ -566,64 +586,7 @@ function Home() {
           </p>
         )}
       </section>
-
-      <RecommendationRail
-        title={signals.viewed.length ? "Para ti" : "Descubra algo novo"}
-        subtitle={
-          signals.viewed.length
-            ? "Produtos escolhidos a partir do que tens explorado"
-            : "Uma selecção popular para começar a explorar"
-        }
-        items={recommendations.personalized}
-      />
-      {signals.viewed.length > 0 && (
-        <RecommendationRail
-          title="Porque viste estes produtos"
-          subtitle="Semelhantes às categorias e produtos que consultaste"
-          items={recommendations.similar}
-        />
-      )}
-      <RecommendationRail
-        title="Descubra algo novo"
-        subtitle="Produtos fora do teu padrão habitual"
-        items={recommendations.discovery}
-      />
     </Layout>
-  );
-}
-
-function RecommendationRail({
-  title,
-  subtitle,
-  items,
-}: {
-  title: string;
-  subtitle: string;
-  items: { product: Product; reason: string }[];
-}) {
-  if (!items.length) return null;
-  return (
-    <section className="mt-6 px-3 md:px-0">
-      <div className="mb-3 flex items-end justify-between gap-3">
-        <div>
-          <h2 className="font-display text-lg font-bold md:text-xl">{title}</h2>
-          <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
-        </div>
-        <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.12em] text-brand-strong">
-          Siyo recomenda
-        </span>
-      </div>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
-        {items.slice(0, 5).map(({ product, reason }) => (
-          <div key={product.id}>
-            <ProductCard product={product} />
-            <p className="mt-1 px-0.5 text-[10px] leading-snug text-muted-foreground">
-              {reason}
-            </p>
-          </div>
-        ))}
-      </div>
-    </section>
   );
 }
 

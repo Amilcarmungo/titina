@@ -9,6 +9,7 @@ type Signals = {
   viewed: string[];
   categories: Record<string, number>;
   views: Record<string, number>;
+  searches: string[];
 };
 
 export type Recommendation = {
@@ -17,7 +18,12 @@ export type Recommendation = {
   reason: string;
 };
 
-const emptySignals = (): Signals => ({ viewed: [], categories: {}, views: {} });
+const emptySignals = (): Signals => ({
+  viewed: [],
+  categories: {},
+  views: {},
+  searches: [],
+});
 
 function readSignals(): Signals {
   if (typeof window === "undefined") return emptySignals();
@@ -29,9 +35,24 @@ function readSignals(): Signals {
       viewed: Array.isArray(value?.viewed) ? value.viewed : [],
       categories: value?.categories ?? {},
       views: value?.views ?? {},
+      searches: readSearches(),
     };
   } catch {
     return emptySignals();
+  }
+}
+
+function readSearches() {
+  if (typeof window === "undefined") return [];
+  try {
+    const searches = JSON.parse(
+      localStorage.getItem("search_recent_v1") || "[]",
+    );
+    return Array.isArray(searches)
+      ? searches.filter((term): term is string => typeof term === "string")
+      : [];
+  } catch {
+    return [];
   }
 }
 
@@ -55,6 +76,12 @@ export function recordProductView(product: Product) {
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   window.dispatchEvent(new Event(SIGNAL_EVENT));
+}
+
+export function recordSearchIntent(term: string) {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(SIGNAL_EVENT));
+  }
 }
 
 export function useRecommendationSignals() {
@@ -95,9 +122,16 @@ export function recommendProducts(
   const scored = products
     .filter((product) => !excluded.has(product.id))
     .map((product) => {
+      const searchIntent = signals.searches.some((term) =>
+        `${product.name} ${product.category}`
+          .toLowerCase()
+          .includes(term.toLowerCase()),
+      )
+        ? 1
+        : 0;
       const categoryInterest = Math.min(
         1,
-        (signals.categories[product.category] ?? 0) / 5,
+        (signals.categories[product.category] ?? 0) / 5 + searchIntent * 0.5,
       );
       const viewHistory = Math.min(
         1,
@@ -119,6 +153,7 @@ export function recommendProducts(
       let reason = "Uma escolha popular na Bazarixy";
       if (favorite) reason = "Está nos teus favoritos";
       else if (viewHistory) reason = "Porque viste este produto";
+      else if (searchIntent) reason = "Relacionado com o que procuraste";
       else if (categoryInterest) reason = "Semelhante ao que tens explorado";
       else if (discovery) reason = "Fora do teu padrão habitual";
       return { product, score, reason };
@@ -148,4 +183,48 @@ export function recommendationSections(
     limit: 8,
   });
   return { personalized: favoriteProducts, similar, discovery };
+}
+
+function seededShuffle<T>(items: T[], seed: number) {
+  const copy = [...items];
+  let value = seed || 1;
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    value = (value * 9301 + 49297) % 233280;
+    const target = Math.floor((value / 233280) * (index + 1));
+    [copy[index], copy[target]] = [copy[target], copy[index]];
+  }
+  return copy;
+}
+
+export function rankFeedProducts(
+  products: Product[],
+  options: {
+    favorites?: string[];
+    orders?: Order[];
+    category?: string | null;
+    seed?: number;
+  } = {},
+) {
+  const source = options.category
+    ? products.filter((product) => product.category === options.category)
+    : products;
+  const signals = readSignals();
+  const hasProfile =
+    signals.viewed.length > 0 ||
+    Object.keys(signals.categories).length > 0 ||
+    (options.favorites?.length ?? 0) > 0 ||
+    (options.orders?.length ?? 0) > 0;
+  if (!hasProfile) return seededShuffle(source, options.seed ?? Date.now());
+
+  const ranked = recommendProducts(source, {
+    favorites: options.favorites,
+    orders: options.orders,
+    limit: source.length,
+  });
+  const rankedIds = new Set(ranked.map((item) => item.product.id));
+  const remaining = seededShuffle(
+    source.filter((product) => !rankedIds.has(product.id)),
+    options.seed ?? Date.now(),
+  );
+  return [...ranked.map((item) => item.product), ...remaining];
 }

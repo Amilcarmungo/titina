@@ -17,6 +17,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { SmartImage } from "@/components/SmartImage";
+import { recordSearchIntent } from "@/lib/recommendations";
 
 export const Route = createFileRoute("/categories")({
   head: () => ({
@@ -86,6 +87,7 @@ function SearchPage() {
     } catch {
       /* ignore */
     }
+    recordSearchIntent(t);
     void trackSearch(user?.uid ?? null, t, results.length);
   };
 
