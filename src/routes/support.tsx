@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Layout } from "@/components/Layout";
 import { askSupport, fallbackSupportReply } from "@/lib/support-chat.functions";
+import { getFirebaseAuth } from "@/lib/firebase/client";
 import {
   MessageCircle,
   Instagram,
@@ -126,7 +127,8 @@ function SupportPage() {
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "assistant",
-      content: "Bem-vindo à Bazarixy! Eu sou a Siyo, como posso ajudá-lo hoje?",
+      content:
+        "Bem-vindo à Bazarixy! Eu sou a Jilda IA, como posso ajudá-lo hoje?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -148,7 +150,10 @@ function SupportPage() {
     setInput("");
     setLoading(true);
     try {
-      const res = await ask({ data: { messages: next.slice(-12) } });
+      const authToken = await getFirebaseAuth()?.currentUser?.getIdToken();
+      const res = await ask({
+        data: { messages: next.slice(-12), authToken },
+      });
       setMessages([...next, { role: "assistant", content: res.reply }]);
     } catch {
       setMessages([
