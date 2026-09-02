@@ -4,7 +4,7 @@ import { t as attachSync } from "./sync-store-BDWU_rBs.mjs";
 import { i as useAllProducts } from "./products-store-DBaquvrN.mjs";
 import { t as formatKz } from "./format-DAL2ZktZ.mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
-import { R as Plus, h as Target, n as X, p as Trash2 } from "../_libs/lucide-react.mjs";
+import { g as Target, m as Trash2, n as X, z as Plus } from "../_libs/lucide-react.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
 import { useOrders } from "./orders-store-DPNmKvMS.mjs";
 import { n as revenueSummary } from "./revenue-20Z1bVAT.mjs";

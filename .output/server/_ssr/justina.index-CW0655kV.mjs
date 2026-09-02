@@ -2,7 +2,7 @@ import { n as useCategories } from "./categories-store-CFvdBuKR.mjs";
 import { a as useCustomProducts, t as getAnyProduct } from "./products-store-DBaquvrN.mjs";
 import { t as formatKz } from "./format-DAL2ZktZ.mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
-import { C as ShoppingBag, H as Package, Nt as ClipboardList, R as Plus, Xt as ArrowUpRight, _ as Store, bt as FolderTree, f as TrendingUp, it as Layers, st as Image, u as Truck } from "../_libs/lucide-react.mjs";
+import { Ft as ClipboardList, Qt as ArrowUpRight, St as FolderTree, U as Package, d as Truck, lt as Image, ot as Layers, p as TrendingUp, v as Store, w as ShoppingBag, z as Plus } from "../_libs/lucide-react.mjs";
 import { r as useShops } from "./shops-store-Dm5LimXI.mjs";
 import { v as Link } from "../_libs/@tanstack/react-router+[...].mjs";
 import { s as useSlidesRaw } from "./banner-Zgl4ECrY.mjs";

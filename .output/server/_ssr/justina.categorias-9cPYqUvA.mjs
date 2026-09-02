@@ -4,7 +4,7 @@ import { n as useCategories, t as categoryActions } from "./categories-store-CFv
 import { i as useAllProducts, n as productActions } from "./products-store-DBaquvrN.mjs";
 import { t as formatKz } from "./format-DAL2ZktZ.mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
-import { B as Pencil, Qt as ArrowRightLeft, R as Plus, it as Layers, n as X, nt as LayoutList, ot as Info, p as Trash2, st as Image, wt as Eye } from "../_libs/lucide-react.mjs";
+import { Et as Eye, V as Pencil, ct as Info, en as ArrowRightLeft, it as LayoutList, lt as Image, m as Trash2, n as X, ot as Layers, z as Plus } from "../_libs/lucide-react.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
 import { n as AdminInput, r as AdminModal, t as AdminField } from "./AdminModal-DXEoyymL.mjs";
 import { n as uploadImageFile, t as storagePaths } from "./upload-B3FhhBx-.mjs";

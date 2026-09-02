@@ -2,7 +2,7 @@ import { r as __toESM } from "../_runtime.mjs";
 import { n as require_react } from "../_libs/@radix-ui/react-compose-refs+[...].mjs";
 import { i as useAllProducts } from "./products-store-DBaquvrN.mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
-import { B as Pencil, H as Package, R as Plus, Xt as ArrowUpRight, _ as Store, p as Trash2, st as Image } from "../_libs/lucide-react.mjs";
+import { Qt as ArrowUpRight, U as Package, V as Pencil, lt as Image, m as Trash2, v as Store, z as Plus } from "../_libs/lucide-react.mjs";
 import { n as shopActions, r as useShops } from "./shops-store-Dm5LimXI.mjs";
 import { v as Link } from "../_libs/@tanstack/react-router+[...].mjs";
 import { n as toast } from "../_libs/sonner.mjs";

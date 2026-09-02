@@ -1262,6 +1262,46 @@ var LoaderCircle = createLucideIcon("loader-circle", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var Loader = createLucideIcon("loader", [
+	["path", {
+		d: "M12 2v4",
+		key: "3427ic"
+	}],
+	["path", {
+		d: "m16.2 7.8 2.9-2.9",
+		key: "r700ao"
+	}],
+	["path", {
+		d: "M18 12h4",
+		key: "wj9ykh"
+	}],
+	["path", {
+		d: "m16.2 16.2 2.9 2.9",
+		key: "1bxg5t"
+	}],
+	["path", {
+		d: "M12 18v4",
+		key: "jadmvz"
+	}],
+	["path", {
+		d: "m4.9 19.1 2.9-2.9",
+		key: "bwix9q"
+	}],
+	["path", {
+		d: "M2 12h4",
+		key: "j09sii"
+	}],
+	["path", {
+		d: "m4.9 4.9 2.9 2.9",
+		key: "giyufr"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var LockKeyhole = createLucideIcon("lock-keyhole", [
 	["circle", {
 		cx: "12",
@@ -2283,6 +2323,28 @@ var User = createLucideIcon("user", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var UsersRound = createLucideIcon("users-round", [
+	["path", {
+		d: "M18 21a8 8 0 0 0-16 0",
+		key: "3ypg7q"
+	}],
+	["circle", {
+		cx: "10",
+		cy: "8",
+		r: "5",
+		key: "o932ke"
+	}],
+	["path", {
+		d: "M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3",
+		key: "10s06x"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Users = createLucideIcon("users", [
 	["path", {
 		d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2",
@@ -2340,4 +2402,4 @@ var Zap = createLucideIcon("zap", [["path", {
 	key: "1xq2db"
 }]]);
 //#endregion
-export { LoaderCircle as $, ArrowLeft as $t, Rows3 as A, Copy as At, Pencil as B, ChevronDown as Bt, ShoppingBag as C, FileCheckCorner as Ct, Settings as D, Download as Dt, Share2 as E, ExternalLink as Et, QrCode as F, CircleCheck as Ft, MessageSquare as G, Camera as Gt, Package as H, CheckCheck as Ht, Printer as I, CircleAlert as It, MapPin as J, BadgeCheck as Jt, MessageCircle as K, Bike as Kt, Power as L, ChevronUp as Lt, Repeat2 as M, Clock as Mt, RefreshCcw as N, ClipboardList as Nt, Send as O, DollarSign as Ot, Receipt as P, CircleX as Pt, LockKeyhole as Q, ArrowRightLeft as Qt, Plus as R, ChevronRight as Rt, ShoppingCart as S, FileText as St, ShieldAlert as T, EyeOff as Tt, PackageOpen as U, ChartPie as Ut, Palette as V, Check as Vt, Minus as W, ChartColumn as Wt, LogOut as X, ArrowUpRight as Xt, Mail as Y, ArrowUp as Yt, Lock as Z, ArrowRight as Zt, Store as _, Globe as _t, User as a, Instagram as at, Sparkle as b, FolderTree as bt, Undo2 as c, Images as ct, TriangleAlert as d, House as dt, ArrowDown as en, ListChecks as et, TrendingUp as f, Heart as ft, Tag as g, GripVertical as gt, Target as h, Handshake as ht, Users as i, Layers as it, RotateCcw as j, Coins as jt, Search as k, CreditCard as kt, Trophy as l, ImagePlus as lt, Ticket as m, Headphones as mt, X as n, LayoutList as nt, UserPlus as o, Info as ot, Trash2 as p, Headset as pt, Menu as q, BellOff as qt, Wallet as r, LayoutGrid as rt, Upload as s, Image as st, Zap as t, Link2 as tt, Truck as u, ImageOff as ut, Star as v, Gift as vt, ShieldCheck as w, Eye as wt, SlidersHorizontal as x, Flame as xt, Sparkles as y, Funnel as yt, Phone as z, ChevronLeft as zt };
+export { LockKeyhole as $, ArrowRight as $t, Search as A, DollarSign as At, Phone as B, ChevronRight as Bt, ShoppingCart as C, Flame as Ct, Share2 as D, EyeOff as Dt, ShieldAlert as E, Eye as Et, Receipt as F, ClipboardList as Ft, Minus as G, ChartPie as Gt, Palette as H, ChevronDown as Ht, QrCode as I, CircleX as It, Menu as J, Bike as Jt, MessageSquare as K, ChartColumn as Kt, Printer as L, CircleCheck as Lt, RotateCcw as M, Copy as Mt, Repeat2 as N, Coins as Nt, Settings as O, ExternalLink as Ot, RefreshCcw as P, Clock as Pt, Lock as Q, ArrowUpRight as Qt, Power as R, CircleAlert as Rt, SlidersHorizontal as S, FolderTree as St, ShieldCheck as T, FileCheckCorner as Tt, Package as U, Check as Ut, Pencil as V, ChevronLeft as Vt, PackageOpen as W, CheckCheck as Wt, Mail as X, BadgeCheck as Xt, MapPin as Y, BellOff as Yt, LogOut as Z, ArrowUp as Zt, Tag as _, Handshake as _t, UsersRound as a, LayoutGrid as at, Sparkles as b, Gift as bt, Upload as c, Info as ct, Truck as d, ImagePlus as dt, ArrowRightLeft as en, Loader as et, TriangleAlert as f, ImageOff as ft, Target as g, Headphones as gt, Ticket as h, Headset as ht, Users as i, LayoutList as it, Rows3 as j, CreditCard as jt, Send as k, Download as kt, Undo2 as l, Image as lt, Trash2 as m, Heart as mt, X as n, ArrowDown as nn, ListChecks as nt, User as o, Layers as ot, TrendingUp as p, House as pt, MessageCircle as q, Camera as qt, Wallet as r, Link2 as rt, UserPlus as s, Instagram as st, Zap as t, ArrowLeft as tn, LoaderCircle as tt, Trophy as u, Images as ut, Store as v, GripVertical as vt, ShoppingBag as w, FileText as wt, Sparkle as x, Funnel as xt, Star as y, Globe as yt, Plus as z, ChevronUp as zt };

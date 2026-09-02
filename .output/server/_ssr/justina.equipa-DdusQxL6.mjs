@@ -5,7 +5,7 @@ import { a as usePermission, t as ROLE_LABEL } from "./roles-DIBzW3mP.mjs";
 import { K as onSnapshot, Lt as collection, T as deleteDoc, Ut as doc, rt as setDoc, un as serverTimestamp } from "../_libs/@firebase/firestore+[...].mjs";
 import "../_libs/firebase.mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
-import { $ as LoaderCircle, o as UserPlus, p as Trash2, w as ShieldCheck } from "../_libs/lucide-react.mjs";
+import { T as ShieldCheck, m as Trash2, s as UserPlus, tt as LoaderCircle } from "../_libs/lucide-react.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/justina.equipa-DdusQxL6.js
 var import_react = /* @__PURE__ */ __toESM(require_react());

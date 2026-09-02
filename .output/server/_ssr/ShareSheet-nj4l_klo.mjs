@@ -1,7 +1,7 @@
 import { r as __toESM } from "../_runtime.mjs";
 import { n as require_react } from "../_libs/@radix-ui/react-compose-refs+[...].mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
-import { At as Copy, E as Share2, K as MessageCircle, O as Send, Vt as Check, Y as Mail, n as X, tt as Link2 } from "../_libs/lucide-react.mjs";
+import { D as Share2, Mt as Copy, Ut as Check, X as Mail, k as Send, n as X, q as MessageCircle, rt as Link2 } from "../_libs/lucide-react.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/ShareSheet-nj4l_klo.js
 var import_react = /* @__PURE__ */ __toESM(require_react());

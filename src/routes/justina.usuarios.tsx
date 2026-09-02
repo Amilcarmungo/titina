@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { collection, onSnapshot } from "firebase/firestore";
-import { Search, ShieldCheck, Users } from "lucide-react";
+import { collection, onSnapshot, query, where, getDocs } from "firebase/firestore";
+import { Search, ShieldCheck, Users, MapPin, Gift, ShoppingBag, Users2, X, Loader } from "lucide-react";
 
 import { getDb } from "@/lib/firebase/client";
 import { useStaff } from "@/lib/firebase/roles";
@@ -17,6 +17,23 @@ type Row = {
   photoURL?: string | null;
   points?: number;
   createdAt?: unknown;
+  addresses?: Array<{ street?: string; city?: string; country?: string }>;
+  referredBy?: string;
+  referralCount?: number;
+  ordersCount?: number;
+  totalSpent?: number;
+};
+
+type UserDetail = {
+  uid: string;
+  email?: string;
+  name?: string | null;
+  photoURL?: string | null;
+  points?: number;
+  createdAt?: unknown;
+  addresses: Array<{ street?: string; city?: string; country?: string }>;
+  referrals: string[];
+  orders: { count: number; total: number };
 };
 
 function UsersPage() {
@@ -24,6 +41,8 @@ function UsersPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [q, setQ] = useState("");
+  const [selectedUser, setSelectedUser] = useState<UserDetail | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
 
   useEffect(() => {
     const db = getDb();
@@ -41,6 +60,51 @@ function UsersPage() {
     );
   }, [staff]);
 
+  const loadUserDetail = async (uid: string) => {
+    setLoadingDetail(true);
+    const db = getDb();
+    if (!db) {
+      setLoadingDetail(false);
+      return;
+    }
+    
+    try {
+      const user = rows.find(r => r.uid === uid);
+      if (!user) return;
+
+      // Buscar endereços
+      const addressesSnap = await getDocs(collection(db, "users", uid, "addresses"));
+      const addresses = addressesSnap.docs.map(d => d.data() as any);
+
+      // Buscar referrals
+      const referralsSnap = await getDocs(query(collection(db, "users"), where("referredBy", "==", uid)));
+      const referrals = referralsSnap.docs.map(d => d.id);
+
+      // Buscar orders
+      const ordersSnap = await getDocs(collection(db, "users", uid, "orders"));
+      const orders = {
+        count: ordersSnap.size,
+        total: ordersSnap.docs.reduce((sum, doc) => sum + (doc.data().total ?? 0), 0)
+      };
+
+      setSelectedUser({
+        uid,
+        email: user.email,
+        name: user.name,
+        photoURL: user.photoURL,
+        points: user.points,
+        createdAt: user.createdAt,
+        addresses,
+        referrals,
+        orders
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
   const list = useMemo(() => {
     const term = q.trim().toLowerCase();
     const base = [...rows].sort((a, b) =>
@@ -53,93 +117,194 @@ function UsersPage() {
   }, [rows, q]);
 
   return (
-    <div className="space-y-4">
-      <header className="flex flex-wrap items-center gap-3">
-        <span className="grid h-11 w-11 place-items-center rounded-2xl bg-foreground text-background">
-          <Users className="h-5 w-5" />
-        </span>
-        <div className="min-w-0">
-          <h1 className="font-display text-2xl font-black">Usuários</h1>
-          <p className="text-xs text-muted-foreground">
-            {rows.length} conta(s) registada(s) na Bazarixy.
-          </p>
-        </div>
-        <div className="ml-auto flex w-full items-center gap-2 rounded-xl border border-border bg-background px-3 py-2 sm:w-72">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar por email ou nome"
-            className="min-w-0 flex-1 bg-transparent text-sm outline-none"
-          />
-        </div>
-      </header>
-
-      {state === "loading" && (
-        <div className="space-y-2">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-16 animate-pulse rounded-xl bg-muted" />
-          ))}
-        </div>
-      )}
-
-      {state === "error" && (
-        <p className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
-          Sem permissão para listar utilizadores ou sem ligação ao banco. Só a
-          equipa autenticada consegue ver esta página.
-        </p>
-      )}
-
-      {state === "ready" &&
-        (list.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
-            Nenhum utilizador encontrado.
-          </p>
-        ) : (
-          <div className="overflow-hidden rounded-2xl border border-border bg-card">
-            <div className="hidden grid-cols-[1fr_auto_auto] gap-4 border-b border-border px-4 py-2.5 text-[11px] font-black uppercase tracking-wider text-muted-foreground sm:grid">
-              <span>Conta</span>
-              <span>Pontos</span>
-              <span>ID</span>
-            </div>
-            <ul className="divide-y divide-border">
-              {list.map((r) => (
-                <li
-                  key={r.uid}
-                  className="grid gap-2 px-4 py-3 sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-4"
-                >
-                  <div className="flex min-w-0 items-center gap-3">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-muted text-xs font-black">
-                      {r.photoURL ? (
-                        <img
-                          src={r.photoURL}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        (r.email?.[0] ?? "?").toUpperCase()
-                      )}
-                    </span>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-bold">
-                        {r.name || r.email || "Sem nome"}
-                      </p>
-                      <p className="truncate text-xs text-muted-foreground">
-                        {r.email}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="inline-flex w-fit items-center gap-1 rounded-full bg-gold/15 px-2.5 py-1 text-xs font-bold text-gold">
-                    <ShieldCheck className="h-3.5 w-3.5" /> {r.points ?? 0} pts
-                  </span>
-                  <code className="truncate text-[11px] text-muted-foreground">
-                    {r.uid}
-                  </code>
-                </li>
-              ))}
-            </ul>
+    <>
+      <div className="space-y-4">
+        <header className="flex flex-wrap items-center gap-3">
+          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-brand-strong text-background">
+            <Users className="h-6 w-6" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h1 className="font-display text-2xl font-black">Usuários</h1>
+            <p className="text-sm text-muted-foreground">
+              {rows.length} conta(s) registada(s) • {list.length} resultado(s)
+            </p>
           </div>
-        ))}
+          <div className="w-full sm:w-72 flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Buscar por email ou nome"
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none"
+            />
+          </div>
+        </header>
+
+        {state === "loading" && (
+          <div className="space-y-2">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="h-16 animate-pulse rounded-xl bg-muted" />
+            ))}
+          </div>
+        )}
+
+        {state === "error" && (
+          <p className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
+            Sem permissão para listar utilizadores ou sem ligação ao banco. Só a equipa autenticada consegue ver esta página.
+          </p>
+        )}
+
+        {state === "ready" &&
+          (list.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+              Nenhum utilizador encontrado.
+            </p>
+          ) : (
+            <div className="overflow-hidden rounded-2xl border border-border bg-card">
+              <div className="hidden grid-cols-[1fr_auto_auto_auto] gap-4 border-b border-border px-4 py-3 text-[11px] font-black uppercase tracking-wider text-muted-foreground lg:grid">
+                <span>Conta</span>
+                <span className="text-center">Pontos</span>
+                <span className="text-center">Compras</span>
+                <span className="text-center">Ação</span>
+              </div>
+              <ul className="divide-y divide-border">
+                {list.map((r) => (
+                  <li
+                    key={r.uid}
+                    className="grid gap-2 px-4 py-3 lg:grid-cols-[1fr_auto_auto_auto] lg:items-center lg:gap-4 hover:bg-muted/50 transition"
+                  >
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-muted text-sm font-black">
+                        {r.photoURL ? (
+                          <img
+                            src={r.photoURL}
+                            alt=""
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          (r.email?.[0] ?? "?").toUpperCase()
+                        )}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold">
+                          {r.name || r.email || "Sem nome"}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {r.email}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="inline-flex w-fit items-center gap-1 rounded-full bg-gold/15 px-2.5 py-1 text-xs font-bold text-gold lg:justify-center">
+                      <ShieldCheck className="h-3.5 w-3.5" /> {r.points ?? 0}
+                    </span>
+                    <div className="text-center text-sm font-bold text-muted-foreground">
+                      -
+                    </div>
+                    <button
+                      onClick={() => loadUserDetail(r.uid)}
+                      className="inline-block w-full lg:w-auto rounded-lg bg-brand-strong/10 px-3 py-1.5 text-xs font-bold text-brand-strong hover:bg-brand-strong/20 transition"
+                    >
+                      Ver detalhes
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+      </div>
+
+      {selectedUser && (
+        <UserModal user={selectedUser} onClose={() => setSelectedUser(null)} loading={loadingDetail} />
+      )}
+    </>
+  );
+}
+
+function UserModal({ user, onClose, loading }: { user: UserDetail; onClose: () => void; loading: boolean }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-background border border-border p-6 space-y-6">
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-4">
+            <span className="grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-muted text-xl font-black">
+              {user.photoURL ? (
+                <img src={user.photoURL} alt="" className="h-full w-full object-cover" />
+              ) : (
+                (user.email?.[0] ?? "?").toUpperCase()
+              )}
+            </span>
+            <div className="min-w-0">
+              <h2 className="text-xl font-black">{user.name || user.email || "Sem nome"}</h2>
+              <p className="text-sm text-muted-foreground">{user.email}</p>
+              <div className="mt-2 flex gap-2 flex-wrap">
+                <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2.5 py-1 text-xs font-bold text-gold">
+                  <ShieldCheck className="h-3.5 w-3.5" /> {user.points ?? 0} pts
+                </span>
+              </div>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 text-muted-foreground hover:text-foreground">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="flex items-center justify-center py-8">
+            <Loader className="h-5 w-5 animate-spin text-brand-strong" />
+          </div>
+        ) : (
+          <>
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="rounded-lg border border-border bg-muted/50 p-4">
+                <p className="text-xs text-muted-foreground">Compras</p>
+                <p className="mt-1 text-2xl font-black">{user.orders.count}</p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/50 p-4">
+                <p className="text-xs text-muted-foreground">Total gasto</p>
+                <p className="mt-1 text-2xl font-black">{(user.orders.total / 1000).toFixed(0)}K</p>
+              </div>
+              <div className="rounded-lg border border-border bg-muted/50 p-4">
+                <p className="text-xs text-muted-foreground">Referidos</p>
+                <p className="mt-1 text-2xl font-black">{user.referrals.length}</p>
+              </div>
+            </div>
+
+            {/* Addresses */}
+            {user.addresses.length > 0 && (
+              <div>
+                <h3 className="flex items-center gap-2 font-bold">
+                  <MapPin className="h-4 w-4" /> Endereços ({user.addresses.length})
+                </h3>
+                <div className="mt-3 space-y-2">
+                  {user.addresses.map((addr, i) => (
+                    <div key={i} className="rounded-lg border border-border bg-muted/50 p-3">
+                      <p className="text-sm font-semibold">{addr.street}</p>
+                      <p className="text-xs text-muted-foreground">{addr.city}, {addr.country}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Referrals */}
+            {user.referrals.length > 0 && (
+              <div>
+                <h3 className="flex items-center gap-2 font-bold">
+                  <Users2 className="h-4 w-4" /> Usuários Convidados ({user.referrals.length})
+                </h3>
+                <div className="mt-3 space-y-2">
+                  {user.referrals.map((uid, i) => (
+                    <div key={i} className="rounded-lg border border-border bg-muted/50 p-3 text-xs">
+                      <code className="text-muted-foreground">{uid}</code>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

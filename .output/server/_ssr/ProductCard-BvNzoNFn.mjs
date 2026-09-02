@@ -1,6 +1,6 @@
 import { t as formatKz } from "./format-DAL2ZktZ.mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
-import { v as Star } from "../_libs/lucide-react.mjs";
+import { y as Star } from "../_libs/lucide-react.mjs";
 import { n as SmartImage } from "./SmartImage-BH5TwHiu.mjs";
 import { v as Link } from "../_libs/@tanstack/react-router+[...].mjs";
 import { r as recordProductView } from "./recommendations-DtzW4eO9.mjs";

@@ -3,7 +3,7 @@ import { n as require_react } from "../_libs/@radix-ui/react-compose-refs+[...].
 import { t as getAnyProduct } from "./products-store-DBaquvrN.mjs";
 import { t as formatKz } from "./format-DAL2ZktZ.mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
-import { $t as ArrowLeft, Dt as Download, P as Receipt, Ut as ChartPie, _ as Store, f as TrendingUp, r as Wallet } from "../_libs/lucide-react.mjs";
+import { F as Receipt, Gt as ChartPie, kt as Download, p as TrendingUp, r as Wallet, tn as ArrowLeft, v as Store } from "../_libs/lucide-react.mjs";
 import { r as useShops } from "./shops-store-Dm5LimXI.mjs";
 import { v as Link } from "../_libs/@tanstack/react-router+[...].mjs";
 import { n as PLATFORM_FEE } from "./logistics-store-DuC-stwY.mjs";

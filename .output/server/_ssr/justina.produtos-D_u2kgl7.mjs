@@ -4,7 +4,7 @@ import { n as useCategories } from "./categories-store-CFvdBuKR.mjs";
 import { i as useAllProducts, n as productActions } from "./products-store-DBaquvrN.mjs";
 import { t as formatKz } from "./format-DAL2ZktZ.mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
-import { $t as ArrowLeft, B as Pencil, H as Package, R as Plus, Rt as ChevronRight, V as Palette, Vt as Check, Zt as ArrowRight, b as Sparkle, et as ListChecks, g as Tag, k as Search, lt as ImagePlus, n as X, ot as Info, p as Trash2, st as Image, v as Star, yt as Funnel, zt as ChevronLeft } from "../_libs/lucide-react.mjs";
+import { $t as ArrowRight, A as Search, Bt as ChevronRight, H as Palette, U as Package, Ut as Check, V as Pencil, Vt as ChevronLeft, _ as Tag, ct as Info, dt as ImagePlus, lt as Image, m as Trash2, n as X, nt as ListChecks, tn as ArrowLeft, x as Sparkle, xt as Funnel, y as Star, z as Plus } from "../_libs/lucide-react.mjs";
 import { r as useShops } from "./shops-store-Dm5LimXI.mjs";
 import { n as toast } from "../_libs/sonner.mjs";
 import { a as AdminTextarea, i as AdminSelect, n as AdminInput, r as AdminModal, t as AdminField } from "./AdminModal-DXEoyymL.mjs";

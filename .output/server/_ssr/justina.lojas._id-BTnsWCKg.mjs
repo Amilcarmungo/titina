@@ -3,7 +3,7 @@ import { n as require_react } from "../_libs/@radix-ui/react-compose-refs+[...].
 import { i as useAllProducts } from "./products-store-DBaquvrN.mjs";
 import { t as formatKz } from "./format-DAL2ZktZ.mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
-import { $t as ArrowLeft, C as ShoppingBag, G as MessageSquare, H as Package, _ as Store, v as Star } from "../_libs/lucide-react.mjs";
+import { K as MessageSquare, U as Package, tn as ArrowLeft, v as Store, w as ShoppingBag, y as Star } from "../_libs/lucide-react.mjs";
 import { t as getShop } from "./shops-store-Dm5LimXI.mjs";
 import { v as Link, x as useParams } from "../_libs/@tanstack/react-router+[...].mjs";
 import { useOrders } from "./orders-store-DPNmKvMS.mjs";

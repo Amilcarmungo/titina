@@ -5,7 +5,7 @@ import { n as useCategories } from "./categories-store-CFvdBuKR.mjs";
 import { i as useHomeConfig, t as homeConfigActions } from "./home-config-DXJgCGsf.mjs";
 import { a as useCustomProducts } from "./products-store-DBaquvrN.mjs";
 import { n as require_jsx_runtime } from "../_libs/radix-ui__react-context+react.mjs";
-import { A as Rows3, B as Pencil, Et as ExternalLink, R as Plus, ct as Images, gt as GripVertical, p as Trash2, rt as LayoutGrid, st as Image, wt as Eye, xt as Flame, y as Sparkles } from "../_libs/lucide-react.mjs";
+import { Ct as Flame, Et as Eye, Ot as ExternalLink, V as Pencil, at as LayoutGrid, b as Sparkles, j as Rows3, lt as Image, m as Trash2, ut as Images, vt as GripVertical, z as Plus } from "../_libs/lucide-react.mjs";
 import { v as Link } from "../_libs/@tanstack/react-router+[...].mjs";
 import { n as toast } from "../_libs/sonner.mjs";
 import { s as useSlidesRaw } from "./banner-Zgl4ECrY.mjs";
