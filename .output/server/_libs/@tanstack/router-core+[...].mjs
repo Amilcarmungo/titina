@@ -1,4 +1,4 @@
-import { W as globalthis_default } from "../@firebase/analytics+[...].mjs";
+import { X as globalthis_default } from "../@firebase/analytics+[...].mjs";
 import { B as rootRouteId, C as GLOBAL_TSR, E as createInlineCssStyleAsset, F as decodePath, I as dehydrateSsrMatchId, N as invariant, O as getStylesheetHref, P as createLRUCache, T as createInlineCssPlaceholderAsset, j as _getRenderedMatches, w as TSR_SCRIPT_BARRIER_ID } from "./react-router+[...].mjs";
 //#region node_modules/seroval/dist/index.js
 var SYM_ASYNC_ITERATOR = Symbol.asyncIterator;

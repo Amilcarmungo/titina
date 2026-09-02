@@ -85,11 +85,33 @@
   * {
     border-color: var(--color-border);
   }
+  html {
+    /* Layout estável: o texto nunca aumenta sozinho e o duplo toque não amplia. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    touch-action: manipulation;
+    overflow-x: hidden;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    /* Só conteúdos marcados como «selectable» podem ser seleccionados/copiados. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  input,
+  textarea,
+  select,
+  [contenteditable="true"],
+  .selectable,
+  .selectable * {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
   }
   h1,
   h2,

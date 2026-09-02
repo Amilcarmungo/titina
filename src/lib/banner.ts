@@ -1,15 +1,7 @@
 import { useSyncExternalStore } from "react";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  setDoc,
-} from "firebase/firestore";
-
 import { type Product } from "@/lib/products";
 import { useAllProducts } from "@/lib/products-store";
-import { getDb } from "@/lib/firebase/client";
+import { ensureDb } from "@/lib/firebase/client";
 import { canSyncSiteData } from "@/lib/firebase/roles";
 import { stripUndefined } from "@/lib/firebase/sanitize";
 import { createRetrier } from "@/lib/firebase/retry";
@@ -58,12 +50,15 @@ let unsubscribe: (() => void) | null = null;
 const retrier = createRetrier(() => {
   unsubscribe?.();
   unsubscribe = null;
-  subscribe();
+  void subscribe();
 });
 
-function subscribe() {
+async function subscribe() {
   if (typeof window === "undefined" || unsubscribe) return;
-  const db = getDb();
+  const [db, { collection, onSnapshot }] = await Promise.all([
+    ensureDb(),
+    import("firebase/firestore"),
+  ]);
   if (!db) {
     status = "error";
     listeners.forEach((l) => l());
@@ -88,18 +83,21 @@ function subscribe() {
   );
 }
 
-if (typeof window !== "undefined") subscribe();
+if (typeof window !== "undefined") void subscribe();
 
 export function retryBanners() {
   unsubscribe?.();
   unsubscribe = null;
   status = "loading";
   listeners.forEach((l) => l());
-  subscribe();
+  void subscribe();
 }
 
 async function publishBanner(slide: SlideData): Promise<void> {
-  const db = getDb();
+  const [db, { doc, setDoc }] = await Promise.all([
+    ensureDb(),
+    import("firebase/firestore"),
+  ]);
   if (!db) throw new Error("Sem ligação ao banco de dados.");
   if (!canSyncSiteData())
     throw new Error("Sem permissão para publicar banners.");
@@ -158,7 +156,10 @@ export const slideActions = {
   async remove(id: string) {
     slidesData = slidesData.filter((s) => s.id !== id);
     emit();
-    const db = getDb();
+    const [db, { deleteDoc, doc }] = await Promise.all([
+      ensureDb(),
+      import("firebase/firestore"),
+    ]);
     if (db && canSyncSiteData()) await deleteDoc(doc(db, "banners", id));
   },
 };

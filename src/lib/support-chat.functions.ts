@@ -177,51 +177,59 @@ export function fallbackSupportReply(message: string): string {
 export const askSupport = createServerFn({ method: "POST" })
   .validator((data: unknown) => schema.parse(data))
   .handler(async ({ data }) => {
-    const key = process.env.GEMINI_API_KEY;
+    const key = process.env.LOVABLE_API_KEY;
     const lastMessage = data.messages.at(-1)?.content ?? "";
     if (!key) return { reply: fallbackSupportReply(lastMessage) };
 
     try {
       const context = await buildDataContext(data.messages, data.authToken);
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
       const res = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-goog-api-key": key,
+            "Lovable-API-Key": key,
+            "X-Lovable-AIG-SDK": "fetch",
           },
           body: JSON.stringify({
-            systemInstruction: {
-              parts: [
-                {
-                  text: `${SYSTEM}\nContexto verificado nesta sessão:\n${context}`,
-                },
-              ],
-            },
-            contents: data.messages.map((message) => ({
-              role: message.role === "assistant" ? "model" : "user",
-              parts: [{ text: message.content }],
-            })),
-            generationConfig: { temperature: 0.2, maxOutputTokens: 500 },
+            model: "google/gemini-2.5-flash",
+            temperature: 0.2,
+            max_tokens: 500,
+            messages: [
+              {
+                role: "system",
+                content: `${SYSTEM}\nContexto verificado nesta sessão:\n${context}`,
+              },
+              ...data.messages.map((message) => ({
+                role: message.role,
+                content: message.content,
+              })),
+            ],
           }),
-          signal: controller.signal,
         },
       );
-      clearTimeout(timeout);
 
-      if (res.status === 429 || !res.ok)
+      if (!res.ok) {
+        if (res.status === 402)
+          return {
+            reply:
+              "O assistente está temporariamente indisponível (créditos de IA esgotados). Fale connosco no WhatsApp +244 934 033 532.",
+          };
+        if (res.status === 429)
+          return {
+            reply:
+              "Estou a receber muitos pedidos neste momento. Tente novamente dentro de instantes ou fale connosco no WhatsApp +244 934 033 532.",
+          };
         return { reply: fallbackSupportReply(lastMessage) };
+      }
+
       const json = (await res.json()) as {
-        candidates?: { content?: { parts?: { text?: string }[] } }[];
+        choices?: { message?: { content?: string } }[];
       };
-      if (!json.candidates?.[0]?.content?.parts?.[0]?.text?.trim())
-        return { reply: fallbackSupportReply(lastMessage) };
-      return {
-        reply: json.candidates[0].content?.parts?.[0]?.text?.trim() ?? context,
-      };
+      const reply = json.choices?.[0]?.message?.content?.trim();
+      if (!reply) return { reply: fallbackSupportReply(lastMessage) };
+      return { reply };
     } catch {
       return { reply: fallbackSupportReply(lastMessage) };
     }

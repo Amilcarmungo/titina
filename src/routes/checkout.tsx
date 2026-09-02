@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { getAnyProduct as getProduct } from "@/lib/products-store";
 import { formatKz } from "@/lib/format";
@@ -193,7 +193,8 @@ function CheckoutPage() {
         };
         setAddress(next);
         writeCachedAddress(uid, next);
-        if (def.isDefault && def.name && def.street && def.city)
+        // Já comprou antes → não pede o endereço outra vez.
+        if (def.name && def.street && def.city)
           setStep((s) => (s === 1 ? 2 : s));
       })
       .catch(() => setAddressLoaded(true));
@@ -201,6 +202,28 @@ function CheckoutPage() {
       alive = false;
     };
   }, [user?.uid, addressLoaded]);
+
+  // Navegação por etapas: avançar empurra uma entrada no histórico, por isso o
+  // botão «voltar» do telemóvel regressa à etapa anterior em vez de sair.
+  const stepRef = useRef(step);
+  stepRef.current = step;
+  const goToStep = useCallback((next: number) => {
+    if (typeof window !== "undefined" && next < stepRef.current) {
+      window.history.back(); // o popstate recua uma etapa
+      return;
+    }
+    setStep(next);
+    if (typeof window !== "undefined")
+      window.history.pushState({ checkoutStep: next }, "");
+  }, []);
+
+  useEffect(() => {
+    const onPop = () => {
+      if (stepRef.current > 1) setStep(stepRef.current - 1);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   const canConfirmAddress =
     address.name &&
@@ -484,7 +507,7 @@ function CheckoutPage() {
                     </p>
                   </div>
                   <button
-                    onClick={() => setStep(1)}
+                    onClick={() => goToStep(1)}
                     className="p-2 text-muted-foreground"
                   >
                     <ChevronRight className="h-5 w-5" />
@@ -493,7 +516,7 @@ function CheckoutPage() {
                 <button
                   onClick={() => {
                     setAddress(emptyAddress);
-                    setStep(1);
+                    goToStep(1);
                   }}
                   className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted"
                 >
@@ -861,8 +884,8 @@ function CheckoutPage() {
               (step === 1 && !canConfirmAddress) || (step === 3 && !payment)
             }
             onClick={() => {
-              if (step === 1) setStep(2);
-              else if (step === 2) setStep(3);
+              if (step === 1) goToStep(2);
+              else if (step === 2) goToStep(3);
               else if (payment === "card") placeOrder();
               else if (payment) {
                 const code = newOrderCode();

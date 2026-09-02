@@ -25,7 +25,7 @@ import { inviteUrl } from "@/lib/site";
 
 const PENDING_KEY = "bx_referral_code";
 
-export const POINTS_PER_REFERRAL = 5;
+export const POINTS_PER_REFERRAL = 50;
 
 /** Código de convite público de um utilizador (o próprio uid). */
 export function referralCode(uid: string) {

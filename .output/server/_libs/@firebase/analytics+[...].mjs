@@ -2065,6 +2065,17 @@ function _getProvider(app, name) {
 }
 /**
 *
+* @param app - FirebaseApp instance
+* @param name - service name
+* @param instanceIdentifier - service instance identifier in case the service supports multiple instances
+*
+* @internal
+*/
+function _removeServiceInstance(app, name, instanceIdentifier = DEFAULT_ENTRY_NAME) {
+	_getProvider(app, name).clearInstance(instanceIdentifier);
+}
+/**
+*
 * @param obj - an object of type FirebaseApp.
 *
 * @returns true if the provided object is of type FirebaseServerAppImpl.
@@ -4387,4 +4398,4 @@ function registerAnalytics() {
 }
 registerAnalytics();
 //#endregion
-export { getUA as A, isSafariOrWebkit as B, deepEqual as C, getExperimentalSetting as D, getDefaultEmulatorHostnameAndPort as E, isIE as F, querystring as H, isIndexedDBAvailable as I, isMobileCordova as L, isCloudWorkstation as M, isCloudflareWorker as N, getGlobal as O, isEmpty as P, isReactNative as R, createSubscribe as S, getDefaultEmulatorHost as T, querystringDecode as U, pingServer as V, globalthis_default as W, Deferred as _, setUserProperties as a, base64Decode as b, _isFirebaseServerApp as c, getApps as d, initializeApp as f, Component as g, Logger as h, logEvent as i, isBrowserExtension as j, getModularInstance as k, _registerComponent as l, LogLevel as m, initializeAnalytics as n, SDK_VERSION as o, registerVersion as p, isSupported as r, _getProvider as s, getAnalytics as t, getApp as u, ErrorFactory as v, extractQuerystring as w, createMockUserToken as x, FirebaseError as y, isSafari as z };
+export { extractQuerystring as A, isEmpty as B, Deferred as C, createMockUserToken as D, base64Decode as E, getModularInstance as F, isSafari as G, isIndexedDBAvailable as H, getUA as I, querystring as J, isSafariOrWebkit as K, isBrowserExtension as L, getDefaultEmulatorHostnameAndPort as M, getExperimentalSetting as N, createSubscribe as O, getGlobal as P, isCloudWorkstation as R, Component as S, FirebaseError as T, isMobileCordova as U, isIE as V, isReactNative as W, globalthis_default as X, querystringDecode as Y, getApps as _, setUserProperties as a, LogLevel as b, _addComponent as c, _getProvider as d, _isFirebaseServerApp as f, getApp as g, _serverApps as h, logEvent as i, getDefaultEmulatorHost as j, deepEqual as k, _apps as l, _removeServiceInstance as m, initializeAnalytics as n, DEFAULT_ENTRY_NAME as o, _registerComponent as p, pingServer as q, isSupported as r, SDK_VERSION as s, getAnalytics as t, _components as u, initializeApp as v, ErrorFactory as w, Logger as x, registerVersion as y, isCloudflareWorker as z };

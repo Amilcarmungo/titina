@@ -1,17 +1,15 @@
 /**
  * Firebase client (browser only).
  * Todas as chaves vêm do .env (VITE_FIREBASE_*) — nunca hardcoded.
+ *
+ * Os SDKs do Firebase são carregados sob demanda (import dinâmico) para não
+ * entrarem no JavaScript inicial da página — a home aparece primeiro e a
+ * ligação ao banco liga-se logo depois, sem bloquear o primeiro render.
  */
-import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { getAuth, type Auth } from "firebase/auth";
-import {
-  getFirestore,
-  initializeFirestore,
-  persistentLocalCache,
-  persistentMultipleTabManager,
-  type Firestore,
-} from "firebase/firestore";
-import { getStorage, type FirebaseStorage } from "firebase/storage";
+import type { FirebaseApp } from "firebase/app";
+import type { Auth } from "firebase/auth";
+import type { Firestore } from "firebase/firestore";
+import type { FirebaseStorage } from "firebase/storage";
 
 const env = import.meta.env as Record<string, string | undefined>;
 
@@ -30,51 +28,118 @@ export const firebaseEnabled = Boolean(
   firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId,
 );
 
+const canUse = () => typeof window !== "undefined" && firebaseEnabled;
+
 let app: FirebaseApp | null = null;
+let appPromise: Promise<FirebaseApp | null> | null = null;
 
-function ensureApp(): FirebaseApp | null {
-  if (typeof window === "undefined" || !firebaseEnabled) return null;
-  if (!app) app = getApps()[0] ?? initializeApp(firebaseConfig);
-  return app;
+async function ensureApp(): Promise<FirebaseApp | null> {
+  if (!canUse()) return null;
+  if (app) return app;
+  if (!appPromise) {
+    appPromise = import("firebase/app")
+      .then(({ initializeApp, getApps }) => {
+        app = getApps()[0] ?? initializeApp(firebaseConfig);
+        return app;
+      })
+      .catch(() => null);
+  }
+  return appPromise;
 }
 
+// -------- Auth --------
+let auth: Auth | null = null;
+let authPromise: Promise<Auth | null> | null = null;
+
+export async function ensureFirebaseAuth(): Promise<Auth | null> {
+  if (!canUse()) return null;
+  if (auth) return auth;
+  if (!authPromise) {
+    authPromise = (async () => {
+      const [a, mod] = await Promise.all([ensureApp(), import("firebase/auth")]);
+      if (!a) return null;
+      auth = mod.getAuth(a);
+      return auth;
+    })().catch(() => null);
+  }
+  return authPromise;
+}
+
+/** Instância já carregada (null enquanto o SDK ainda está a chegar). */
 export function getFirebaseAuth(): Auth | null {
-  const a = ensureApp();
-  return a ? getAuth(a) : null;
+  if (!auth) void ensureFirebaseAuth();
+  return auth;
 }
 
+// -------- Firestore --------
 let db: Firestore | null = null;
+let dbPromise: Promise<Firestore | null> | null = null;
 
 /**
  * Firestore com cache local persistente: em internet lenta (ou offline) os
  * produtos, lojas e banners aparecem imediatamente a partir do cache do
  * dispositivo e são actualizados quando a ligação responde.
  */
-export function getDb(): Firestore | null {
-  const a = ensureApp();
-  if (!a) return null;
-  if (!db) {
-    try {
-      db = initializeFirestore(a, {
-        localCache: persistentLocalCache({
-          tabManager: persistentMultipleTabManager(),
-        }),
-      });
-    } catch {
-      db = getFirestore(a);
-    }
+export async function ensureDb(): Promise<Firestore | null> {
+  if (!canUse()) return null;
+  if (db) return db;
+  if (!dbPromise) {
+    dbPromise = (async () => {
+      const [a, mod] = await Promise.all([
+        ensureApp(),
+        import("firebase/firestore"),
+      ]);
+      if (!a) return null;
+      try {
+        db = mod.initializeFirestore(a, {
+          localCache: mod.persistentLocalCache({
+            tabManager: mod.persistentMultipleTabManager(),
+          }),
+        });
+      } catch {
+        db = mod.getFirestore(a);
+      }
+      return db;
+    })().catch(() => null);
   }
+  return dbPromise;
+}
+
+/** Instância já carregada (null enquanto o SDK ainda está a chegar). */
+export function getDb(): Firestore | null {
+  if (!db) void ensureDb();
   return db;
 }
 
+// -------- Storage --------
+let storage: FirebaseStorage | null = null;
+let storagePromise: Promise<FirebaseStorage | null> | null = null;
+
+export async function ensureFirebaseStorage(): Promise<FirebaseStorage | null> {
+  if (!canUse()) return null;
+  if (storage) return storage;
+  if (!storagePromise) {
+    storagePromise = (async () => {
+      const [a, mod] = await Promise.all([
+        ensureApp(),
+        import("firebase/storage"),
+      ]);
+      if (!a) return null;
+      storage = mod.getStorage(a);
+      return storage;
+    })().catch(() => null);
+  }
+  return storagePromise;
+}
+
 export function getFirebaseStorage(): FirebaseStorage | null {
-  const a = ensureApp();
-  return a ? getStorage(a) : null;
+  if (!storage) void ensureFirebaseStorage();
+  return storage;
 }
 
 /** Analytics é opcional e carregado sob demanda (evita quebrar SSR/navegadores sem suporte). */
 export async function initAnalytics() {
-  const a = ensureApp();
+  const a = await ensureApp();
   if (!a || !firebaseConfig.measurementId) return null;
   try {
     const { getAnalytics, isSupported } = await import("firebase/analytics");

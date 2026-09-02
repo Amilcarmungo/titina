@@ -1,0 +1,1 @@
+import{f as e,m as t,p as n}from"./index.esm-BsGhgQHX.js";t(`firebase`,`12.17.1`,`app`);export{e as getApps,n as initializeApp};

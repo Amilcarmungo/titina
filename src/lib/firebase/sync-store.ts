@@ -6,14 +6,13 @@
  *
  * Leitura é pública (o catálogo é público); a escrita é restrita por função
  * nas regras do Firestore — o frontend nunca decide permissões.
+ *
+ * O SDK do Firestore é carregado sob demanda para não pesar no arranque.
  */
-import { doc, onSnapshot, serverTimestamp, setDoc } from "firebase/firestore";
-
-import { getDb } from "./client";
+import { ensureDb, getFirebaseAuth } from "./client";
 import { canSyncSiteData } from "./roles";
 import { stripUndefined } from "./sanitize";
 import { createRetrier } from "./retry";
-import { getFirebaseAuth } from "./client";
 
 export type SyncHandle = { push: () => void };
 
@@ -31,23 +30,32 @@ export function attachSync<T>(
   let lastRemote = "";
 
   const push = () => {
-    const db = getDb();
-    if (!db || !canSyncSiteData()) return;
+    if (!canSyncSiteData()) return;
     const value = stripUndefined(getLocal());
     const json = JSON.stringify(value ?? null);
     if (json === lastRemote) return;
     lastRemote = json;
-    void setDoc(
-      doc(db, "siteData", key),
-      {
-        value,
-        updatedAt: serverTimestamp(),
-        updatedBy: getFirebaseAuth()?.currentUser?.uid ?? null,
-      },
-      { merge: true },
-    ).catch(() => {
-      lastRemote = "";
-    });
+    void (async () => {
+      const [db, { doc, serverTimestamp, setDoc }] = await Promise.all([
+        ensureDb(),
+        import("firebase/firestore"),
+      ]);
+      if (!db) {
+        lastRemote = "";
+        return;
+      }
+      await setDoc(
+        doc(db, "siteData", key),
+        {
+          value,
+          updatedAt: serverTimestamp(),
+          updatedBy: getFirebaseAuth()?.currentUser?.uid ?? null,
+        },
+        { merge: true },
+      ).catch(() => {
+        lastRemote = "";
+      });
+    })();
   };
 
   if (typeof window !== "undefined") {
@@ -55,12 +63,15 @@ export function attachSync<T>(
     const retrier = createRetrier(() => {
       stop?.();
       stop = null;
-      start();
+      void start();
     });
 
     // Espera o app montar para não bloquear a hidratação.
-    function start() {
-      const db = getDb();
+    async function start() {
+      const [db, { doc, onSnapshot }] = await Promise.all([
+        ensureDb(),
+        import("firebase/firestore"),
+      ]);
       if (!db) {
         options?.onSettled?.(false, true);
         retrier.schedule();
@@ -84,7 +95,7 @@ export function attachSync<T>(
         },
       );
     }
-    start();
+    void start();
   }
 
   return { push };

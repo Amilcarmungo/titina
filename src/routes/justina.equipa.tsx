@@ -33,7 +33,7 @@ export const Route = createFileRoute("/justina/equipa")({
   component: EquipaPage,
 });
 
-const ROLES: StaffRole[] = ["justina", "gerente", "atendente"];
+const ROLES: StaffRole[] = ["admin", "gerente", "atendente"];
 
 const ROLE_HINT: Record<StaffRole, string> = {
   admin: "Acesso total, incluindo equipa e configurações.",

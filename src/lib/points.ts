@@ -2,7 +2,7 @@
  * Pontos Bazarixy.
  *
  *  · Avaliações de pedidos → pontos guardados em `users/{uid}.points`.
- *  · Convites aceites      → 5 pontos por amigo (contados em `referrals`).
+ *  · Convites aceites      → 50 pontos por amigo (contados em `referrals`).
  *
  * Sem sessão os pontos ficam apenas no dispositivo (localStorage) e são
  * enviados para o banco assim que o utilizador entra.
@@ -15,7 +15,7 @@ import { watchReferrals, POINTS_PER_REFERRAL } from "@/lib/firebase/referrals";
 
 const KEY = "bx_points_v1";
 
-export const POINTS_PER_REVIEW = 50;
+export const POINTS_PER_REVIEW = 25;
 export { POINTS_PER_REFERRAL };
 
 function readLocal(): number {

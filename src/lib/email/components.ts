@@ -6,6 +6,7 @@
  * Nenhum destes ficheiros toca no Firebase — só constrói HTML.
  */
 import { absoluteUrl, SITE_NAME, SITE_URL } from "@/lib/site";
+import emailLogo from "@/assets/bazarixy-email-logo.png.asset.json";
 
 const BRAND = "#e83e8c";
 const BRAND_DARK = "#c52d73";
@@ -13,7 +14,14 @@ const BRAND_PALE = "#fff0f6";
 const TEXT = "#24202a";
 const MUTED = "#766d78";
 const BORDER = "#f1e5ec";
-const LOGO_URL = absoluteUrl("/logotipo.webp");
+const LOGO_URL = absoluteUrl(emailLogo.url);
+
+const SOCIALS = [
+  { label: "WhatsApp", href: "https://whatsapp.com/channel/0029VbCwfxIGzzKOSgeKqH3z" },
+  { label: "Instagram", href: "https://www.instagram.com/bazarixy/" },
+  { label: "Facebook", href: "https://web.facebook.com/profile.php?id=61576475860905" },
+  { label: "TikTok", href: "https://www.tiktok.com/@bazarixy" },
+];
 
 /** Escapa texto vindo de dados do utilizador (nunca injectar HTML cru). */
 export function esc(value: unknown): string {
@@ -109,15 +117,22 @@ export function shell(bodyHtml: string, preheader = ""): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff7fa;padding:30px 12px">
   <tr><td align="center">
     <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;border:1px solid ${BORDER};border-radius:18px;overflow:hidden">
-      <tr><td style="padding:22px 28px;border-bottom:1px solid ${BORDER};background:#fff">
-        <a href="${SITE_URL}" style="display:inline-block;text-decoration:none"><img src="${LOGO_URL}" width="164" alt="${SITE_NAME}" style="display:block;width:164px;height:auto;max-height:58px;object-fit:contain;object-position:left center" /></a>
+      <tr><td align="center" style="padding:26px 28px 18px;border-bottom:1px solid ${BORDER};background:#fff">
+        <a href="${SITE_URL}" style="display:inline-block;text-decoration:none"><img src="${LOGO_URL}" width="64" height="64" alt="${SITE_NAME}" style="display:block;width:64px;height:64px;border-radius:16px;object-fit:cover" /></a>
+        <div style="margin-top:10px;font:800 18px Arial,Helvetica,sans-serif;letter-spacing:-.3px;color:${TEXT}">${SITE_NAME}</div>
       </td></tr>
-      <tr><td style="padding:26px 28px">${bodyHtml}</td></tr>
-      <tr><td style="padding:24px 28px;background:${BRAND_PALE};font:400 12px/1.7 Arial,Helvetica,sans-serif;color:${MUTED}">
+      <tr><td style="padding:28px 30px">${bodyHtml}</td></tr>
+      <tr><td align="center" style="padding:26px 28px;background:${BRAND_PALE};font:400 12px/1.7 Arial,Helvetica,sans-serif;color:${MUTED};text-align:center">
+        <div style="margin-bottom:14px;font:700 12px Arial,Helvetica,sans-serif;color:${TEXT}">Siga a Bazarixy</div>
+        <div style="margin-bottom:16px">
+          ${SOCIALS.map(
+            (s) =>
+              `<a href="${s.href}" style="display:inline-block;margin:0 4px 6px;padding:8px 14px;border-radius:999px;background:#ffffff;border:1px solid ${BORDER};font:700 11px Arial,Helvetica,sans-serif;color:${BRAND_DARK};text-decoration:none">${s.label}</a>`,
+          ).join("")}
+        </div>
         <strong style="color:${TEXT}">Bazarixy</strong> · Compras online em Angola<br />
-        Recebeu este e-mail porque tem uma conta ou uma encomenda na ${SITE_NAME}.<br />
-        <a href="${SITE_URL}" style="color:${BRAND_DARK};font-weight:700;text-decoration:none">${SITE_URL.replace("https://", "")}</a> · <a href="${absoluteUrl("/support")}" style="color:${BRAND_DARK};font-weight:700;text-decoration:none">Contactar suporte</a><br />
-        <span style="color:#9b8d97">Este é um e-mail automático. Por favor, não responda directamente.</span>
+        <a href="${SITE_URL}" style="color:${BRAND_DARK};font-weight:700;text-decoration:none">${SITE_URL.replace("https://", "")}</a> · <a href="${absoluteUrl("/support")}" style="color:${BRAND_DARK};font-weight:700;text-decoration:none">Suporte</a> · <a href="tel:+244934033532" style="color:${BRAND_DARK};font-weight:700;text-decoration:none">+244 934 033 532</a><br />
+        <span style="color:#9b8d97">E-mail automático — por favor, não responda directamente.</span>
       </td></tr>
     </table>
   </td></tr>

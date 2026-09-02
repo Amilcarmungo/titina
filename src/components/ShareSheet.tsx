@@ -27,7 +27,7 @@ function encode(v: string) {
 }
 
 const NETWORKS = (t: ShareTarget) => {
-  const msg = `${t.text ?? t.title} ${t.url}`;
+  const msg = t.text ? `${t.text} ${t.url}` : t.url;
   return [
     {
       key: "whatsapp",

@@ -103,7 +103,7 @@ function AuthPage() {
 
   const { user } = useStore();
 
-  /** Link de convite (?convite=) é guardado para dar 5 pontos a quem convidou. */
+  /** Link de convite (?convite=) é guardado para dar 50 pontos a quem convidou. */
   useEffect(() => {
     captureReferralFromUrl();
   }, []);

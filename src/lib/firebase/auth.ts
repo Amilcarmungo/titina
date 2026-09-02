@@ -21,7 +21,7 @@ import {
   type User,
 } from "firebase/auth";
 
-import { getFirebaseAuth } from "./client";
+import { ensureFirebaseAuth, getFirebaseAuth } from "./client";
 import { emailIsRegistered, rememberEmail } from "./email-index";
 
 export type AppUser = {
@@ -43,14 +43,25 @@ export function toAppUser(u: User): AppUser {
 }
 
 export function subscribeToUser(cb: (user: AppUser | null) => void) {
-  const auth = getFirebaseAuth();
-  if (!auth) return () => {};
-  // Sessão persistente no dispositivo: entra uma vez, continua entrado.
-  void setPersistence(auth, browserLocalPersistence).catch(() => {});
-  // Conclui um login que voltou por redirect (mobile/webview) sem pedir nada.
-  void getRedirectResult(auth).catch(() => {});
-  return onAuthStateChanged(auth, (u) => cb(u ? toAppUser(u) : null));
+  let stop: (() => void) | null = null;
+  let disposed = false;
+  void ensureFirebaseAuth().then((auth) => {
+    if (!auth || disposed) return;
+    // Sessão persistente no dispositivo: entra uma vez, continua entrado.
+    void setPersistence(auth, browserLocalPersistence).catch(() => {});
+    // Conclui um login que voltou por redirect (mobile/webview) sem pedir nada.
+    void getRedirectResult(auth).catch(() => {});
+    stop = onAuthStateChanged(auth, (u) => cb(u ? toAppUser(u) : null));
+  });
+  return () => {
+    disposed = true;
+    stop?.();
+    stop = null;
+  };
 }
+
+// Assim que este módulo é carregado, prepara a instância de Auth.
+void ensureFirebaseAuth();
 
 function requireAuthInstance() {
   const auth = getFirebaseAuth();

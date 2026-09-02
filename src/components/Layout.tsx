@@ -18,14 +18,7 @@ import {
 import { useUnreadCount } from "@/lib/notifications-store";
 import { useSlides, useBannerIndex } from "@/lib/banner";
 import { SearchIcon } from "@/components/SearchIcon";
-import { MobileMenu } from "@/components/MobileMenu";
-import { LoginModal } from "@/components/LoginModal";
-import {
-  CartDrawer,
-  FavoritesDrawer,
-  ProfileDrawer,
-  NotificationsDrawer,
-} from "@/components/SideDrawers";
+import { DeferredOverlays } from "@/components/DeferredOverlays";
 import { requireAuth } from "@/lib/auth-guard";
 
 /** Coração das notificações: só fica dourado (e a piscar) quando há avisos novos. */
@@ -418,12 +411,7 @@ export function Layout({
         </nav>
       )}
 
-      <MobileMenu open={menuOpen} onOpenChange={setMenuOpen} />
-      <LoginModal />
-      <CartDrawer />
-      <FavoritesDrawer />
-      <ProfileDrawer />
-      <NotificationsDrawer />
+      <DeferredOverlays menuOpen={menuOpen} onMenuOpenChange={setMenuOpen} />
     </div>
   );
 }

@@ -27,6 +27,7 @@ import {
   Trash2,
   Upload,
   Clock,
+  ChevronLeft,
   LoaderCircle,
 } from "lucide-react";
 
@@ -89,7 +90,6 @@ function PayMethodPage() {
     [methods, methodId, pending],
   );
   const selectedMethod = method?.id ?? methodId;
-  const isExpress = selectedMethod === "multicaixa-express";
 
   const message = useMemo(
     () =>
@@ -250,89 +250,49 @@ function PayMethodPage() {
   return (
     <Layout hideHeader hideBottomNav>
       <div className="mx-auto max-w-5xl px-3 pb-28 pt-4 md:px-0 md:pb-10">
-        {/* Brand bar */}
-        <div
-          className="overflow-hidden rounded-2xl"
-          style={{
-            background: isExpress
-              ? "linear-gradient(90deg,#f59e0b,#f97316)"
-              : "linear-gradient(90deg,#111827,#374151)",
-          }}
-        >
-          <div className="flex items-center justify-center gap-2 px-4 py-3 text-white">
-            {method?.image ? (
-              <span className="grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-white/90">
-                <img
-                  src={method.image}
-                  alt={method.label}
-                  className="max-h-7 max-w-7 object-contain"
-                />
-              </span>
-            ) : (
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-white/25 text-sm font-black">
-                ✳
-              </span>
-            )}
-            <span className="font-display text-xl font-black tracking-tight">
-              {method?.label ?? "Pagamento"}
+        {/* Cabeçalho simples e profissional */}
+        <header className="flex items-center gap-3 border-b border-border pb-4">
+          <button
+            onClick={() => window.history.back()}
+            aria-label="Voltar"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-border text-muted-foreground hover:bg-muted"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          {method?.image ? (
+            <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-xl bg-white ring-1 ring-border">
+              <img
+                src={method.image}
+                alt={method.label}
+                className="max-h-9 max-w-9 object-contain"
+              />
             </span>
+          ) : (
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-muted">
+              <ShieldCheck className="h-5 w-5" />
+            </span>
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-black">
+              {method?.label ?? "Pagamento"}
+            </p>
+            <p className="truncate text-[11px] text-muted-foreground">
+              Pedido {pending.code}
+            </p>
           </div>
-        </div>
+          <div className="text-right">
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              Total
+            </p>
+            <p className="font-display text-lg font-black text-sale">
+              {formatKz(pending.total)}
+            </p>
+          </div>
+        </header>
 
         <div className="mt-4 grid gap-4 md:grid-cols-[minmax(0,380px)_1fr] md:items-start">
           <div className="space-y-4">
-            {isExpress ? (
-              <div
-                className="relative aspect-[16/10] overflow-hidden rounded-2xl p-4 text-white shadow-[var(--shadow-card)]"
-                style={{
-                  background:
-                    "radial-gradient(120% 120% at 20% 0%, #2f8fe0 0%, #1565c0 45%, #0b3f8f 100%)",
-                }}
-              >
-                <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full border border-white/20" />
-                <div className="absolute -right-16 top-6 h-48 w-48 rounded-full border border-white/10" />
-                <div className="flex items-start justify-between">
-                  <span className="font-display text-xl font-black tracking-tight">
-                    BAI
-                  </span>
-                  <span className="text-[10px] font-semibold uppercase tracking-widest opacity-80">
-                    Débito
-                  </span>
-                </div>
-                <div className="mt-4 h-8 w-11 rounded-md bg-gradient-to-br from-yellow-200 to-yellow-500" />
-                <div className="mt-4 font-mono text-base tracking-[0.18em] opacity-95">
-                  •••• •••• •••• ••••
-                </div>
-                <div className="mt-3 flex items-end justify-between text-[10px] uppercase tracking-widest opacity-85">
-                  <span>
-                    Válido até
-                    <br />
-                    <span className="text-sm tracking-normal">07/29</span>
-                  </span>
-                  <span className="text-sm normal-case tracking-normal opacity-90">
-                    {method?.label ?? "Multicaixa Express"}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-foreground p-5 text-background shadow-[var(--shadow-card)]">
-                <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">
-                  Pagamento seguro
-                </p>
-                <p className="mt-2 font-display text-2xl font-black">
-                  {method?.label ?? "Pagamento"}
-                </p>
-                <p className="mt-1 text-xs opacity-80">{method?.desc}</p>
-                <div className="absolute bottom-4 left-5 right-5 flex items-end justify-between">
-                  <span className="font-mono text-sm tracking-widest opacity-80">
-                    {pending.code}
-                  </span>
-                  <span className="font-display text-lg font-black">
-                    {formatKz(pending.total)}
-                  </span>
-                </div>
-              </div>
-            )}
+
 
             <div className="rounded-2xl bg-card p-4 shadow-[var(--shadow-card)]">
               <h2 className="flex items-center gap-2 text-sm font-black">
@@ -549,7 +509,7 @@ function CopyRow({
       </p>
       <div className="mt-1 flex items-start gap-2 rounded-xl border border-border bg-muted/40 px-3 py-2.5">
         <span
-          className={`min-w-0 flex-1 text-sm ${mono ? "font-mono tracking-wide" : ""} ${highlight ? "text-base font-black text-sale" : "font-semibold"} ${multiline ? "line-clamp-3" : "truncate"}`}
+          className={`selectable min-w-0 flex-1 text-sm ${mono ? "font-mono tracking-wide" : ""} ${highlight ? "text-base font-black text-sale" : "font-semibold"} ${multiline ? "line-clamp-3" : "truncate"}`}
         >
           {value}
         </span>

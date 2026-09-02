@@ -1,3 +1,4 @@
+import type { ShippingQuote } from "@/lib/logistics-store";
 /**
  * Dados do usuário no Firestore.
  *  users/{uid}                       perfil
@@ -54,6 +55,7 @@ export type CheckoutDraft = {
   address?: Partial<SavedAddress>;
   paymentMethod?: string | null;
   coupon?: string | null;
+  shipping?: ShippingQuote | null;
 };
 
 export type InterestEvent = {

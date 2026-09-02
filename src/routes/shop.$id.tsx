@@ -32,7 +32,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/shop/$id")({
   loader: ({ params }) => ({ id: params.id, shop: getShop(params.id) }),
   head: ({ params, loaderData }) => {
-    const shop = loaderData.shop;
+    const shop = loaderData?.shop;
     const name = shop?.name ?? "Loja";
     const desc = seoDescription(
       shop?.description,

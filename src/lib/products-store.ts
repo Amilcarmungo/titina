@@ -1,14 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { type Product } from "@/lib/products";
 import { attachSync } from "@/lib/firebase/sync-store";
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  setDoc,
-} from "firebase/firestore";
-import { getDb } from "@/lib/firebase/client";
+import { ensureDb } from "@/lib/firebase/client";
 import { canSyncSiteData } from "@/lib/firebase/roles";
 import { stripUndefined } from "@/lib/firebase/sanitize";
 
@@ -66,15 +59,19 @@ const sync = attachSync<Product[]>(
 
 let loading = false;
 
-function subscribe() {
+async function subscribe() {
   if (typeof window === "undefined" || loading) return;
-  const db = getDb();
+  loading = true;
+  const [db, { collection, getDocs }] = await Promise.all([
+    ensureDb(),
+    import("firebase/firestore"),
+  ]);
   if (!db) {
+    loading = false;
     status = "error";
     notify();
     return;
   }
-  loading = true;
   getDocs(collection(db, "products"))
     .then((snap) => {
       list = snap.docs.map((d) => ({ ...(d.data() as Product), id: d.id }));
@@ -91,17 +88,20 @@ function subscribe() {
     });
 }
 
-if (typeof window !== "undefined") subscribe();
+if (typeof window !== "undefined") void subscribe();
 
 /** Tenta ligar de novo ao banco (usado pelos estados de erro na UI). */
 export function retryProducts() {
   status = "loading";
   notify();
-  subscribe();
+  void subscribe();
 }
 
 async function publishProduct(product: Product): Promise<void> {
-  const db = getDb();
+  const [db, { doc, setDoc }] = await Promise.all([
+    ensureDb(),
+    import("firebase/firestore"),
+  ]);
   if (!db) throw new Error("Sem ligação ao banco de dados.");
   if (!canSyncSiteData())
     throw new Error(
@@ -161,7 +161,10 @@ export const productActions = {
   async remove(id: string) {
     list = list.filter((p) => p.id !== id);
     emit();
-    const db = getDb();
+    const [db, { deleteDoc, doc }] = await Promise.all([
+      ensureDb(),
+      import("firebase/firestore"),
+    ]);
     if (db && canSyncSiteData()) await deleteDoc(doc(db, "products", id));
   },
   moveCategory(id: string, category: string, subcategory?: string) {

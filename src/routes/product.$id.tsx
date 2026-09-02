@@ -45,12 +45,11 @@ import {
   productUrl,
   SHARE_IMAGE,
   seoDescription,
-  shareText,
   SITE_NAME,
 } from "@/lib/site";
 
 export const Route = createFileRoute("/product/$id")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { variant?: string } => ({
     variant: typeof search.variant === "string" ? search.variant : undefined,
   }),
   loader: ({ params }) => getProduct(params.id) ?? null,
@@ -64,7 +63,7 @@ export const Route = createFileRoute("/product/$id")({
     }
     const url = productUrl(params.id);
     const image = absoluteUrl(loaderData.image);
-    const shareImage = SHARE_IMAGE;
+    const shareImage = loaderData.image ? image : SHARE_IMAGE;
     const price = loaderData.price;
     const desc = seoDescription(
       loaderData.description,
@@ -81,6 +80,9 @@ export const Route = createFileRoute("/product/$id")({
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
         { property: "og:image", content: shareImage },
+        { property: "og:image:secure_url", content: shareImage },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
         { property: "og:image:alt", content: loaderData.name },
         { property: "product:price:amount", content: String(price) },
         { property: "product:price:currency", content: "AOA" },
@@ -377,7 +379,7 @@ function ProductPage() {
 
             <div className="border-t border-border pt-4">
               <h3 className="font-display text-base font-bold">Descrição</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              <p className="selectable mt-2 text-sm leading-relaxed text-muted-foreground">
                 {product.description}
               </p>
             </div>
@@ -445,7 +447,6 @@ function ProductPage() {
                   const target = {
                     url: productUrl(product.id),
                     title: product.name,
-                    text: shareText(product.name, product.description),
                     image: mainImage,
                   };
                   if (!(await nativeShare(target))) setShareOpen(true);
@@ -596,7 +597,7 @@ function ProductPage() {
 
         <div className="mt-2 bg-card px-4 py-4">
           <h3 className="font-display text-lg font-bold">Descrição</h3>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          <p className="selectable mt-2 text-sm leading-relaxed text-muted-foreground">
             {product.description}
           </p>
         </div>
@@ -659,7 +660,6 @@ function ProductPage() {
         target={{
           url: productUrl(product.id),
           title: product.name,
-          text: shareText(product.name, product.description),
           image: mainImage,
         }}
       />

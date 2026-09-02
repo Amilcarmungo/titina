@@ -17,6 +17,8 @@ import {
   RotateCcw,
   Zap,
   ChevronRight,
+  ChevronLeft,
+  Sparkles,
 } from "lucide-react";
 import supportLogo from "../../img/suportlogo.png";
 
@@ -167,210 +169,264 @@ function SupportPage() {
 
   return (
     <Layout hideHeader hideBottomNav>
-      <div className="flex min-h-screen flex-col bg-muted/30">
-        {/* Header */}
-        <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-border bg-background px-3 py-3">
-          <button
-            onClick={() => window.history.back()}
-            aria-label="Voltar"
-            className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted"
-          >
-            <span className="text-xl leading-none">‹</span>
-          </button>
-          <div className="min-w-0 flex-1 text-center">
-            <p className="font-display text-base font-black tracking-tight">
-              Suporte Bazarixy
-            </p>
-            <p className="text-[11px] text-muted-foreground">
-              Assistente Jilda IA · online
-            </p>
-          </div>
-          <a
-            href={WHATSAPP}
-            target="_blank"
-            rel="noreferrer"
-            className="text-xs font-bold text-sale"
-          >
-            Humano
-          </a>
-        </header>
-
-        <div className="mx-auto w-full max-w-3xl flex-1 px-3 pb-40 pt-4 md:pb-44">
-          {/* Conversation */}
-          <div className="space-y-4">
-            {messages.map((m, i) =>
-              m.role === "assistant" ? (
-                <div key={i} className="flex items-start gap-2.5">
-                  <img
-                    src={supportLogo}
-                    alt="Jilda IA"
-                    className="h-9 w-9 shrink-0 rounded-full bg-background object-contain ring-1 ring-border"
-                  />
-                  <div className="max-w-[85%] whitespace-pre-line rounded-2xl rounded-tl-sm bg-background px-4 py-3 text-sm shadow-[var(--shadow-card)]">
-                    {m.content}
-                  </div>
-                </div>
-              ) : (
-                <div key={i} className="flex justify-end">
-                  <div className="max-w-[85%] whitespace-pre-line rounded-2xl rounded-tr-sm bg-primary px-4 py-3 text-sm text-primary-foreground">
-                    {m.content}
-                  </div>
-                </div>
-              ),
-            )}
-            {loading && (
-              <div className="flex items-start gap-2.5">
-                <img
-                  src={supportLogo}
-                  alt=""
-                  className="h-9 w-9 shrink-0 rounded-full bg-background object-contain ring-1 ring-border"
-                />
-                <div className="rounded-2xl rounded-tl-sm bg-background px-4 py-3 text-sm text-muted-foreground shadow-[var(--shadow-card)]">
-                  A escrever…
-                </div>
-              </div>
-            )}
-            <div ref={endRef} />
-          </div>
-
-          {/* Shortcut cards */}
-          <div className="no-scrollbar mt-4 flex gap-2 overflow-x-auto">
-            {SHORTCUTS.map((s) => (
-              <button
-                key={s.label}
-                onClick={() => send(s.prompt)}
-                className="flex w-[104px] shrink-0 flex-col items-center gap-1.5 rounded-2xl bg-background px-2 py-3 text-center shadow-[var(--shadow-card)] transition hover:-translate-y-0.5"
-              >
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-muted">
-                  <s.icon className="h-4 w-4" />
-                </span>
-                <span className="text-[11px] font-bold leading-tight">
-                  {s.label}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {/* FAQ */}
-          <section className="mt-3 rounded-2xl bg-background p-3 shadow-[var(--shadow-card)]">
-            <div className="flex items-center gap-3 border-b border-border pb-2">
-              <div className="no-scrollbar flex flex-1 items-center gap-3 overflow-x-auto">
-                {FAQ_TABS.map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => {
-                      setTab(t);
-                      setOpenFaq(null);
-                    }}
-                    className={`whitespace-nowrap text-xs font-bold ${tab === t ? "text-sale" : "text-muted-foreground"}`}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => setFaqOpen((v) => !v)}
-                className="inline-flex items-center gap-1 text-xs font-bold text-sale"
-              >
-                Mais{" "}
-                {faqOpen ? (
-                  <ChevronUp className="h-3.5 w-3.5" />
-                ) : (
-                  <ChevronDown className="h-3.5 w-3.5" />
-                )}
-              </button>
+      <div className="min-h-screen bg-background text-foreground">
+        <header className="sticky top-0 z-30 border-b border-border bg-background">
+          <div className="mx-auto flex w-full max-w-5xl items-center gap-3 px-3 py-3 md:px-6">
+            <button
+              onClick={() => window.history.back()}
+              aria-label="Voltar"
+              className="grid h-9 w-9 place-items-center border border-border bg-transparent text-muted-foreground transition hover:text-foreground"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <div className="relative">
+              <img
+                src={supportLogo}
+                alt="Jilda IA"
+                className="h-10 w-10 border border-border bg-background object-contain"
+              />
+              <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 border-2 border-background bg-emerald-500" />
             </div>
-
-            {faqOpen && (
-              <ul className="divide-y divide-border">
-                {FAQS[tab].map((f, i) => (
-                  <li key={f.q}>
-                    <button
-                      onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                      className="flex w-full items-center gap-3 py-3 text-left"
-                    >
-                      <span
-                        className={`text-sm font-black ${i === 0 ? "text-sale" : i === 1 ? "text-amber-500" : "text-muted-foreground"}`}
-                      >
-                        {i + 1}
-                      </span>
-                      <span className="min-w-0 flex-1 text-sm">{f.q}</span>
-                      <ChevronRight
-                        className={`h-4 w-4 shrink-0 text-muted-foreground transition ${openFaq === i ? "rotate-90" : ""}`}
-                      />
-                    </button>
-                    {openFaq === i && (
-                      <div className="pb-3 pl-7 pr-2">
-                        <p className="text-xs leading-relaxed text-muted-foreground">
-                          {f.a}
-                        </p>
-                        <button
-                          onClick={() => send(f.q)}
-                          className="mt-2 rounded-full border border-border px-3 py-1 text-[11px] font-bold hover:bg-muted"
-                        >
-                          Perguntar à Jilda IA
-                        </button>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          {/* Contact channels */}
-          <section className="mt-3 grid gap-2 sm:grid-cols-3">
+            <div className="min-w-0 flex-1">
+              <p className="font-display text-[15px] font-black leading-tight tracking-tight">
+                Jilda IA
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                Assistente Bazarixy
+              </p>
+            </div>
             <a
               href={WHATSAPP}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-2.5 rounded-2xl bg-background p-3 shadow-[var(--shadow-card)]"
+              className="inline-flex items-center gap-1.5 border border-emerald-500 bg-emerald-500 px-3 py-2 text-[11px] font-black text-white transition hover:opacity-90 md:px-4 md:text-xs"
             >
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-500 text-white">
-                <MessageCircle className="h-4 w-4" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-xs font-black">WhatsApp</span>
-                <span className="block truncate text-[11px] text-muted-foreground">
-                  {PHONE}
-                </span>
-              </span>
+              <MessageCircle className="h-3.5 w-3.5" />
+              Falar com humano
             </a>
-            <a
-              href={INSTAGRAM}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2.5 rounded-2xl bg-background p-3 shadow-[var(--shadow-card)]"
+          </div>
+        </header>
+
+        <div className="mx-auto grid w-full max-w-5xl gap-5 px-3 pb-40 pt-5 md:grid-cols-[minmax(0,1fr)_320px] md:px-6 md:pb-10">
+          <section className="flex min-h-[70vh] flex-col border border-border bg-background md:h-[calc(100vh-9rem)]">
+            <div className="hidden items-center gap-2 border-b border-border px-5 py-3 md:flex">
+              <Sparkles className="h-4 w-4 text-sale" />
+              <p className="text-xs font-black uppercase tracking-wide text-muted-foreground">
+                Conversa
+              </p>
+            </div>
+
+            <div className="flex-1 space-y-4 overflow-y-auto px-3 py-4 md:px-5">
+              {messages.map((m, i) =>
+                m.role === "assistant" ? (
+                  <div key={i} className="flex items-end gap-2.5">
+                    <img
+                      src={supportLogo}
+                      alt="Jilda IA"
+                      className="h-8 w-8 shrink-0 border border-border bg-background object-contain"
+                    />
+                    <div className="max-w-[85%] whitespace-pre-line border border-border bg-background px-4 py-3 text-sm leading-relaxed">
+                      {m.content}
+                    </div>
+                  </div>
+                ) : (
+                  <div key={i} className="flex justify-end">
+                    <div className="max-w-[85%] whitespace-pre-line bg-foreground px-4 py-3 text-sm leading-relaxed text-background">
+                      {m.content}
+                    </div>
+                  </div>
+                ),
+              )}
+              {loading && (
+                <div className="flex items-end gap-2.5">
+                  <img
+                    src={supportLogo}
+                    alt=""
+                    className="h-8 w-8 shrink-0 border border-border bg-background object-contain"
+                  />
+                  <div className="flex items-center gap-1 border border-border bg-background px-4 py-3.5">
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:-0.2s]" />
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/60 [animation-delay:-0.1s]" />
+                    <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/60" />
+                  </div>
+                </div>
+              )}
+              <div ref={endRef} />
+            </div>
+
+            <div className="no-scrollbar flex gap-2 overflow-x-auto border-t border-border px-3 py-3 md:px-5">
+              {SHORTCUTS.map((s) => (
+                <button
+                  key={s.label}
+                  onClick={() => send(s.prompt)}
+                  className="group inline-flex shrink-0 items-center gap-2 border border-border bg-transparent px-3 py-2 text-[11px] font-bold transition hover:border-foreground"
+                >
+                  <span className="grid h-6 w-6 place-items-center border border-border bg-transparent text-foreground">
+                    <s.icon className="h-3.5 w-3.5" />
+                  </span>
+                  {s.label}
+                </button>
+              ))}
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                void send(input);
+              }}
+              className="hidden items-end gap-2 border-t border-border px-5 py-3 md:flex"
             >
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-amber-500 to-pink-500 text-white">
-                <Instagram className="h-4 w-4" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-xs font-black">Instagram</span>
-                <span className="block truncate text-[11px] text-muted-foreground">
-                  @bazarixy
-                </span>
-              </span>
-            </a>
-            <a
-              href="tel:+244934033532"
-              className="flex items-center gap-2.5 rounded-2xl bg-background p-3 shadow-[var(--shadow-card)]"
-            >
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-foreground text-background">
-                <Phone className="h-4 w-4" />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-xs font-black">Telefone</span>
-                <span className="block truncate text-[11px] text-muted-foreground">
-                  {PHONE}
-                </span>
-              </span>
-            </a>
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    void send(input);
+                  }
+                }}
+                rows={1}
+                placeholder="Escreva a sua mensagem…"
+                className="max-h-32 min-h-11 flex-1 resize-none border border-border bg-background px-4 py-3 text-sm outline-none placeholder:text-muted-foreground focus:border-foreground"
+              />
+              <button
+                type="submit"
+                disabled={!input.trim() || loading}
+                aria-label="Enviar"
+                className="grid h-11 w-11 shrink-0 place-items-center bg-foreground text-background transition hover:opacity-90 disabled:opacity-40"
+              >
+                <Send className="h-4 w-4" />
+              </button>
+            </form>
           </section>
+
+          <aside className="space-y-4 md:h-[calc(100vh-9rem)] md:overflow-y-auto md:pr-1">
+            <section className="border border-border bg-background p-4">
+              <p className="mb-3 text-xs font-black uppercase tracking-wide text-muted-foreground">
+                Fale connosco
+              </p>
+              <div className="grid gap-2 sm:grid-cols-3 md:grid-cols-1">
+                <a
+                  href={WHATSAPP}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 border border-border p-3 transition hover:border-foreground"
+                >
+                  <span className="grid h-10 w-10 place-items-center bg-emerald-500 text-white">
+                    <MessageCircle className="h-4.5 w-4.5" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs font-black">WhatsApp</span>
+                    <span className="block truncate text-[11px] text-muted-foreground">
+                      {PHONE}
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href={INSTAGRAM}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-3 border border-border p-3 transition hover:border-foreground"
+                >
+                  <span className="grid h-10 w-10 place-items-center bg-gradient-to-br from-amber-400 via-pink-500 to-purple-600 text-white">
+                    <Instagram className="h-4.5 w-4.5" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs font-black">Instagram</span>
+                    <span className="block truncate text-[11px] text-muted-foreground">
+                      @bazarixy
+                    </span>
+                  </span>
+                </a>
+                <a
+                  href="tel:+244934033532"
+                  className="flex items-center gap-3 border border-border p-3 transition hover:border-foreground"
+                >
+                  <span className="grid h-10 w-10 place-items-center bg-foreground text-background">
+                    <Phone className="h-4.5 w-4.5" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-xs font-black">Telefone</span>
+                    <span className="block truncate text-[11px] text-muted-foreground">
+                      {PHONE}
+                    </span>
+                  </span>
+                </a>
+              </div>
+            </section>
+
+            <section className="border border-border bg-background p-4">
+              <div className="flex items-center gap-3 border-b border-border pb-2">
+                <div className="no-scrollbar flex flex-1 items-center gap-3 overflow-x-auto">
+                  {FAQ_TABS.map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => {
+                        setTab(t);
+                        setOpenFaq(null);
+                      }}
+                      className={`whitespace-nowrap px-2.5 py-1 text-xs font-bold transition ${
+                        tab === t
+                          ? "bg-foreground text-background"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setFaqOpen((v) => !v)}
+                  aria-label="Mostrar perguntas"
+                  className="grid h-7 w-7 place-items-center text-muted-foreground hover:text-foreground"
+                >
+                  {faqOpen ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+
+              {faqOpen && (
+                <ul className="divide-y divide-border">
+                  {FAQS[tab].map((f, i) => (
+                    <li key={f.q}>
+                      <button
+                        onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                        className="flex w-full items-center gap-3 py-3 text-left"
+                      >
+                        <span className="grid h-6 w-6 shrink-0 place-items-center border border-border text-[11px] font-black text-muted-foreground">
+                          {i + 1}
+                        </span>
+                        <span className="min-w-0 flex-1 text-sm">{f.q}</span>
+                        <ChevronRight
+                          className={`h-4 w-4 shrink-0 text-muted-foreground transition ${openFaq === i ? "rotate-90 text-foreground" : ""}`}
+                        />
+                      </button>
+                      {openFaq === i && (
+                        <div className="pb-3 pl-9 pr-2">
+                          <p className="text-xs leading-relaxed text-muted-foreground">
+                            {f.a}
+                          </p>
+                          <button
+                            onClick={() => send(f.q)}
+                            className="mt-2 inline-flex items-center gap-1.5 border border-foreground px-3 py-1.5 text-[11px] font-bold text-foreground transition hover:bg-foreground hover:text-background"
+                          >
+                            <Sparkles className="h-3 w-3" />
+                            Perguntar à Jilda IA
+                          </button>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </aside>
         </div>
 
-        {/* Composer */}
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background px-3 py-2.5">
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background px-3 py-2.5 md:hidden">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -388,14 +444,14 @@ function SupportPage() {
                 }
               }}
               rows={1}
-              placeholder="Digite a sua mensagem aqui"
-              className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl bg-muted px-4 py-3 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-sale/40"
+              placeholder="Escreva a sua mensagem…"
+              className="max-h-32 min-h-11 flex-1 resize-none border border-border bg-background px-4 py-3 text-sm outline-none placeholder:text-muted-foreground focus:border-foreground"
             />
             <button
               type="submit"
               disabled={!input.trim() || loading}
               aria-label="Enviar"
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-strong text-white transition hover:opacity-90 disabled:opacity-40"
+              className="grid h-11 w-11 shrink-0 place-items-center bg-foreground text-background transition hover:opacity-90 disabled:opacity-40"
             >
               <Send className="h-4 w-4" />
             </button>

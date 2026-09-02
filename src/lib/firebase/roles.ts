@@ -5,9 +5,7 @@
  *   staff/{uid} = { role: "admin" | "gerente" | "atendente", shopId?: string, name?: string, active: boolean }
  */
 import { useSyncExternalStore } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
-
-import { getDb, getFirebaseAuth } from "./client";
+import { ensureDb, getFirebaseAuth } from "./client";
 
 export type StaffRole = "admin" | "gerente" | "atendente";
 
@@ -53,6 +51,7 @@ let state: StaffState = { staff: null, loading: true };
 const server: StaffState = { staff: null, loading: true };
 const listeners = new Set<() => void>();
 let unsubscribe: (() => void) | null = null;
+let watchToken = 0;
 
 function emit(next: StaffState) {
   state = next;
@@ -61,18 +60,28 @@ function emit(next: StaffState) {
 
 /** Liga/desliga a observação da função do utilizador autenticado. */
 export function watchStaff(uid: string | null) {
+  watchToken++;
   unsubscribe?.();
   unsubscribe = null;
   if (!uid) {
     emit({ staff: null, loading: false });
     return;
   }
-  const db = getDb();
+  emit({ staff: null, loading: true });
+  void startWatch(uid);
+}
+
+async function startWatch(uid: string) {
+  const token = ++watchToken;
+  const [db, { doc, onSnapshot }] = await Promise.all([
+    ensureDb(),
+    import("firebase/firestore"),
+  ]);
+  if (token !== watchToken) return;
   if (!db) {
     emit({ staff: null, loading: false });
     return;
   }
-  emit({ staff: null, loading: true });
   unsubscribe = onSnapshot(
     doc(db, "staff", uid),
     (snap) => {

@@ -73,6 +73,7 @@ export function recordProductView(product: Product) {
       ...current.views,
       [product.id]: (current.views[product.id] ?? 0) + 1,
     },
+    searches: current.searches,
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   window.dispatchEvent(new Event(SIGNAL_EVENT));

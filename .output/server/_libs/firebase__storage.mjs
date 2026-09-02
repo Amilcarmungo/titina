@@ -1,4 +1,4 @@
-import { E as getDefaultEmulatorHostnameAndPort, M as isCloudWorkstation, V as pingServer, c as _isFirebaseServerApp, g as Component, k as getModularInstance, l as _registerComponent, o as SDK_VERSION, p as registerVersion, s as _getProvider, u as getApp, x as createMockUserToken, y as FirebaseError } from "./@firebase/analytics+[...].mjs";
+import { D as createMockUserToken, F as getModularInstance, M as getDefaultEmulatorHostnameAndPort, R as isCloudWorkstation, S as Component, T as FirebaseError, d as _getProvider, f as _isFirebaseServerApp, g as getApp, p as _registerComponent, q as pingServer, s as SDK_VERSION, y as registerVersion } from "./@firebase/analytics+[...].mjs";
 //#region node_modules/@firebase/storage/dist/index.esm.js
 /**
 * @license
@@ -1240,6 +1240,33 @@ function toResourceString(metadata, mappings) {
 * limitations under the License.
 */
 /**
+* @fileoverview Documentation for the listOptions and listResult format
+*/
+var PREFIXES_KEY = "prefixes";
+var ITEMS_KEY = "items";
+function fromBackendResponse(service, bucket, resource) {
+	const listResult = {
+		prefixes: [],
+		items: [],
+		nextPageToken: resource["nextPageToken"]
+	};
+	if (resource[PREFIXES_KEY]) for (const path of resource[PREFIXES_KEY]) {
+		const pathWithoutTrailingSlash = path.replace(/\/$/, "");
+		const reference = service._makeStorageReference(new Location(bucket, pathWithoutTrailingSlash));
+		listResult.prefixes.push(reference);
+	}
+	if (resource[ITEMS_KEY]) for (const item of resource[ITEMS_KEY]) {
+		const reference = service._makeStorageReference(new Location(bucket, item["name"]));
+		listResult.items.push(reference);
+	}
+	return listResult;
+}
+function fromResponseString(service, bucket, resourceString) {
+	const obj = jsonObjectOrNull(resourceString);
+	if (obj === null) return null;
+	return fromBackendResponse(service, bucket, obj);
+}
+/**
 * Contains a fully specified request.
 *
 * @param I - the type of the backend's network response.
@@ -1294,6 +1321,14 @@ function metadataHandler(service, mappings) {
 	}
 	return handler;
 }
+function listHandler(service, bucket) {
+	function handler(xhr, text) {
+		const listResult = fromResponseString(service, bucket, text);
+		handlerCheck(listResult !== null);
+		return listResult;
+	}
+	return handler;
+}
 function downloadUrlHandler(service, mappings) {
 	function handler(xhr, text) {
 		const metadata = fromResourceString(service, text, mappings);
@@ -1335,11 +1370,60 @@ function getMetadata$2(service, location, mappings) {
 	requestInfo.errorHandler = objectErrorHandler(location);
 	return requestInfo;
 }
+function list$2(service, location, delimiter, pageToken, maxResults) {
+	const urlParams = {};
+	if (location.isRoot) urlParams["prefix"] = "";
+	else urlParams["prefix"] = location.path + "/";
+	if (delimiter.length > 0) urlParams["delimiter"] = delimiter;
+	if (pageToken) urlParams["pageToken"] = pageToken;
+	if (maxResults) urlParams["maxResults"] = maxResults;
+	const url = makeUrl(location.bucketOnlyServerUrl(), service.host, service._protocol);
+	const method = "GET";
+	const timeout = service.maxOperationRetryTime;
+	const requestInfo = new RequestInfo(url, method, listHandler(service, location.bucket), timeout);
+	requestInfo.urlParams = urlParams;
+	requestInfo.errorHandler = sharedErrorHandler(location);
+	return requestInfo;
+}
+function getBytes$1(service, location, maxDownloadSizeBytes) {
+	const url = makeUrl(location.fullServerUrl(), service.host, service._protocol) + "?alt=media";
+	const method = "GET";
+	const timeout = service.maxOperationRetryTime;
+	const requestInfo = new RequestInfo(url, method, (_, data) => data, timeout);
+	requestInfo.errorHandler = objectErrorHandler(location);
+	if (maxDownloadSizeBytes !== void 0) {
+		requestInfo.headers["Range"] = `bytes=0-${maxDownloadSizeBytes}`;
+		requestInfo.successCodes = [200, 206];
+	}
+	return requestInfo;
+}
 function getDownloadUrl(service, location, mappings) {
 	const url = makeUrl(location.fullServerUrl(), service.host, service._protocol);
 	const method = "GET";
 	const timeout = service.maxOperationRetryTime;
 	const requestInfo = new RequestInfo(url, method, downloadUrlHandler(service, mappings), timeout);
+	requestInfo.errorHandler = objectErrorHandler(location);
+	return requestInfo;
+}
+function updateMetadata$2(service, location, metadata, mappings) {
+	const url = makeUrl(location.fullServerUrl(), service.host, service._protocol);
+	const method = "PATCH";
+	const body = toResourceString(metadata, mappings);
+	const headers = { "Content-Type": "application/json; charset=utf-8" };
+	const timeout = service.maxOperationRetryTime;
+	const requestInfo = new RequestInfo(url, method, metadataHandler(service, mappings), timeout);
+	requestInfo.headers = headers;
+	requestInfo.body = body;
+	requestInfo.errorHandler = objectErrorHandler(location);
+	return requestInfo;
+}
+function deleteObject$2(service, location) {
+	const url = makeUrl(location.fullServerUrl(), service.host, service._protocol);
+	const method = "DELETE";
+	const timeout = service.maxOperationRetryTime;
+	function handler(_xhr, _text) {}
+	const requestInfo = new RequestInfo(url, method, handler, timeout);
+	requestInfo.successCodes = [200, 204];
 	requestInfo.errorHandler = objectErrorHandler(location);
 	return requestInfo;
 }
@@ -1540,6 +1624,24 @@ function continueResumableUpload(location, service, url, blob, chunkSize, mappin
 * limitations under the License.
 */
 /**
+* An event that is triggered on a task.
+* @internal
+*/
+var TaskEvent = { 
+/**
+* For this event,
+* <ul>
+*   <li>The `next` function is triggered on progress updates and when the
+*       task is paused/resumed with an `UploadTaskSnapshot` as the first
+*       argument.</li>
+*   <li>The `error` function is triggered if the upload is canceled or fails
+*       for another reason.</li>
+*   <li>The `complete` function is triggered if the upload completes
+*       successfully.</li>
+* </ul>
+*/
+STATE_CHANGED: "state_changed" };
+/**
 * Represents the current state of a running upload.
 * @internal
 */
@@ -1716,6 +1818,22 @@ var XhrTextConnection = class extends XhrConnection {
 };
 function newTextConnection() {
 	return new XhrTextConnection();
+}
+var XhrBytesConnection = class extends XhrConnection {
+	initXhr() {
+		this.xhr_.responseType = "arraybuffer";
+	}
+};
+function newBytesConnection() {
+	return new XhrBytesConnection();
+}
+var XhrBlobConnection = class extends XhrConnection {
+	initXhr() {
+		this.xhr_.responseType = "blob";
+	}
+};
+function newBlobConnection() {
+	return new XhrBlobConnection();
 }
 /**
 * @license
@@ -2215,6 +2333,43 @@ var Reference = class Reference {
 	}
 };
 /**
+* Download the bytes at the object's location.
+* @returns A Promise containing the downloaded bytes.
+*/
+function getBytesInternal(ref, maxDownloadSizeBytes) {
+	ref._throwIfRoot("getBytes");
+	const requestInfo = getBytes$1(ref.storage, ref._location, maxDownloadSizeBytes);
+	return ref.storage.makeRequestWithTokens(requestInfo, newBytesConnection).then((bytes) => maxDownloadSizeBytes !== void 0 ? bytes.slice(0, maxDownloadSizeBytes) : bytes);
+}
+/**
+* Download the bytes at the object's location.
+* @returns A Promise containing the downloaded blob.
+*/
+function getBlobInternal(ref, maxDownloadSizeBytes) {
+	ref._throwIfRoot("getBlob");
+	const requestInfo = getBytes$1(ref.storage, ref._location, maxDownloadSizeBytes);
+	return ref.storage.makeRequestWithTokens(requestInfo, newBlobConnection).then((blob) => maxDownloadSizeBytes !== void 0 ? blob.slice(0, maxDownloadSizeBytes) : blob);
+}
+/**
+* Uploads data to this object's location.
+* The upload is not resumable.
+*
+* @param ref - StorageReference where data should be uploaded.
+* @param data - The data to upload.
+* @param metadata - Metadata for the newly uploaded data.
+* @returns A Promise containing an UploadResult
+*/
+function uploadBytes$1(ref, data, metadata) {
+	ref._throwIfRoot("uploadBytes");
+	const requestInfo = multipartUpload(ref.storage, ref._location, getMappings(), new FbsBlob(data, true), metadata);
+	return ref.storage.makeRequestWithTokens(requestInfo, newTextConnection).then((finalMetadata) => {
+		return {
+			metadata: finalMetadata,
+			ref
+		};
+	});
+}
+/**
 * Uploads data to this object's location.
 * The upload can be paused and resumed, and exposes progress updates.
 * @public
@@ -2226,6 +2381,119 @@ var Reference = class Reference {
 function uploadBytesResumable$1(ref, data, metadata) {
 	ref._throwIfRoot("uploadBytesResumable");
 	return new UploadTask(ref, new FbsBlob(data), metadata);
+}
+/**
+* Uploads a string to this object's location.
+* The upload is not resumable.
+* @public
+* @param ref - StorageReference where string should be uploaded.
+* @param value - The string to upload.
+* @param format - The format of the string to upload.
+* @param metadata - Metadata for the newly uploaded string.
+* @returns A Promise containing an UploadResult
+*/
+function uploadString$1(ref, value, format = StringFormat.RAW, metadata) {
+	ref._throwIfRoot("uploadString");
+	const data = dataFromString(format, value);
+	const metadataClone = { ...metadata };
+	if (metadataClone["contentType"] == null && data.contentType != null) metadataClone["contentType"] = data.contentType;
+	return uploadBytes$1(ref, data.data, metadataClone);
+}
+/**
+* List all items (files) and prefixes (folders) under this storage reference.
+*
+* This is a helper method for calling list() repeatedly until there are
+* no more results. The default pagination size is 1000.
+*
+* Note: The results may not be consistent if objects are changed while this
+* operation is running.
+*
+* Warning: listAll may potentially consume too many resources if there are
+* too many results.
+* @public
+* @param ref - StorageReference to get list from.
+*
+* @returns A Promise that resolves with all the items and prefixes under
+*      the current storage reference. `prefixes` contains references to
+*      sub-directories and `items` contains references to objects in this
+*      folder. `nextPageToken` is never returned.
+*/
+function listAll$1(ref) {
+	const accumulator = {
+		prefixes: [],
+		items: []
+	};
+	return listAllHelper(ref, accumulator).then(() => accumulator);
+}
+/**
+* Separated from listAll because async functions can't use "arguments".
+* @param ref
+* @param accumulator
+* @param pageToken
+*/
+async function listAllHelper(ref, accumulator, pageToken) {
+	const nextPage = await list$1(ref, { pageToken });
+	accumulator.prefixes.push(...nextPage.prefixes);
+	accumulator.items.push(...nextPage.items);
+	if (nextPage.nextPageToken != null) await listAllHelper(ref, accumulator, nextPage.nextPageToken);
+}
+/**
+* List items (files) and prefixes (folders) under this storage reference.
+*
+* List API is only available for Firebase Rules Version 2.
+*
+* GCS is a key-blob store. Firebase Storage imposes the semantic of '/'
+* delimited folder structure.
+* Refer to GCS's List API if you want to learn more.
+*
+* To adhere to Firebase Rules's Semantics, Firebase Storage does not
+* support objects whose paths end with "/" or contain two consecutive
+* "/"s. Firebase Storage List API will filter these unsupported objects.
+* list() may fail if there are too many unsupported objects in the bucket.
+* @public
+*
+* @param ref - StorageReference to get list from.
+* @param options - See ListOptions for details.
+* @returns A Promise that resolves with the items and prefixes.
+*      `prefixes` contains references to sub-folders and `items`
+*      contains references to objects in this folder. `nextPageToken`
+*      can be used to get the rest of the results.
+*/
+function list$1(ref, options) {
+	if (options != null) {
+		if (typeof options.maxResults === "number") validateNumber("options.maxResults", 1, 1e3, options.maxResults);
+	}
+	const op = options || {};
+	const requestInfo = list$2(ref.storage, ref._location, "/", op.pageToken, op.maxResults);
+	return ref.storage.makeRequestWithTokens(requestInfo, newTextConnection);
+}
+/**
+* A `Promise` that resolves with the metadata for this object. If this
+* object doesn't exist or metadata cannot be retrieved, the promise is
+* rejected.
+* @public
+* @param ref - StorageReference to get metadata from.
+*/
+function getMetadata$1(ref) {
+	ref._throwIfRoot("getMetadata");
+	const requestInfo = getMetadata$2(ref.storage, ref._location, getMappings());
+	return ref.storage.makeRequestWithTokens(requestInfo, newTextConnection);
+}
+/**
+* Updates the metadata for this object.
+* @public
+* @param ref - StorageReference to update metadata for.
+* @param metadata - The new metadata for the object.
+*     Only values that have been explicitly set will be changed. Explicitly
+*     setting a value to null will remove the metadata.
+* @returns A `Promise` that resolves
+*     with the new metadata for this object.
+*     See `firebaseStorage.Reference.prototype.getMetadata`
+*/
+function updateMetadata$1(ref, metadata) {
+	ref._throwIfRoot("updateMetadata");
+	const requestInfo = updateMetadata$2(ref.storage, ref._location, metadata, getMappings());
+	return ref.storage.makeRequestWithTokens(requestInfo, newTextConnection);
 }
 /**
 * Returns the download URL for the given Reference.
@@ -2240,6 +2508,17 @@ function getDownloadURL$1(ref) {
 		if (url === null) throw noDownloadURL();
 		return url;
 	});
+}
+/**
+* Deletes the object at this location.
+* @public
+* @param ref - StorageReference for object to delete.
+* @returns A `Promise` that resolves if the deletion succeeds.
+*/
+function deleteObject$1(ref) {
+	ref._throwIfRoot("deleteObject");
+	const requestInfo = deleteObject$2(ref.storage, ref._location);
+	return ref.storage.makeRequestWithTokens(requestInfo, newTextConnection);
 }
 /**
 * Returns reference for object obtained by appending `childPath` to `ref`.
@@ -2467,6 +2746,51 @@ var STORAGE_TYPE = "storage";
 * limitations under the License.
 */
 /**
+* Downloads the data at the object's location. Returns an error if the object
+* is not found.
+*
+* To use this functionality, you have to whitelist your app's origin in your
+* Cloud Storage bucket. See also
+* https://cloud.google.com/storage/docs/configuring-cors
+*
+* @public
+* @param ref - StorageReference where data should be downloaded.
+* @param maxDownloadSizeBytes - If set, the maximum allowed size in bytes to
+* retrieve.
+* @returns A Promise containing the object's bytes
+*/
+function getBytes(ref, maxDownloadSizeBytes) {
+	ref = getModularInstance(ref);
+	return getBytesInternal(ref, maxDownloadSizeBytes);
+}
+/**
+* Uploads data to this object's location.
+* The upload is not resumable.
+* @public
+* @param ref - {@link StorageReference} where data should be uploaded.
+* @param data - The data to upload.
+* @param metadata - Metadata for the data to upload.
+* @returns A Promise containing an UploadResult
+*/
+function uploadBytes(ref, data, metadata) {
+	ref = getModularInstance(ref);
+	return uploadBytes$1(ref, data, metadata);
+}
+/**
+* Uploads a string to this object's location.
+* The upload is not resumable.
+* @public
+* @param ref - {@link StorageReference} where string should be uploaded.
+* @param value - The string to upload.
+* @param format - The format of the string to upload.
+* @param metadata - Metadata for the string to upload.
+* @returns A Promise containing an UploadResult
+*/
+function uploadString(ref, value, format, metadata) {
+	ref = getModularInstance(ref);
+	return uploadString$1(ref, value, format, metadata);
+}
+/**
 * Uploads data to this object's location.
 * The upload can be paused and resumed, and exposes progress updates.
 * @public
@@ -2480,6 +2804,79 @@ function uploadBytesResumable(ref, data, metadata) {
 	return uploadBytesResumable$1(ref, data, metadata);
 }
 /**
+* A `Promise` that resolves with the metadata for this object. If this
+* object doesn't exist or metadata cannot be retrieved, the promise is
+* rejected.
+* @public
+* @param ref - {@link StorageReference} to get metadata from.
+*/
+function getMetadata(ref) {
+	ref = getModularInstance(ref);
+	return getMetadata$1(ref);
+}
+/**
+* Updates the metadata for this object.
+* @public
+* @param ref - {@link StorageReference} to update metadata for.
+* @param metadata - The new metadata for the object.
+*     Only values that have been explicitly set will be changed. Explicitly
+*     setting a value to null will remove the metadata.
+* @returns A `Promise` that resolves with the new metadata for this object.
+*/
+function updateMetadata(ref, metadata) {
+	ref = getModularInstance(ref);
+	return updateMetadata$1(ref, metadata);
+}
+/**
+* List items (files) and prefixes (folders) under this storage reference.
+*
+* List API is only available for Firebase Rules Version 2.
+*
+* GCS is a key-blob store. Firebase Storage imposes the semantic of '/'
+* delimited folder structure.
+* Refer to GCS's List API if you want to learn more.
+*
+* To adhere to Firebase Rules's Semantics, Firebase Storage does not
+* support objects whose paths end with "/" or contain two consecutive
+* "/"s. Firebase Storage List API will filter these unsupported objects.
+* list() may fail if there are too many unsupported objects in the bucket.
+* @public
+*
+* @param ref - {@link StorageReference} to get list from.
+* @param options - See {@link ListOptions} for details.
+* @returns A `Promise` that resolves with the items and prefixes.
+*      `prefixes` contains references to sub-folders and `items`
+*      contains references to objects in this folder. `nextPageToken`
+*      can be used to get the rest of the results.
+*/
+function list(ref, options) {
+	ref = getModularInstance(ref);
+	return list$1(ref, options);
+}
+/**
+* List all items (files) and prefixes (folders) under this storage reference.
+*
+* This is a helper method for calling list() repeatedly until there are
+* no more results. The default pagination size is 1000.
+*
+* Note: The results may not be consistent if objects are changed while this
+* operation is running.
+*
+* Warning: `listAll` may potentially consume too many resources if there are
+* too many results.
+* @public
+* @param ref - {@link StorageReference} to get list from.
+*
+* @returns A `Promise` that resolves with all the items and prefixes under
+*      the current storage reference. `prefixes` contains references to
+*      sub-directories and `items` contains references to objects in this
+*      folder. `nextPageToken` is never returned.
+*/
+function listAll(ref) {
+	ref = getModularInstance(ref);
+	return listAll$1(ref);
+}
+/**
 * Returns the download URL for the given {@link StorageReference}.
 * @public
 * @param ref - {@link StorageReference} to get the download URL for.
@@ -2490,9 +2887,25 @@ function getDownloadURL(ref) {
 	ref = getModularInstance(ref);
 	return getDownloadURL$1(ref);
 }
+/**
+* Deletes the object at this location.
+* @public
+* @param ref - {@link StorageReference} for object to delete.
+* @returns A `Promise` that resolves if the deletion succeeds.
+*/
+function deleteObject(ref) {
+	ref = getModularInstance(ref);
+	return deleteObject$1(ref);
+}
 function ref(serviceOrRef, pathOrUrl) {
 	serviceOrRef = getModularInstance(serviceOrRef);
 	return ref$1(serviceOrRef, pathOrUrl);
+}
+/**
+* @internal
+*/
+function _getChild(ref, childPath) {
+	return _getChild$1(ref, childPath);
 }
 /**
 * Gets a {@link FirebaseStorage} instance for the given Firebase app.
@@ -2539,6 +2952,41 @@ function connectStorageEmulator(storage, host, port, options = {}) {
 * limitations under the License.
 */
 /**
+* Downloads the data at the object's location. Returns an error if the object
+* is not found.
+*
+* To use this functionality, you have to whitelist your app's origin in your
+* Cloud Storage bucket. See also
+* https://cloud.google.com/storage/docs/configuring-cors
+*
+* This API is not available in Node.
+*
+* @public
+* @param ref - StorageReference where data should be downloaded.
+* @param maxDownloadSizeBytes - If set, the maximum allowed size in bytes to
+* retrieve.
+* @returns A Promise that resolves with a Blob containing the object's bytes
+*/
+function getBlob(ref, maxDownloadSizeBytes) {
+	ref = getModularInstance(ref);
+	return getBlobInternal(ref, maxDownloadSizeBytes);
+}
+/**
+* Downloads the data at the object's location. Raises an error event if the
+* object is not found.
+*
+* This API is only available in Node.
+*
+* @public
+* @param ref - StorageReference where data should be downloaded.
+* @param maxDownloadSizeBytes - If set, the maximum allowed size in bytes to
+* retrieve.
+* @returns A stream with the object's data as bytes
+*/
+function getStream(ref, maxDownloadSizeBytes) {
+	throw new Error("getStream() is only supported by NodeJS builds");
+}
+/**
 * Cloud Storage for Firebase
 *
 * @packageDocumentation
@@ -2569,4 +3017,4 @@ function registerStorage() {
 }
 registerStorage();
 //#endregion
-export { uploadBytesResumable as i, getStorage as n, ref as r, getDownloadURL as t };
+export { ref as C, uploadString as D, uploadBytesResumable as E, listAll as S, uploadBytes as T, getStorage as _, StringFormat as a, invalidRootOperation as b, UploadTask as c, dataFromString as d, deleteObject as f, getMetadata as g, getDownloadURL as h, StorageErrorCode as i, _getChild as l, getBytes as m, Location as n, TaskEvent as o, getBlob as p, StorageError as r, TaskState as s, FbsBlob as t, connectStorageEmulator as u, getStream as v, updateMetadata as w, list as x, invalidArgument as y };
