@@ -1,1 +1,0 @@
-import{t as e}from"./jsx-runtime-0vZSBttN.js";import{t}from"./Layout-D6i1VBaE.js";var n=e(),r=()=>(0,n.jsx)(t,{title:`Loja`,showBack:!0,children:(0,n.jsx)(`p`,{className:`p-6`,children:`Loja não encontrada.`})});export{r as notFoundComponent};

@@ -202,34 +202,29 @@ function SearchPage() {
               </label>
             </div>
 
-            <div className="grid gap-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
               {results.map((p) => (
                 <Link
                   key={p.id}
                   to="/product/$id"
                   params={{ id: p.id }}
-                  className="group overflow-hidden rounded-xl border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:border-foreground/20"
+                  className="group overflow-hidden rounded-none bg-card shadow-[var(--shadow-card)] transition hover:-translate-y-0.5"
                 >
-                  <div className="flex items-start gap-3 p-2 md:block md:p-0">
-                    <div className="relative h-24 w-24 shrink-0 overflow-hidden bg-muted md:h-40 md:w-full">
-                      <SmartImage
-                        src={p.image}
-                        alt={p.name}
-                        wrapperClassName="absolute inset-0 h-full w-full"
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="min-w-0 flex-1 p-2 md:p-2.5">
-                      <p className="line-clamp-2 text-xs leading-tight md:text-sm">
-                        {p.name}
-                      </p>
-                      <p className="mt-1 text-sm font-black text-sale">
-                        {formatKz(p.price)}
-                      </p>
-                      <p className="mt-1 hidden text-[11px] leading-snug text-muted-foreground md:line-clamp-2">
-                        {p.description ?? "Produto em destaque com qualidade e entrega rápida."}
-                      </p>
-                    </div>
+                  <div className="aspect-square overflow-hidden bg-muted">
+                    <SmartImage
+                      src={p.image}
+                      alt={p.name}
+                      wrapperClassName="absolute inset-0 h-full w-full"
+                      className="object-cover transition duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-2.5">
+                    <p className="line-clamp-2 text-xs leading-tight">
+                      {p.name}
+                    </p>
+                    <p className="mt-1 text-sm font-black text-sale">
+                      {formatKz(p.price)}
+                    </p>
                   </div>
                 </Link>
               ))}
