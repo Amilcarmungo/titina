@@ -17,7 +17,6 @@ import {
   linkGoogleToPasswordAccount,
   NeedsPasswordLinkError,
   resetPassword,
-  signInWithFacebook,
   signInWithEmail,
   signInWithGoogle,
   signUpWithEmail,
@@ -60,27 +59,6 @@ function GoogleIcon() {
     </svg>
   );
 }
-function FacebookIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-      <path
-        fill="#1877F2"
-        d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z"
-      />
-    </svg>
-  );
-}
-function AppleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M16.4 12.7c0-2.4 2-3.5 2-3.6-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.1-2.8.9-3.5.9-.7 0-1.9-.8-3.1-.8-1.6 0-3.1.9-3.9 2.4-1.7 2.9-.4 7.2 1.2 9.6.8 1.2 1.7 2.4 3 2.4 1.2-.1 1.7-.8 3.1-.8 1.5 0 1.9.8 3.1.8 1.3 0 2.1-1.2 2.9-2.3.9-1.3 1.3-2.6 1.3-2.7 0 0-2.5-1-2.5-3.9zM14.2 5.6c.7-.8 1.1-1.9 1-3-1 .1-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.2-.6 2.8-1.4z"
-      />
-    </svg>
-  );
-}
-
 function AuthPage() {
   const [step, setStep] = useState<
     "email" | "signin" | "signup" | "verify" | "reset"
@@ -236,11 +214,6 @@ function AuthPage() {
         throw err;
       }
     });
-  const doFacebook = () =>
-    guard(async () => {
-      const u = await signInWithFacebook();
-      if (u) finish();
-    });
   const doReset = () =>
     guard(async () => {
       await resetPassword(email);
@@ -362,25 +335,6 @@ function AuthPage() {
             >
               <GoogleIcon /> Continuar com o Google
             </button>
-
-            {/*
-            <div className="mt-3 flex items-center justify-center gap-5">
-              {[
-                { Icon: FacebookIcon, label: "Facebook" },
-                { Icon: AppleIcon, label: "Apple" },
-              ].map(({ Icon, label }) => (
-                <button
-                  key={label}
-                  aria-label={label}
-                  onClick={label === "Facebook" ? doFacebook : undefined}
-                  disabled={busy || label === "Apple"}
-                  className="grid h-12 w-12 place-items-center rounded-full border border-border bg-background shadow-sm transition hover:bg-muted"
-                >
-                  <Icon />
-                </button>
-              ))}
-            </div>
-            */}
 
             <div className="mt-6 flex justify-center">
               <button className="flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-xs">

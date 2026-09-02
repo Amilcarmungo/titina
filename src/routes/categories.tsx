@@ -8,7 +8,6 @@ import { useStore } from "@/lib/store";
 import { trackSearch } from "@/lib/firebase/user-data";
 import {
   ChevronLeft,
-  Camera,
   Search,
   Trophy,
   X,
@@ -152,13 +151,6 @@ function SearchPage() {
                   <X className="h-4 w-4" />
                 </button>
               )}
-              <button
-                type="button"
-                className="shrink-0 p-1.5 text-muted-foreground"
-                aria-label="Buscar por foto"
-              >
-                <Camera className="h-5 w-5" />
-              </button>
               <button
                 type="submit"
                 className="grid h-9 w-12 shrink-0 place-items-center rounded-full bg-brand-strong text-white"
