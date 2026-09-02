@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { getSecurityHeaders } from "./lib/security/security-headers";
 
 type ServerEntry = {
   fetch: (
@@ -48,18 +49,32 @@ async function normalizeCatastrophicSsrResponse(
   });
 }
 
+// Aplicar headers de segurança a todas as respostas
+function applySecurityHeaders(response: Response): Response {
+  const securityHeaders = getSecurityHeaders();
+  const newResponse = new Response(response.body, response);
+
+  for (const [name, value] of Object.entries(securityHeaders)) {
+    newResponse.headers.set(name, value);
+  }
+
+  return newResponse;
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const normalizedResponse = await normalizeCatastrophicSsrResponse(response);
+      return applySecurityHeaders(normalizedResponse);
     } catch (error) {
       console.error(error);
-      return new Response(renderErrorPage(), {
+      const errorResponse = new Response(renderErrorPage(), {
         status: 500,
         headers: { "content-type": "text/html; charset=utf-8" },
       });
+      return applySecurityHeaders(errorResponse);
     }
   },
 };
