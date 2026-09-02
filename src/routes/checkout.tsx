@@ -24,6 +24,11 @@ import {
   readCachedAddress,
   writeCachedAddress,
 } from "@/lib/address-cache";
+import {
+  buildAddressSummary,
+  hasCompletedAddress,
+  normalizeSavedAddress,
+} from "@/lib/checkout-state";
 import { sendAppEmail } from "@/lib/email/send";
 import {
   Check,
@@ -118,10 +123,10 @@ function CheckoutPage() {
   }, [user, navigate]);
 
   const cached = readCachedAddress(user?.uid);
-  const [step, setStep] = useState(() =>
-    cached?.name && cached.street && cached.city && cached.cep ? 2 : 1,
-  );
-  // Endereço guardado no dispositivo → nova compra já vem preenchida.
+  const [step, setStep] = useState<number>(() => {
+    if (cached && hasCompletedAddress(cached)) return 2;
+    return 1;
+  });
   const [address, setAddress] = useState<Address>(() => cached ?? emptyAddress);
   const [carrierId, setCarrierId] = useState<string | undefined>();
   const shippingSettings = useShippingSettings();
@@ -138,6 +143,7 @@ function CheckoutPage() {
   });
   const [showCardForm, setShowCardForm] = useState(false);
   const [placed, setPlaced] = useState(false);
+  const [savedAddressConfirmed, setSavedAddressConfirmed] = useState(false);
 
   // Cupom
   const [couponCode, setCouponCode] = useState("");
@@ -176,26 +182,13 @@ function CheckoutPage() {
         setAddressLoaded(true);
         const def = rows.find((r) => r.isDefault) ?? rows[0];
         if (!def) return;
-        const raw = (def.phone ?? "").trim();
-        const cc =
-          def.countryCode || (raw.startsWith("+") ? raw.split(" ")[0] : "+244");
-        const phone = raw.startsWith("+") ? raw.slice(cc.length).trim() : raw;
-        const next = {
-          name: def.name ?? "",
-          phone,
-          countryCode: cc,
-          street: def.street ?? "",
-          complement: def.complement ?? "",
-          state: def.state ?? "",
-          city: def.city ?? "",
-          cep: def.cep ?? "",
-          isDefault: def.isDefault ?? true,
-        };
+        const next = normalizeSavedAddress(def);
         setAddress(next);
         writeCachedAddress(uid, next);
-        // Já comprou antes → não pede o endereço outra vez.
-        if (def.name && def.street && def.city)
+        if (hasCompletedAddress(next)) {
+          setSavedAddressConfirmed(true);
           setStep((s) => (s === 1 ? 2 : s));
+        }
       })
       .catch(() => setAddressLoaded(true));
     return () => {
@@ -209,13 +202,21 @@ function CheckoutPage() {
   stepRef.current = step;
   const goToStep = useCallback((next: number) => {
     if (typeof window !== "undefined" && next < stepRef.current) {
-      window.history.back(); // o popstate recua uma etapa
+      window.history.back();
       return;
     }
     setStep(next);
     if (typeof window !== "undefined")
       window.history.pushState({ checkoutStep: next }, "");
   }, []);
+
+  const goToPreviousStep = useCallback(() => {
+    if (step > 1) {
+      setStep(step - 1);
+      if (typeof window !== "undefined")
+        window.history.pushState({ checkoutStep: step - 1 }, "");
+    }
+  }, [step]);
 
   useEffect(() => {
     const onPop = () => {
@@ -225,12 +226,11 @@ function CheckoutPage() {
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  const canConfirmAddress =
-    address.name &&
-    address.phone &&
-    address.street &&
-    address.city &&
-    address.cep;
+  useEffect(() => {
+    if (user?.uid) writeCachedAddress(user.uid, address);
+  }, [user?.uid, address]);
+
+  const canConfirmAddress = hasCompletedAddress(address);
 
   // Checkout abandonado: guarda o rascunho enquanto o pedido não é concluído.
   useEffect(() => {
@@ -495,15 +495,7 @@ function CheckoutPage() {
                       {address.cep}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {[
-                        address.street,
-                        address.complement,
-                        address.city,
-                        address.state,
-                        "Angola",
-                      ]
-                        .filter(Boolean)
-                        .join(", ")}
+                      {buildAddressSummary(address)}
                     </p>
                   </div>
                   <button
@@ -515,7 +507,8 @@ function CheckoutPage() {
                 </div>
                 <button
                   onClick={() => {
-                    setAddress(emptyAddress);
+                    setAddress({ ...emptyAddress, countryCode: "+244" });
+                    setSavedAddressConfirmed(false);
                     goToStep(1);
                   }}
                   className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-border py-2.5 text-xs font-bold text-muted-foreground hover:bg-muted"
@@ -734,10 +727,19 @@ function CheckoutPage() {
 
           {step === 3 && (
             <>
-              <p className="flex items-center gap-2 text-sm text-emerald-600">
-                <ShieldCheck className="h-4 w-4" /> Sua informação de pagamento
-                está segura conosco.
-              </p>
+              <div className="flex items-center justify-between rounded-xl bg-card p-4 shadow-sm">
+                <p className="flex items-center gap-2 text-sm text-emerald-600">
+                  <ShieldCheck className="h-4 w-4" /> Sua informação de pagamento
+                  está segura conosco.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => goToPreviousStep()}
+                  className="text-xs font-bold text-muted-foreground hover:text-foreground"
+                >
+                  Voltar
+                </button>
+              </div>
 
               {methods.map((m) => (
                 <section
@@ -885,8 +887,11 @@ function CheckoutPage() {
             }
             onClick={() => {
               if (step === 1) goToStep(2);
-              else if (step === 2) goToStep(3);
-              else if (payment === "card") placeOrder();
+              else if (step === 2) {
+                if (hasCompletedAddress(address)) {
+                  goToStep(3);
+                }
+              } else if (payment === "card") placeOrder();
               else if (payment) {
                 const code = newOrderCode();
                 setPendingPayment({
@@ -928,7 +933,9 @@ function CheckoutPage() {
             {step === 1
               ? "Salvar endereço"
               : step === 2
-                ? "Fazer o pedido"
+                ? hasCompletedAddress(address)
+                  ? "Continuar para o pagamento"
+                  : "Preencha o endereço"
                 : "Pagar"}
           </button>
         </div>
