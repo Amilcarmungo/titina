@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { collection, onSnapshot, query, where, getDocs } from "firebase/firestore";
-import { Search, ShieldCheck, Users, MapPin, Gift, ShoppingBag, Users2, X, Loader } from "lucide-react";
+import { collection, onSnapshot, query, where, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { Search, ShieldCheck, Users, MapPin, Gift, ShoppingBag, Users2, X, Loader, Trash2, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 import { getDb } from "@/lib/firebase/client";
 import { useStaff } from "@/lib/firebase/roles";
@@ -43,6 +44,7 @@ function UsersPage() {
   const [q, setQ] = useState("");
   const [selectedUser, setSelectedUser] = useState<UserDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [deletingUid, setDeletingUid] = useState<string | null>(null);
 
   useEffect(() => {
     const db = getDb();
@@ -105,6 +107,32 @@ function UsersPage() {
     }
   };
 
+  const deleteUser = async (uid: string) => {
+    if (!confirm(`Tem a certeza que quer remover este utilizador? Esta ação é irreversível.`)) {
+      return;
+    }
+
+    setDeletingUid(uid);
+    const db = getDb();
+    if (!db) {
+      toast.error("Erro ao conectar ao banco de dados");
+      setDeletingUid(null);
+      return;
+    }
+
+    try {
+      // Deletar documento do usuário
+      await deleteDoc(doc(db, "users", uid));
+      toast.success("Utilizador removido com sucesso");
+      setSelectedUser(null);
+    } catch (err) {
+      console.error(err);
+      toast.error("Erro ao remover utilizador");
+    } finally {
+      setDeletingUid(null);
+    }
+  };
+
   const list = useMemo(() => {
     const term = q.trim().toLowerCase();
     const base = [...rows].sort((a, b) =>
@@ -160,67 +188,95 @@ function UsersPage() {
               Nenhum utilizador encontrado.
             </p>
           ) : (
-            <div className="overflow-hidden rounded-2xl border border-border bg-card">
-              <div className="hidden grid-cols-[1fr_auto_auto_auto] gap-4 border-b border-border px-4 py-3 text-[11px] font-black uppercase tracking-wider text-muted-foreground lg:grid">
+            <div className="overflow-x-auto rounded-2xl border border-border bg-card">
+              <div className="hidden lg:grid grid-cols-[1.5fr_auto_auto_auto_auto_auto] gap-4 border-b border-border px-6 py-3 text-[11px] font-black uppercase tracking-wider text-muted-foreground sticky top-0 bg-muted/50">
                 <span>Conta</span>
                 <span className="text-center">Pontos</span>
-                <span className="text-center">Compras</span>
-                <span className="text-center">Ação</span>
+                <span className="text-center">Pedidos</span>
+                <span className="text-center">Referidos</span>
+                <span className="text-center">Data</span>
+                <span className="text-center">Ações</span>
               </div>
               <ul className="divide-y divide-border">
-                {list.map((r) => (
-                  <li
-                    key={r.uid}
-                    className="grid gap-2 px-4 py-3 lg:grid-cols-[1fr_auto_auto_auto] lg:items-center lg:gap-4 hover:bg-muted/50 transition"
-                  >
-                    <div className="flex min-w-0 items-center gap-3">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-muted text-sm font-black">
-                        {r.photoURL ? (
-                          <img
-                            src={r.photoURL}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          (r.email?.[0] ?? "?").toUpperCase()
-                        )}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-bold">
-                          {r.name || r.email || "Sem nome"}
-                        </p>
-                        <p className="truncate text-xs text-muted-foreground">
-                          {r.email}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="inline-flex w-fit items-center gap-1 rounded-full bg-gold/15 px-2.5 py-1 text-xs font-bold text-gold lg:justify-center">
-                      <ShieldCheck className="h-3.5 w-3.5" /> {r.points ?? 0}
-                    </span>
-                    <div className="text-center text-sm font-bold text-muted-foreground">
-                      -
-                    </div>
-                    <button
-                      onClick={() => loadUserDetail(r.uid)}
-                      className="inline-block w-full lg:w-auto rounded-lg bg-brand-strong/10 px-3 py-1.5 text-xs font-bold text-brand-strong hover:bg-brand-strong/20 transition"
+                {list.map((r) => {
+                  const createdDate = r.createdAt?.toDate?.() ?? new Date();
+                  const dateStr = createdDate.toLocaleDateString("pt-PT");
+                  
+                  return (
+                    <li
+                      key={r.uid}
+                      className="grid gap-3 px-4 py-4 lg:grid-cols-[1.5fr_auto_auto_auto_auto_auto] lg:items-center hover:bg-muted/50 transition"
                     >
-                      Ver detalhes
-                    </button>
-                  </li>
-                ))}
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full bg-muted text-sm font-black">
+                          {r.photoURL ? (
+                            <img
+                              src={r.photoURL}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            (r.email?.[0] ?? "?").toUpperCase()
+                          )}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-bold">
+                            {r.name || r.email || "Sem nome"}
+                          </p>
+                          <p className="truncate text-xs text-muted-foreground">
+                            {r.email}
+                          </p>
+                        </div>
+                      </div>
+                      <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-gold/15 px-2.5 py-1 text-xs font-bold text-gold lg:justify-center">
+                        <ShieldCheck className="h-3 w-3" /> {r.points ?? 0}
+                      </span>
+                      <div className="text-center text-sm font-bold text-foreground bg-muted/50 rounded-lg py-2 px-2">
+                        0
+                      </div>
+                      <div className="text-center text-sm font-bold text-foreground bg-muted/50 rounded-lg py-2 px-2">
+                        0
+                      </div>
+                      <div className="text-center text-xs text-muted-foreground">
+                        {dateStr}
+                      </div>
+                      <div className="flex gap-2 justify-end">
+                        <button
+                          onClick={() => loadUserDetail(r.uid)}
+                          className="rounded-lg bg-brand-strong/10 px-3 py-2 text-xs font-bold text-brand-strong hover:bg-brand-strong/20 transition"
+                        >
+                          Ver
+                        </button>
+                        <button
+                          onClick={() => deleteUser(r.uid)}
+                          disabled={deletingUid === r.uid}
+                          className="rounded-lg bg-sale/10 px-3 py-2 text-xs font-bold text-sale hover:bg-sale/20 transition disabled:opacity-50"
+                        >
+                          {deletingUid === r.uid ? <Loader className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
       </div>
 
       {selectedUser && (
-        <UserModal user={selectedUser} onClose={() => setSelectedUser(null)} loading={loadingDetail} />
+        <UserModal 
+          user={selectedUser} 
+          onClose={() => setSelectedUser(null)} 
+          loading={loadingDetail}
+          onDelete={() => deleteUser(selectedUser.uid)}
+          isDeleting={deletingUid === selectedUser.uid}
+        />
       )}
     </>
   );
 }
 
-function UserModal({ user, onClose, loading }: { user: UserDetail; onClose: () => void; loading: boolean }) {
+function UserModal({ user, onClose, loading, onDelete, isDeleting }: { user: UserDetail; onClose: () => void; loading: boolean; onDelete: () => void; isDeleting: boolean }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
       <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-background border border-border p-6 space-y-6">
@@ -302,6 +358,31 @@ function UserModal({ user, onClose, loading }: { user: UserDetail; onClose: () =
                 </div>
               </div>
             )}
+
+            {/* Actions */}
+            <div className="border-t border-border pt-6 flex gap-3">
+              <button
+                onClick={onClose}
+                className="flex-1 rounded-lg border border-border bg-background px-4 py-2.5 text-sm font-bold hover:bg-muted transition"
+              >
+                Fechar
+              </button>
+              <button
+                onClick={onDelete}
+                disabled={isDeleting}
+                className="flex-1 rounded-lg bg-sale/10 px-4 py-2.5 text-sm font-bold text-sale hover:bg-sale/20 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader className="h-4 w-4 animate-spin" /> Removendo...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4" /> Remover Utilizador
+                  </>
+                )}
+              </button>
+            </div>
           </>
         )}
       </div>
