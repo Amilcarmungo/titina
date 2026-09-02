@@ -363,6 +363,7 @@ function AuthPage() {
               <GoogleIcon /> Continuar com o Google
             </button>
 
+            {/*
             <div className="mt-3 flex items-center justify-center gap-5">
               {[
                 { Icon: FacebookIcon, label: "Facebook" },
@@ -379,6 +380,7 @@ function AuthPage() {
                 </button>
               ))}
             </div>
+            */}
 
             <div className="mt-6 flex justify-center">
               <button className="flex items-center gap-1 rounded-full bg-muted px-3 py-1.5 text-xs">

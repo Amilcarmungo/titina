@@ -133,16 +133,18 @@ export function Layout({
               <BrandLogo className="h-10" />
             </Link>
             <div className="ml-auto flex flex-1 items-center justify-end gap-3">
-              <Link
-                to="/categories"
-                className="hidden lg:flex flex-1 max-w-md items-center gap-2 rounded-full border border-brand-strong/50 bg-brand/25 px-4 py-2 text-sm text-brand-foreground transition hover:bg-brand/40"
-              >
-                <SearchIcon className="h-4 w-4 text-brand-strong" />
-                <span className="flex-1 truncate">Buscar em Bazarixy…</span>
-                <span className="grid h-6 w-8 place-items-center rounded-full bg-brand-strong text-white">
-                  <SearchIcon className="h-3.5 w-3.5" />
-                </span>
-              </Link>
+              {pathname !== "/categories" && (
+                <Link
+                  to="/categories"
+                  className="hidden lg:flex flex-1 max-w-md items-center gap-2 rounded-full border border-brand-strong/50 bg-brand/25 px-4 py-2 text-sm text-brand-foreground transition hover:bg-brand/40"
+                >
+                  <SearchIcon className="h-4 w-4 text-brand-strong" />
+                  <span className="flex-1 truncate">Buscar em Bazarixy…</span>
+                  <span className="grid h-6 w-8 place-items-center rounded-full bg-brand-strong text-white">
+                    <SearchIcon className="h-3.5 w-3.5" />
+                  </span>
+                </Link>
+              )}
               <Link
                 to="/notifications"
                 onClick={openNotifications}

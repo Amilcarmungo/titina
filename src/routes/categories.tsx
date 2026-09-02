@@ -134,9 +134,8 @@ function SearchPage() {
                 e.preventDefault();
                 remember(q);
               }}
-              className="flex min-w-0 flex-1 items-center gap-1 rounded-none border border-brand-strong/40 bg-brand/20 pl-4 pr-1 py-1 transition focus-within:border-brand-strong focus-within:bg-background md:py-1.5"
+              className="flex min-w-0 flex-1 items-center gap-1 rounded-full border border-brand-strong/40 bg-brand/20 pl-3 pr-1 py-1 transition focus-within:border-brand-strong focus-within:bg-background md:max-w-3xl md:py-1.5"
             >
-              <Search className="h-4 w-4 shrink-0 text-muted-foreground md:hidden" />
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
@@ -162,7 +161,7 @@ function SearchPage() {
               </button>
               <button
                 type="submit"
-                className="grid h-9 w-12 shrink-0 place-items-center rounded-none bg-brand-strong text-white"
+                className="grid h-9 w-12 shrink-0 place-items-center rounded-full bg-brand-strong text-white"
                 aria-label="Buscar"
               >
                 <Search className="h-4 w-4" />
@@ -211,29 +210,34 @@ function SearchPage() {
               </label>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid gap-3 md:grid-cols-4 lg:grid-cols-5">
               {results.map((p) => (
                 <Link
                   key={p.id}
                   to="/product/$id"
                   params={{ id: p.id }}
-                  className="group overflow-hidden rounded-none bg-card shadow-[var(--shadow-card)] transition hover:-translate-y-0.5"
+                  className="group overflow-hidden rounded-xl border border-border bg-card shadow-sm transition hover:-translate-y-0.5 hover:border-foreground/20"
                 >
-                  <div className="aspect-square overflow-hidden bg-muted">
-                    <SmartImage
-                      src={p.image}
-                      alt={p.name}
-                      wrapperClassName="absolute inset-0 h-full w-full"
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-2.5">
-                    <p className="line-clamp-2 text-xs leading-tight">
-                      {p.name}
-                    </p>
-                    <p className="mt-1 text-sm font-black text-sale">
-                      {formatKz(p.price)}
-                    </p>
+                  <div className="flex items-start gap-3 p-2 md:block md:p-0">
+                    <div className="relative h-24 w-24 shrink-0 overflow-hidden bg-muted md:h-40 md:w-full">
+                      <SmartImage
+                        src={p.image}
+                        alt={p.name}
+                        wrapperClassName="absolute inset-0 h-full w-full"
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 p-2 md:p-2.5">
+                      <p className="line-clamp-2 text-xs leading-tight md:text-sm">
+                        {p.name}
+                      </p>
+                      <p className="mt-1 text-sm font-black text-sale">
+                        {formatKz(p.price)}
+                      </p>
+                      <p className="mt-1 hidden text-[11px] leading-snug text-muted-foreground md:line-clamp-2">
+                        {p.description ?? "Produto em destaque com qualidade e entrega rápida."}
+                      </p>
+                    </div>
                   </div>
                 </Link>
               ))}
